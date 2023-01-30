@@ -1,11 +1,12 @@
-# Project Title
+# STAT540 Group Project
+Welcome to the repository for the Zinc group! 
 
 ## Team members: 
 
-- person 1
-- person 2
-- person 3
-- person 4
+- Cindy (XiaoYu) Zhang
+- Lucy Chi
+- Shunsuke Ishige
+- Janet (Jia He) Zhang
 
 ## Deliverables:
 
