@@ -8,10 +8,10 @@ Welcome to the repository for the Zinc group!
 - Shunsuke Ishige
 - Janet (Jia He) Zhang
 
-## Deliverables:
+## Project Proprosal:
 
-Include links to each deliverable file here
+Our project proposal slide can be found here. 
 
 ## More info
 
-Feel free to use this space however you'd like
+More information will be updated in this repository throughout the term. 
