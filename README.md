@@ -4,7 +4,7 @@ Welcome to the repository for the Zinc group! For this group project, we chose t
 ## Team members: 
 
 - Cindy (XiaoYu) Zhang
-- Lucy Chi
+- Lucy(Shuxin) Chi
 - Shunsuke Ishige
 - Janet (Jia He) Zhang
 
