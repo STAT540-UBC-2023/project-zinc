@@ -10,7 +10,7 @@ Welcome to the repository for the Zinc group! For this group project, we chose t
 
 ## Project Proprosal:
 
-Our project proposal slide can be found here. 
+Our project proposal slide can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf). 
 
 ## Other info
 
