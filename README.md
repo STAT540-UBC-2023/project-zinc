@@ -1,5 +1,5 @@
 # STAT540 Group Project
-Welcome to the repository for the Zinc group! 
+Welcome to the repository for the Zinc group! For this group project, we chose this [paper].(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5069352/)
 
 ## Team members: 
 
