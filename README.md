@@ -12,6 +12,6 @@ Welcome to the repository for the Zinc group!
 
 Our project proposal slide can be found here. 
 
-## More info
+## Other info
 
-More information will be updated in this repository throughout the term. 
+More information for this project will be updated in this repository throughout the term. 
