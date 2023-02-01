@@ -30,13 +30,14 @@ library(tidyverse)
 
 ## Reading the data
 
-Reading the data into R first. 
+Reading the raw data into R first. 
 ```{r}
 wholeisletsdata <- read.table("pancreas_refseq_rpkms_wholeislet.txt", sep = "\t")
 
 countsdata <- read.table("pancreas_refseq_rpkms_counts_3514sc.txt", sep = "\t")
 ```
-These tables contain the RNA-sequencing data for single-cell and whole-islet collected by the research group. 
+
+These tables contain the RNA-sequencing data for single-cell and whole-islet collected by the research group. Just want to explore the raw data first. 
 
 ```{r}
 head(wholeisletsdata)
