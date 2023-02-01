@@ -1,20 +1,23 @@
 ---
-title: "Process data (limma)"
+title: "Processing/Sorting data"
 author: "Janet"
 date: "31/01/2023"
 output: github_document
 ---
 ## Set up 
-Trying to use limma package to process the data over here. 
+
+Installing all the packages we will need for data analysis. 
 ```{r setup}
 library(BiocManager)
 BiocManager::install("limma")
 ```
 
+Installing additional packages. 
 ```{r} 
 BiocManager :: install(c("edgeR", "Glimma", "org.Mm.eg.db", "RColorBrewer", "NMF", "BiasedUrn"))
 ```
 
+Loading the packages. 
 ```{r}
 library(limma)
 library(edgeR)
@@ -27,8 +30,15 @@ library(tidyverse)
 
 ## Reading the data
 
+Reading the data into R first. 
 ```{r}
 wholeisletsdata <- read.table("pancreas_refseq_rpkms_wholeislet.txt", sep = "\t")
+
 countsdata <- read.table("pancreas_refseq_rpkms_counts_3514sc.txt", sep = "\t")
+```
+These tables contain the RNA-sequencing data for single-cell and whole-islet collected by the research group. 
+
+```{r}
+head(wholeisletsdata)
 ```
 
