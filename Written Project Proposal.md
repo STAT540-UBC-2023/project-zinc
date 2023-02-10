@@ -15,7 +15,7 @@ Single-cell RNA sequences (scRNA-seq) [E-MTAB-5061](https://www.ebi.ac.uk/biostu
 
 The microarray RNA sequencing data enables us to understand the relationship between variables such as BMI and differential gene expression in T2D or healthy subjects via linear regression. The scRNA-seq data allows us to visualize the differential expression at the single cell level. Comparisons can therefore be made for these single cells to evaluate cell-type specific responses and identify cell-markers.
 
-## Analysis Done Previously (By Shunsuke)
+## Analysis Done Previously ~~(By Shunsuke)~~
 
 Here, we briefly summarize the analysis procedures of previous work, to clarify the differences between the original study and our own objectives and corresponding methods. Segerstolpe et al. analyzed the granularity of individual genes of identified cell types include: reporting correlations by Spearman's rho between genetic expressions and obesity in the group of the males without T2D; and finding significantly different gene expressions, comparing the two cohorts by ANOVA [7]. 
 
