@@ -31,7 +31,7 @@ Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
 Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. Single cell RNA-seq data processing,quality control, and analysis 
 Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  literature search on biological background 3. Differential gene analysis (volcano plot for obese vs non-obese T2D)
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial data selection and wrangling 3. Examine relationship between BMI, age, sex their interactions and differential gene expression in T2D with linear regression model
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial data selection and wrangling 3. Examine relationship between BMI, age, sex and differential gene expression in T2D and healthy subjects using a linear regression model
 Shunsuke Ishige|Interdisciplinary Oncology|BSc.(Mathematics, with Philosophy minor), BSc.(Computer Science)|1. Literature survey on methods for quantitative comparison of genetic expression differences 2. Data processing 3. Search for larger data sets(e.g., mice) which we can apply our analysis (if needed) 4. Study data with summary statistics 5. Provide support for coding issues (if needed) 6. Provide typeset drafts in LaTeX (if needed)
 
 ## References (By Lucy)
