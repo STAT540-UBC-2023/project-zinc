@@ -1,5 +1,5 @@
 # Project Proposal 
-This is the project proposal for the group zinc. Everyone has read over the proposal and edited everything. 
+This is the project proposal for the group zinc. Everyone has read over the proposal and edited everything. Final proposal .md file made, committed, and pushed by Janet. 
 
 ## Motivation, Background and Hypothesis (By Lucy)
 
