@@ -7,7 +7,7 @@ Type-2 diabetes (T2D) is a common metabolic disorder characterized by an elevati
 
 The pancreas tightly regulates metabolic homeostasis through its exocrine and endocrine systems, which contains the islets of Langerhans, including 5 cell types (α, β, γ/PP, δ, and ε) [7]. In this paper, Segerstolpe et al. have identified gene expression alterations in obese individuals (vs BMI<30) and T2D patients (vs healthy), respectively [7]. However, given the complication between obesity and T2D, the correlation between BMI and T2D remains to be elucidated. 
 
-Based on the different genetic mechanisms causing two forms of T2D, we hypothesize that BMI is associated with differential gene expression profiles in obese T2D patients, and thus, the non-obese and obese T2D individuals are expected to have different changes in their genetic compositions.
+Based on the different genetic mechanisms causing two forms of T2D, we hypothesize that BMI, age and or sex are associated with differential gene expression profiles in T2D and healthy subjects. Secondly, the non-obese and obese T2D individuals are expected to have different changes in their genetic compositions.
 
 ## Data (By Cindy)
 
