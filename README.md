@@ -13,7 +13,7 @@ Welcome to the repository for the Zinc group! For this group project, we chose t
 
 Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf). 
 
-Our written proposal (which contains our finalized plan) can be found [here](
+Our written proposal (which contains our finalized plan) can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md). 
 
 ## Other info
 
