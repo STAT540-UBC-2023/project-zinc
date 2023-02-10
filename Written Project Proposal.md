@@ -1,7 +1,7 @@
 # Project Proposal 
 This is the project proposal for the group zinc. Everyone has read over the proposal and edited everything. Final proposal .md file made, committed, and pushed by Janet. 
 
-## Motivation, Background and Hypothesis (By Lucy and Cindy)
+## Motivation, Background and Hypothesis (By Lucy)
 
 Type-2 diabetes (T2D) is a common metabolic disorder characterized by an elevation of blood glucose levels due to the lack of functional insulin [1]. Many patients with T2D are commonly portrayed as having accumulated higher fat percentages in their bodies. Obesity is commonly defined as Body Mass Index (BMI) larger than 30 kg/m2 [1,2]. The metabolic complications of obese individuals consist of insulin resistance, culminating in pancreatic cell overload and failure [3], which leads to T2D [4,5]. However, obesity is not the only factor for T2D, as a large population of non-obese T2D patients has also been rising [5]. The driving force for T2D in non-obese patients leans towards a genetic factor, resulting in defective insulin production [6]. Therefore, it is critical to understand the pathogenesis of both conditions for therapies developments [6]. 
 
