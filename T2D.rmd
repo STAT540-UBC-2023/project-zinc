@@ -25,10 +25,21 @@ eset
 ```
 ## Analysis 
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+#Explore a subset. 
+exprs(eset)[1:5,1:4]
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+#Explore the metadata. 
+str(pData(eset))
+```
+
+This metadata has 40 variables for each of our samples. The BMI information is included in the variable called "bmi:chi." And the status of the participants (whether they have T2D or not) is contained in "status:chi" variable. This R markdown file will focus on exploring the genetic expression in the diabetic vs non-diabetic cohorts. 
+
+```{r}
+# Data wrangling. 
+
+```
+
+
