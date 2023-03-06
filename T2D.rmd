@@ -1,0 +1,34 @@
+---
+title: "Hypothesis 2."
+author: "Janet"
+date: "06/03/2023"
+output: github_document
+---
+
+```{r setup}
+library(tidyverse)
+library(edgeR)
+library(limma)
+library(GEOquery)
+```
+
+## Data Package 
+
+```{r}
+#Load package from GEO. 
+eset <- getGEO("GSE41762", getGPL = FALSE) [[1]]
+```
+
+```{r}
+#Explore the dataset. 
+eset
+```
+## Analysis 
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
