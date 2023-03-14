@@ -119,10 +119,11 @@ pca_data$sample_id = colnames(express)
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
 # pca_data$bmi = as.numeric(pca_data$bmi)
 
-ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3) + geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 
+#geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
 ```
 
 ```{r}
