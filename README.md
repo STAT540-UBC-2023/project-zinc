@@ -15,6 +15,10 @@ Our project proposal slide lightning talk slides can be found [here](https://git
 
 Our written proposal (which contains our finalized plan) can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md). 
 
-## Other info
+## Progress Report
+
+Our project progress report can be found here. 
+
+## Other Info
 
 More information for this project will be updated in this repository throughout the term. 
