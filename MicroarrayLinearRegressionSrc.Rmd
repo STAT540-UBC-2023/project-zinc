@@ -15,13 +15,16 @@ library(ggfortify)
 ```
 
 ### Loading Data
+
 ```{r}
 eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
 head(eset, 10)
 str(pData(eset))
 head(pData(eset)[1:3,1:5]) %>% kable()
 ```
+
 ### Data Wrangling
+
 ```{r}
 pData(eset) <- pData(eset) %>%
   mutate(sample_id = geo_accession) %>% 
@@ -41,18 +44,25 @@ pData(eset) <- pData(eset) %>%
   )) %>% 
   select(-c(bmi,statu))
 ```
+
 ### Arrange factor levels
+
 ```{r}
 pData(eset) <- pData(eset) %>% 
   mutate(BMI = fct_relevel(BMI, "below30", "over30")) %>% 
   mutate(status = as.factor(status))
 ```
+
 ### match ID between matrixes
+
 ```{r}
 identical(colnames(exprs(eset)), pData(eset)$sample_id)
 ```
-### Missing Values 
-* The missing data are found in sample ID 49 through 77 
+
+### Missing Values
+
+-   The missing data are found in sample ID 49 through 77
+
 ```{r}
 express <- exprs(eset) %>% 
   as.data.frame() 
@@ -60,7 +70,9 @@ express <- exprs(eset) %>%
 names(colSums(is.na(express))>0)
 express <- na.omit(express)
 ```
+
 ### Combine data
+
 ```{r}
 # metaData
 id <- colnames(express)
@@ -85,20 +97,53 @@ joint <- toLongerMeta(eset)
 head(joint, 3) %>% kable()
 identical(MetaData$sample_id, colnames(express))
 ```
+
 ## Perform PCA to analyze batch effect
+
 ```{r}
-pca_res <- prcomp(t(express), scale=TRUE)
-autoplot(pca_res)
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 2, y = 3)
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+# pca_res_new <- prcomp(express, scale=TRUE)
+# autoplot(pca_res_new)
+# autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
+# autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+
+express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
+s <- svd(express_scaled)
+
+loadings <- s$v[, 1:3]
+
+scores <- express_scaled %*% loadings
+
+pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
+pca_data$sample_id = colnames(express)
+
+pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+# pca_data$bmi = as.numeric(pca_data$bmi)
+
+ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3) + geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+
 ```
-* No discernable batch effect is observed. Thus, can combine thedata from both cohorts for the following study: 
+
+```{r}
+# eset_new <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+
+myMetaData <- pData(eset_new)  %>%
+  mutate(sample_id = geo_accession) %>% 
+  select("status:ch1",sample_id, "bmi:ch1") 
+colnames(myMetaData) <- c("status","sample_id","bmi")
+```
+
+-   No discernable batch effect is observed. Thus, can combine thedata from both cohorts for the following study:
 
 # Samples in each group
+
 ```{r, echo=FALSE}
 table(MetaData$BMI, MetaData$status)
 ```
-### pivot data format 
+
+### pivot data format
+
 ```{r}
 toLonger <- function(expressionMatrix) {
     expressionMatrix <- longExpressionMatrix <- expressionMatrix %>% 
@@ -118,28 +163,39 @@ toLonger(express) %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
   labs(x = "sample", y = "Gene Expression") 
 ```
+
 # linear model
+
 ```{r}
 modm <- model.matrix(~BMI*status, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 ```
+
 ### DE genes in obese vs. nonobese healthy samples
+
 ```{r}
 DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
 
 DEobH %>% kable()
 ```
+
 ### DE genes in obese vs. nonobese T2D samples
+
 ```{r}
 DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
+DEObT2d
 ```
+
 ### DE genes in T2D vs. Healthy in nonobese samples
+
 ```{r}
 degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
 degT2dNonOb %>% kable()
 ```
-### Examine DE genes in Obese vs. nonobese   
+
+### Examine DE genes in Obese vs. nonobese
+
 ```{r}
 modm <- model.matrix(~BMI, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
@@ -147,22 +203,20 @@ deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05,
 deGenesOb %>% kable()
 
 ```
-### Examine DE genes in T2D vs. nonT2D 
+
+### Examine DE genes in T2D vs. nonT2D
+
 ```{r}
 modm <- model.matrix(~status, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 deGenesT2d %>% kable()
 ```
+
 ### Saving relevant data for aim 2 gene enrichment analysis
 
-saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS") 
+saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
 
 saveRDS(deGenesT2d, file = "T2dvsNonT2d.RDS")
 
-* Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")` 
-
-
-
-
-
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
