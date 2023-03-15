@@ -1,6 +1,6 @@
 ---
 title: "GSE41762 Regression Analysis"
-author: "Cindy Zhang + pca"
+author: "Cindy Zhang"
 date: "2023-02-19"
 output: github_document
 ---
