@@ -18,7 +18,7 @@ Our written proposal (which contains our finalized plan) can be found [here](htt
 
 ## Progress Report
 
-Our project progress report can be found here. 
+Our project progress report can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/progress_report.md). 
 
 ## Other Info
 
