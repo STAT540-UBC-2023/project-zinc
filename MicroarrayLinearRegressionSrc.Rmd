@@ -87,12 +87,21 @@ identical(MetaData$sample_id, colnames(express))
 ```
 ## Perform PCA to analyze batch effect
 ```{r}
+
 pca_res <- prcomp(t(express), scale=TRUE)
-autoplot(pca_res)
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 2, y = 3)
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+
+
+group <- c(rep("A",48), rep("B",29)) 
+  
+meta2 <- MetaData %>% 
+  cbind(.,group)
+
+ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
+  geom_point(size = 3)
+
 ```
-* No discernable batch effect is observed. Thus, can combine thedata from both cohorts for the following study: 
+
+* No discernable batch effect is observed. Thus, can combine the data from both cohorts for the following study: 
 
 # Samples in each group
 ```{r, echo=FALSE}
@@ -139,26 +148,12 @@ degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.0
 
 degT2dNonOb %>% kable()
 ```
-### Examine DE genes in Obese vs. nonobese   
-```{r}
-modm <- model.matrix(~BMI, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-deGenesOb %>% kable()
 
-```
-### Examine DE genes in T2D vs. nonT2D 
-```{r}
-modm <- model.matrix(~status, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-deGenesT2d %>% kable()
-```
 ### Saving relevant data for aim 2 gene enrichment analysis
 
+```{r}
 saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS") 
-
-saveRDS(deGenesT2d, file = "T2dvsNonT2d.RDS")
+```
 
 * Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")` 
 
