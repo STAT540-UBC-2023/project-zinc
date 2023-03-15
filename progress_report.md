@@ -50,6 +50,17 @@ Gene Set Enrichment Analysis (aim2):
 4. [data.table](https://cran.r-project.org/web/packages/data.table/index.html): for handling large tables
 5. [R.utils](https://cran.r-project.org/web/packages/R.utils/index.html): for handling gzipped data
 
+####Current Reports
+
+Gene Expression Analysis R Markdown file Or [Microarray Linear Regression R Markdown  file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.Rmd)
+
+Gene Expression Analysis Markdown file Or [Microarray Linear Regression Markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.md)
+
+PCA Plots [1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)
+
+[Table](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/ObvsNonObHealthy.RDS) for Gene Expression Analysis Result
+
+Boxplots [1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-9-1.png)
 
 ## RESULTS
 
