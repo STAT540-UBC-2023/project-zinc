@@ -255,7 +255,6 @@ ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-<<<<<<< HEAD
 ``` r
 ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
 ```
@@ -280,10 +279,10 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 pca_res <- prcomp(t(express), scale=TRUE)
 
 
-group <- c(rep("A",48), rep("B",29))
-
-meta2 <- MetaData %>%
-cbind(.,group)
+group <- c(rep("A",48), rep("B",29)) 
+  
+meta2 <- MetaData %>% 
+  cbind(.,group)
 
 ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
   geom_point(size = 3)
@@ -291,10 +290,7 @@ ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
-- No discernable batch effect is observed. Thus, can combine thedata
-=======
 - No discernable batch effect is observed. Thus, can combine the data
->>>>>>> main
   from both cohorts for the following study:
 
 # Samples in each group
@@ -363,7 +359,6 @@ degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.0
 degT2dNonOb
 ```
 
-<<<<<<< HEAD
     ##              logFC  AveExpr         t      P.Value   adj.P.Val        B
     ## 8126324  1.7876132 6.871139  5.435329 6.094995e-07 0.008479442 5.434372
     ## 7987405 -0.8180883 6.938990 -5.424617 6.365888e-07 0.008479442 5.397516
@@ -378,32 +373,11 @@ degT2dNonOb
     ## 8139087  1.3069289 4.833279  4.652862 1.322613e-05 0.034431932 2.825087
     ## 8115355 -1.1866442 6.787113 -4.618620 1.505589e-05 0.034431932 2.715284
     ## 8098246  1.0475308 5.734678  4.609555 1.558006e-05 0.034431932 2.686286
-=======
-|         |      logFC |  AveExpr |         t |  P.Value | adj.P.Val |        B |
-|:--------|-----------:|---------:|----------:|---------:|----------:|---------:|
-| 8126324 |  1.7876132 | 6.871139 |  5.435329 | 6.00e-07 | 0.0084794 | 5.434372 |
-| 7987405 | -0.8180883 | 6.938990 | -5.424617 | 6.00e-07 | 0.0084794 | 5.397516 |
-| 8003667 |  1.0519296 | 7.607950 |  5.281525 | 1.10e-06 | 0.0084794 | 4.907905 |
-| 8092083 | -1.1402907 | 7.542657 | -5.259422 | 1.20e-06 | 0.0084794 | 4.832737 |
-| 8169504 |  1.4197096 | 5.804192 |  5.215783 | 1.50e-06 | 0.0084794 | 4.684705 |
-| 8092081 | -0.6426602 | 5.205000 | -5.020353 | 3.20e-06 | 0.0153246 | 4.028178 |
-| 8122457 |  0.4473233 | 6.351325 |  4.737638 | 9.60e-06 | 0.0344319 | 3.098696 |
-| 7930413 |  0.4717516 | 8.707440 |  4.683055 | 1.18e-05 | 0.0344319 | 2.922250 |
-| 8077270 | -0.9436999 | 6.612667 | -4.681199 | 1.19e-05 | 0.0344319 | 2.916268 |
-| 7946757 | -0.2548382 | 6.529406 | -4.674108 | 1.22e-05 | 0.0344319 | 2.893426 |
-| 8139087 |  1.3069289 | 4.833279 |  4.652862 | 1.32e-05 | 0.0344319 | 2.825087 |
-| 8115355 | -1.1866442 | 6.787113 | -4.618620 | 1.51e-05 | 0.0344319 | 2.715284 |
-| 8098246 |  1.0475308 | 5.734678 |  4.609555 | 1.56e-05 | 0.0344319 | 2.686287 |
->>>>>>> main
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ``` r
-<<<<<<< HEAD
 saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
-=======
-saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS") 
->>>>>>> main
 ```
 
 - Note: Result can be loaded into Aim 2 analysis using the following
