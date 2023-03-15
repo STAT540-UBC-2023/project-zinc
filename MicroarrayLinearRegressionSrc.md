@@ -6,8 +6,15 @@ Cindy Zhang + edit
 ### Loading Data
 
 ``` r
-# eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
-eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
+eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+```
+
+    ## Found 1 file(s)
+
+    ## GSE41762_series_matrix.txt.gz
+
+``` r
+# eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
 head(eset, 10)
 ```
 
@@ -242,7 +249,6 @@ pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3)
 pca_data$sample_id = colnames(express)
 
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
-# pca_data$bmi = as.numeric(pca_data$bmi)
 
 ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ```
@@ -270,13 +276,19 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 ```
 
 ``` r
-# eset_new <- getGEO("GSE41762", getGPL = FALSE)[[1]]
-# 
-# myMetaData <- pData(eset_new)  %>%
-#   mutate(sample_id = geo_accession) %>% 
-#   select("status:ch1",sample_id, "bmi:ch1") 
-# colnames(myMetaData) <- c("status","sample_id","bmi")
+pca_res <- prcomp(t(express), scale=TRUE)
+
+
+group <- c(rep("A",48), rep("B",29))
+
+meta2 <- MetaData %>%
+cbind(.,group)
+
+ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
+  geom_point(size = 3)
 ```
+
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 - No discernable batch effect is observed. Thus, can combine thedata
   from both cohorts for the following study:
@@ -362,53 +374,11 @@ degT2dNonOb
     ## 8115355 -1.1866442 6.787113 -4.618620 1.505589e-05 0.034431932 2.715284
     ## 8098246  1.0475308 5.734678  4.609555 1.558006e-05 0.034431932 2.686286
 
-### Examine DE genes in Obese vs. nonobese
-
-``` r
-modm <- model.matrix(~BMI, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-deGenesOb
-```
-
-    ##             logFC  AveExpr        t      P.Value  adj.P.Val        B
-    ## 7948565 0.3073341 7.611851 5.207754 1.461566e-06 0.04199078 4.513915
-
-### Examine DE genes in T2D vs. nonT2D
-
-``` r
-modm <- model.matrix(~status, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-deGenesT2d
-```
-
-    ##              logFC   AveExpr         t      P.Value  adj.P.Val        B
-    ## 8092083 -1.0820364  7.542657 -5.645397 2.442294e-07 0.00701671 6.370124
-    ## 8003667  0.9597603  7.607950  5.324140 9.126314e-07 0.01132526 5.226568
-    ## 7987405 -0.7089442  6.938990 -5.260069 1.182589e-06 0.01132526 5.001737
-    ## 8077270 -0.9326136  6.612667 -5.114337 2.121425e-06 0.01523714 4.494733
-    ## 8010903 -0.3603214  7.370847 -4.977567 3.646926e-06 0.01755746 4.024777
-    ## 8104570 -0.7616175  8.660364 -4.927781 4.434594e-06 0.01755746 3.855194
-    ## 7946757 -0.2300417  6.529405 -4.893138 5.078258e-06 0.01755746 3.737676
-    ## 8126244 -0.5808755  6.313708 -4.865161 5.663796e-06 0.01755746 3.643064
-    ## 8119338 -0.6683442  8.113224 -4.863912 5.691417e-06 0.01755746 3.638847
-    ## 8092081 -0.5436832  5.205000 -4.845625 6.111192e-06 0.01755746 3.577155
-    ## 7925342 -0.6919304 10.563772 -4.798467 7.337808e-06 0.01916502 3.418603
-    ## 8126324  1.3951374  6.871139  4.750079 8.844854e-06 0.02117606 3.256725
-    ## 8175234  0.6839326  5.431720  4.657215 1.262553e-05 0.02783969 2.948426
-    ## 7954377 -0.7182084 13.118733 -4.638354 1.356616e-05 0.02783969 2.886197
-    ## 8005814 -0.2868982  7.471646 -4.594438 1.602777e-05 0.03069851 2.741824
-    ## 7961022  0.2320599 10.683985  4.563856 1.799263e-05 0.03230802 2.641724
-    ## 8043995  0.5526693  8.726264  4.537746 1.985361e-05 0.03355260 2.556544
-    ## 7927803 -0.6287643  7.426039 -4.501160 2.277832e-05 0.03635673 2.437640
-    ## 8037374  0.4251982  8.150206  4.457913 2.677620e-05 0.04048844 2.297771
-
 ### Saving relevant data for aim 2 gene enrichment analysis
 
-saveRDS(degT2dNonOb, file = “ObvsNonObHealthy.RDS”)
-
-saveRDS(deGenesT2d, file = “T2dvsNonT2d.RDS”)
+``` r
+saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
+```
 
 - Note: Result can be loaded into Aim 2 analysis using the following
   code `readRDS("ObvsNonObHealthy.RDS")`
