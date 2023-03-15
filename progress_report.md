@@ -23,7 +23,7 @@ We plan to use the MSigDB database, and the fgsea R package. Using the MSigDB da
 #### Change in Division of Labour
 Since our analysis plan has changed, our division of labour has changed slightly as well. Please see the following table for our plan for new division of labour: 
 |Name|New Labour Plan|
-| ------- | :-----:|
+| ------- |:-----|
 | Cindy | Use linear regression model to assess differential gene expression under the effect of BMI, T2D, and their interactions + Principle Component Analysis |
 | Janet |Gene Set Enrichment Analysis|
 | Lucy |Gene Set Enrichment Analysis + Principle Component Analysis|
