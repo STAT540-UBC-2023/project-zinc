@@ -2,7 +2,7 @@
 
 ## WHAT HAS CHANGED BASED ON THE FINAL PROPOSAL
 
-#### Change in Dataset: More Samples!
+#### Change in Dataset
 
 The original dataset ([E-MTAB-5060](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-5060)) only had a total of 7 samples with only 1 sample in the T2D+BMI\<30 group (1). Since our hypothesis focuses on whether BMI and T2D status affect differential gene expression, that dataset did not have enough samples to answer our biological question. Additionally, the single cell RNA sequencing data from this paper is no longer feasible for our analysis. The main reason is because our hypothesis focuses on the effects of BMI and T2D on the population level, while single cell data only provide information on the individual level, which means that they are less representative and would not be able to help us answer the biological question.
 
