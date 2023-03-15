@@ -226,19 +226,8 @@ autoplot(pca_res)
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-``` r
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 2, y = 3)
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
-
-``` r
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
-\* No discernable batch effect is observed. Thus, can combine thedata
-from both cohorts for the following study:
+- No discernable batch effect is observed. Thus, can combine the data
+  from both cohorts for the following study:
 
 # Samples in each group
 
@@ -319,55 +308,11 @@ degT2dNonOb %>% kable()
 | 8115355 | -1.1866442 | 6.787113 | -4.618620 | 1.51e-05 | 0.0344319 | 2.715284 |
 | 8098246 |  1.0475308 | 5.734678 |  4.609555 | 1.56e-05 | 0.0344319 | 2.686287 |
 
-### Examine DE genes in Obese vs. nonobese
-
-``` r
-modm <- model.matrix(~BMI, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-deGenesOb %>% kable()
-```
-
-|         |     logFC |  AveExpr |        t | P.Value | adj.P.Val |        B |
-|:--------|----------:|---------:|---------:|--------:|----------:|---------:|
-| 7948565 | 0.3073341 | 7.611851 | 5.207755 | 1.5e-06 | 0.0419908 | 4.513915 |
-
-### Examine DE genes in T2D vs. nonT2D
-
-``` r
-modm <- model.matrix(~status, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
-deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-deGenesT2d %>% kable()
-```
-
-|         |      logFC |   AveExpr |         t |  P.Value | adj.P.Val |        B |
-|:--------|-----------:|----------:|----------:|---------:|----------:|---------:|
-| 8092083 | -1.0820364 |  7.542657 | -5.645397 | 2.00e-07 | 0.0070167 | 6.370124 |
-| 8003667 |  0.9597603 |  7.607950 |  5.324140 | 9.00e-07 | 0.0113253 | 5.226567 |
-| 7987405 | -0.7089442 |  6.938990 | -5.260069 | 1.20e-06 | 0.0113253 | 5.001737 |
-| 8077270 | -0.9326136 |  6.612667 | -5.114337 | 2.10e-06 | 0.0152371 | 4.494733 |
-| 8010903 | -0.3603214 |  7.370847 | -4.977567 | 3.60e-06 | 0.0175575 | 4.024777 |
-| 8104570 | -0.7616175 |  8.660364 | -4.927781 | 4.40e-06 | 0.0175575 | 3.855194 |
-| 7946757 | -0.2300417 |  6.529406 | -4.893138 | 5.10e-06 | 0.0175575 | 3.737676 |
-| 8126244 | -0.5808755 |  6.313708 | -4.865161 | 5.70e-06 | 0.0175575 | 3.643064 |
-| 8119338 | -0.6683442 |  8.113224 | -4.863912 | 5.70e-06 | 0.0175575 | 3.638847 |
-| 8092081 | -0.5436832 |  5.205000 | -4.845625 | 6.10e-06 | 0.0175575 | 3.577155 |
-| 7925342 | -0.6919304 | 10.563772 | -4.798467 | 7.30e-06 | 0.0191650 | 3.418603 |
-| 8126324 |  1.3951374 |  6.871139 |  4.750079 | 8.80e-06 | 0.0211761 | 3.256725 |
-| 8175234 |  0.6839326 |  5.431720 |  4.657215 | 1.26e-05 | 0.0278397 | 2.948426 |
-| 7954377 | -0.7182084 | 13.118733 | -4.638354 | 1.36e-05 | 0.0278397 | 2.886197 |
-| 8005814 | -0.2868982 |  7.471646 | -4.594438 | 1.60e-05 | 0.0306985 | 2.741824 |
-| 7961022 |  0.2320599 | 10.683985 |  4.563856 | 1.80e-05 | 0.0323080 | 2.641724 |
-| 8043995 |  0.5526693 |  8.726264 |  4.537746 | 1.99e-05 | 0.0335526 | 2.556544 |
-| 7927803 | -0.6287643 |  7.426039 | -4.501160 | 2.28e-05 | 0.0363567 | 2.437640 |
-| 8037374 |  0.4251982 |  8.150206 |  4.457912 | 2.68e-05 | 0.0404884 | 2.297771 |
-
 ### Saving relevant data for aim 2 gene enrichment analysis
 
-saveRDS(degT2dNonOb, file = “ObvsNonObHealthy.RDS”)
-
-saveRDS(deGenesT2d, file = “T2dvsNonT2d.RDS”)
+``` r
+saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS") 
+```
 
 - Note: Result can be loaded into Aim 2 analysis using the following
   code `readRDS("ObvsNonObHealthy.RDS")`
