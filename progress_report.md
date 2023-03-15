@@ -22,7 +22,12 @@ We plan to use the MSigDB database, and the fgsea R package. Using the MSigDB da
 
 #### Change in Division of Labour
 
-Since our analysis plan has changed, our division of labour has changed slightly as well. Please see the following table for our plan for new division of labour: \|Name\|New Labour Plan\| \| ------- \|:-----\| \| Cindy \| (no change) Datasets Selection, Literature Review, Data Wrangling, Linear Regression\| \| Janet \|Gene Set Enrichment Analysis\| \| Lucy \|Gene Set Enrichment Analysis + Principle Component Analysis\|
+Since our analysis plan has changed, our division of labour has changed slightly as well. Please see the following table for our plan for new division of labour: 
+|Name|New Labour Plan|
+| ------- |:-----|
+| Cindy | (no change) Datasets Selection, Literature Review, Data Wrangling, PCA Visualization, Linear Regression and Result Interpretation|
+| Janet |Gene Set Enrichment Analysis|
+| Lucy |Gene Set Enrichment Analysis + Principle Component Analysis|
 
 ## WHAT IS THE PROGRESS OF THE ANALYSES
 
@@ -32,9 +37,19 @@ To achieve aim 1, factor levels have been determined for T2D and BMI variables, 
 
 #### R Packages Used & Plan to be Used
 
-Differential Gene Expression analysis (aim1) 1. [knitr](https://www.r-project.org/nosvn/pandoc/knitr.html#:~:text=The%20R%20package%20knitr%20is,my%20everyday%20use%20of%20Sweave) 2. [tidyverse](https://www.tidyverse.org/packages/) 3. [GEOquery](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) 4. [limma](https://bioconductor.org/packages/release/bioc/html/limma.html) 5. [ggfortify](https://cran.r-project.org/web/packages/ggfortify/index.html)
+Differential Gene Expression analysis (aim1): 
+1. [knitr](https://www.r-project.org/nosvn/pandoc/knitr.html#:~:text=The%20R%20package%20knitr%20is,my%20everyday%20use%20of%20Sweave) 
+2. [tidyverse](https://www.tidyverse.org/packages/)
+3. [GEOquery](https://bioconductor.org/packages/release/bioc/html/GEOquery.html)
+4. [limma](https://bioconductor.org/packages/release/bioc/html/limma.html)
+5. [ggfortify](https://cran.r-project.org/web/packages/ggfortify/index.html)
 
-Gene Set Enrichment Analysis (aim2): 1. [msigdbr](https://cran.r-project.org/web/packages/msigdbr/vignettes/msigdbr-intro.html): curated source of gene sets and functions 2. [fgsea](https://github.com/ctlab/fgsea): tool for gene set enrichment analysis 3. [biomaRt](https://bioconductor.org/packages/release/bioc/html/biomaRt.html): annotate gene information 4. [data.table](https://cran.r-project.org/web/packages/data.table/index.html): for handling large tables 5. [R.utils](https://cran.r-project.org/web/packages/R.utils/index.html): for handling gzipped data
+Gene Set Enrichment Analysis (aim2): 
+1. [msigdbr](https://cran.r-project.org/web/packages/msigdbr/vignettes/msigdbr-intro.html): curated source of gene sets and functions
+2. [fgsea](https://github.com/ctlab/fgsea): tool for gene set enrichment analysis 
+3. [biomaRt](https://bioconductor.org/packages/release/bioc/html/biomaRt.html): annotate gene information 
+4. [data.table](https://cran.r-project.org/web/packages/data.table/index.html): for handling large tables
+5. [R.utils](https://cran.r-project.org/web/packages/R.utils/index.html): for handling gzipped data
 
 #### Current Reports
 
