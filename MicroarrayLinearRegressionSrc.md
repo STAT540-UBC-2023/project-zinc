@@ -223,7 +223,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-## Perform PCA to analyze batch effect
+
 
 ``` r
 # pca_res_new <- prcomp(express, scale=TRUE)
@@ -245,6 +245,7 @@ pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3)
     ## `.name_repair` is omitted as of tibble 2.0.0.
     ## ℹ Using compatibility `.name_repair`.
 
+##PCA for data visualization
 ``` r
 pca_data$sample_id = colnames(express)
 
@@ -274,7 +275,7 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
-
+## Perform PCA to analyze batch effect
 ``` r
 pca_res <- prcomp(t(express), scale=TRUE)
 
