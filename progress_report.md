@@ -50,7 +50,7 @@ Gene Set Enrichment Analysis (aim2):
 4. [data.table](https://cran.r-project.org/web/packages/data.table/index.html): for handling large tables
 5. [R.utils](https://cran.r-project.org/web/packages/R.utils/index.html): for handling gzipped data
 
-####Current Reports
+#### Current Reports
 
 Gene Expression Analysis R Markdown file Or [Microarray Linear Regression R Markdown  file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.Rmd)
 
@@ -74,7 +74,7 @@ As shown in [MicroarrayLinearRegressionSrc.md file](https://github.com/STAT540-U
 
 Modifying our hypothesis from the written report, sex and age factors are not taken into consideration on the effectS of how the gene expressions differ between obese and non-obese T2D patients. Overall, our results suggested that BMI, T2D status and their interaction terms have effects on the differential gene expression to various degrees. Differentially expressed genes from each category were shown in our [MicroarrayLinearRegressionSrc.md file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.md). Despite the slight clustering effects from BMI shown in the PCA graph, BMI was not found to be significantly associated with differential gene expression and cannot substantially support our hypothesis. One biological explanation is that due to the controversial definition of obesity caused by the current lack of clinical measurements, researchers have grouped individuals with BMI>30 to be “obesity” and others as “non-obese”. Many research groups have since argued that even with BMI values less than 30, these individuals can still be metabolically obese. This makes it hard to judge whether obesity is clearly and correctly distinguished during our analysis, which could explain why BMI factor showed only 1 DE gene (4). Additionally, looking back at our dataset, this result could also be due to the unbalance in samples where 67 samples had BMI<30 and only 10 samples had BMI>30. A larger dataset would be needed for further exploration. 
 
-The results for differential expression analysis can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/ObvsNonObHealthy.RDS) 
+The results for differential expression analysis can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/ObvsNonObHealthy.RDS). 
 
 #### Challenges Encountered
 
