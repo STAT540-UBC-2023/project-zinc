@@ -102,8 +102,8 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-## Perform PCA to analyze batch effect
 
+# PCA for data visualization 
 ```{r}
 # pca_res_new <- prcomp(express, scale=TRUE)
 # autoplot(pca_res_new)
@@ -132,7 +132,7 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
-
+## Perform PCA to analyze batch effect
 ```{r}
 
 pca_res <- prcomp(t(express), scale=TRUE)
