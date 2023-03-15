@@ -77,7 +77,7 @@ The results for differential expression analysis can be found [here](https://git
 
 #### Challenges Encountered
 
-Since our original dataset did not have enough samples to test the hypothesis, further literature review was performed to find a suitable dataset. Literature search was again performed to find new datasets that can answer our [initial biological question](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md). The challenge encountered in aim 1 involved literature review, data wrangling, missing data handling and evaluating batch effects before data merging.
+Since our original dataset did not have enough samples to test the hypothesis, further literature search was performed to find a suitable dataset that could better answer our [initial biological question](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md). During the work for aim 1, we encounted challenges like literature review, evaluating data quality, data wrangling, and missing data handling.
 
 ## References
 
