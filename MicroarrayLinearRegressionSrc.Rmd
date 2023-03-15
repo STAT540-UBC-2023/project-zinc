@@ -1,6 +1,6 @@
 ---
 title: "GSE41762 Regression Analysis"
-author: "Cindy Zhang"
+author: "Cindy Zhang + edit"
 date: "2023-02-19"
 output: github_document
 ---
@@ -17,7 +17,8 @@ library(ggfortify)
 ### Loading Data
 
 ```{r}
-eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+# eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
 head(eset, 10)
 str(pData(eset))
 head(pData(eset)[1:3,1:5]) %>% kable()
@@ -96,6 +97,9 @@ toLongerMeta <- function(expset) {
 joint <- toLongerMeta(eset)
 head(joint, 3) %>% kable()
 identical(MetaData$sample_id, colnames(express))
+
+experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
+MetaData$experiment = experiment_labels
 ```
 
 ## Perform PCA to analyze batch effect
@@ -124,15 +128,19 @@ ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size
 ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 
 #geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+
+# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
 
 ```{r}
 # eset_new <- getGEO("GSE41762", getGPL = FALSE)[[1]]
-
-myMetaData <- pData(eset_new)  %>%
-  mutate(sample_id = geo_accession) %>% 
-  select("status:ch1",sample_id, "bmi:ch1") 
-colnames(myMetaData) <- c("status","sample_id","bmi")
+# 
+# myMetaData <- pData(eset_new)  %>%
+#   mutate(sample_id = geo_accession) %>% 
+#   select("status:ch1",sample_id, "bmi:ch1") 
+# colnames(myMetaData) <- c("status","sample_id","bmi")
 ```
 
 -   No discernable batch effect is observed. Thus, can combine thedata from both cohorts for the following study:
@@ -177,7 +185,7 @@ lmFitEb <- eBayes(lmFit(express, modm))
 ```{r}
 DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
 
-DEobH %>% kable()
+DEobH 
 ```
 
 ### DE genes in obese vs. nonobese T2D samples
@@ -192,7 +200,7 @@ DEObT2d
 ```{r}
 degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
-degT2dNonOb %>% kable()
+degT2dNonOb
 ```
 
 ### Examine DE genes in Obese vs. nonobese
@@ -201,7 +209,7 @@ degT2dNonOb %>% kable()
 modm <- model.matrix(~BMI, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-deGenesOb %>% kable()
+deGenesOb
 
 ```
 
@@ -211,7 +219,7 @@ deGenesOb %>% kable()
 modm <- model.matrix(~status, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-deGenesT2d %>% kable()
+deGenesT2d
 ```
 
 ### Saving relevant data for aim 2 gene enrichment analysis

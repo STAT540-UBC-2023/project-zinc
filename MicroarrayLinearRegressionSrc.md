@@ -1,19 +1,13 @@
 GSE41762 Regression Analysis
 ================
-Cindy Zhang
+Cindy Zhang + edit
 2023-02-19
 
 ### Loading Data
 
 ``` r
-eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
-```
-
-    ## Found 1 file(s)
-
-    ## GSE41762_series_matrix.txt.gz
-
-``` r
+# eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
 head(eset, 10)
 ```
 
@@ -217,28 +211,75 @@ identical(MetaData$sample_id, colnames(express))
 
     ## [1] TRUE
 
+``` r
+experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
+MetaData$experiment = experiment_labels
+```
+
 ## Perform PCA to analyze batch effect
 
 ``` r
-pca_res <- prcomp(t(express), scale=TRUE)
-autoplot(pca_res)
+# pca_res_new <- prcomp(express, scale=TRUE)
+# autoplot(pca_res_new)
+# autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
+# autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+
+express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
+s <- svd(express_scaled)
+
+loadings <- s$v[, 1:3]
+
+scores <- express_scaled %*% loadings
+
+pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
+```
+
+    ## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if
+    ## `.name_repair` is omitted as of tibble 2.0.0.
+    ## ℹ Using compatibility `.name_repair`.
+
+``` r
+pca_data$sample_id = colnames(express)
+
+pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+# pca_data$bmi = as.numeric(pca_data$bmi)
+
+ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 2, y = 3)
+ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
-\* No discernable batch effect is observed. Thus, can combine thedata
-from both cohorts for the following study:
+
+``` r
+#geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+
+# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+```
+
+``` r
+# eset_new <- getGEO("GSE41762", getGPL = FALSE)[[1]]
+# 
+# myMetaData <- pData(eset_new)  %>%
+#   mutate(sample_id = geo_accession) %>% 
+#   select("status:ch1",sample_id, "bmi:ch1") 
+# colnames(myMetaData) <- c("status","sample_id","bmi")
+```
+
+- No discernable batch effect is observed. Thus, can combine thedata
+  from both cohorts for the following study:
 
 # Samples in each group
 
@@ -269,8 +310,9 @@ toLonger(express) %>%
   labs(x = "sample", y = "Gene Expression") 
 ```
 
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
-\# linear model
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+# linear model
 
 ``` r
 modm <- model.matrix(~BMI*status, MetaData)
@@ -282,42 +324,43 @@ lmFitEb <- eBayes(lmFit(express, modm))
 ``` r
 DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
 
-DEobH %>% kable()
+DEobH 
 ```
 
-|         |    logFC |  AveExpr |       t | P.Value | adj.P.Val |        B |
-|:--------|---------:|---------:|--------:|--------:|----------:|---------:|
-| 8105842 | 0.838843 | 3.723151 | 5.38427 |   7e-07 | 0.0215372 | 5.009532 |
+    ##            logFC  AveExpr       t      P.Value  adj.P.Val        B
+    ## 8105842 0.838843 3.723151 5.38427 7.496431e-07 0.02153725 5.009532
 
 ### DE genes in obese vs. nonobese T2D samples
 
 ``` r
 DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
+DEObT2d
 ```
+
+    ## data frame with 0 columns and 0 rows
 
 ### DE genes in T2D vs. Healthy in nonobese samples
 
 ``` r
 degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
-degT2dNonOb %>% kable()
+degT2dNonOb
 ```
 
-|         |      logFC |  AveExpr |         t |  P.Value | adj.P.Val |        B |
-|:--------|-----------:|---------:|----------:|---------:|----------:|---------:|
-| 8126324 |  1.7876132 | 6.871139 |  5.435329 | 6.00e-07 | 0.0084794 | 5.434372 |
-| 7987405 | -0.8180883 | 6.938990 | -5.424617 | 6.00e-07 | 0.0084794 | 5.397516 |
-| 8003667 |  1.0519296 | 7.607950 |  5.281525 | 1.10e-06 | 0.0084794 | 4.907905 |
-| 8092083 | -1.1402907 | 7.542657 | -5.259422 | 1.20e-06 | 0.0084794 | 4.832737 |
-| 8169504 |  1.4197096 | 5.804192 |  5.215783 | 1.50e-06 | 0.0084794 | 4.684705 |
-| 8092081 | -0.6426602 | 5.205000 | -5.020353 | 3.20e-06 | 0.0153246 | 4.028178 |
-| 8122457 |  0.4473233 | 6.351325 |  4.737638 | 9.60e-06 | 0.0344319 | 3.098696 |
-| 7930413 |  0.4717516 | 8.707440 |  4.683055 | 1.18e-05 | 0.0344319 | 2.922250 |
-| 8077270 | -0.9436999 | 6.612667 | -4.681199 | 1.19e-05 | 0.0344319 | 2.916268 |
-| 7946757 | -0.2548382 | 6.529406 | -4.674108 | 1.22e-05 | 0.0344319 | 2.893426 |
-| 8139087 |  1.3069289 | 4.833279 |  4.652862 | 1.32e-05 | 0.0344319 | 2.825087 |
-| 8115355 | -1.1866442 | 6.787113 | -4.618620 | 1.51e-05 | 0.0344319 | 2.715284 |
-| 8098246 |  1.0475308 | 5.734678 |  4.609555 | 1.56e-05 | 0.0344319 | 2.686287 |
+    ##              logFC  AveExpr         t      P.Value   adj.P.Val        B
+    ## 8126324  1.7876132 6.871139  5.435329 6.094995e-07 0.008479442 5.434372
+    ## 7987405 -0.8180883 6.938990 -5.424617 6.365888e-07 0.008479442 5.397516
+    ## 8003667  1.0519296 7.607950  5.281525 1.134188e-06 0.008479442 4.907905
+    ## 8092083 -1.1402907 7.542657 -5.259422 1.239325e-06 0.008479442 4.832737
+    ## 8169504  1.4197096 5.804192  5.215783 1.475712e-06 0.008479442 4.684705
+    ## 8092081 -0.6426602 5.205000 -5.020353 3.200400e-06 0.015324581 4.028178
+    ## 8122457  0.4473233 6.351325  4.737638 9.577256e-06 0.034431932 3.098696
+    ## 7930413  0.4717516 8.707440  4.683055 1.179353e-05 0.034431932 2.922250
+    ## 8077270 -0.9436999 6.612667 -4.681199 1.187705e-05 0.034431932 2.916268
+    ## 7946757 -0.2548382 6.529405 -4.674108 1.220150e-05 0.034431932 2.893426
+    ## 8139087  1.3069289 4.833279  4.652862 1.322613e-05 0.034431932 2.825087
+    ## 8115355 -1.1866442 6.787113 -4.618620 1.505589e-05 0.034431932 2.715284
+    ## 8098246  1.0475308 5.734678  4.609555 1.558006e-05 0.034431932 2.686286
 
 ### Examine DE genes in Obese vs. nonobese
 
@@ -325,12 +368,11 @@ degT2dNonOb %>% kable()
 modm <- model.matrix(~BMI, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 deGenesOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-deGenesOb %>% kable()
+deGenesOb
 ```
 
-|         |     logFC |  AveExpr |        t | P.Value | adj.P.Val |        B |
-|:--------|----------:|---------:|---------:|--------:|----------:|---------:|
-| 7948565 | 0.3073341 | 7.611851 | 5.207755 | 1.5e-06 | 0.0419908 | 4.513915 |
+    ##             logFC  AveExpr        t      P.Value  adj.P.Val        B
+    ## 7948565 0.3073341 7.611851 5.207754 1.461566e-06 0.04199078 4.513915
 
 ### Examine DE genes in T2D vs. nonT2D
 
@@ -338,30 +380,29 @@ deGenesOb %>% kable()
 modm <- model.matrix(~status, MetaData)
 lmFitEb <- eBayes(lmFit(express, modm))
 deGenesT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-deGenesT2d %>% kable()
+deGenesT2d
 ```
 
-|         |      logFC |   AveExpr |         t |  P.Value | adj.P.Val |        B |
-|:--------|-----------:|----------:|----------:|---------:|----------:|---------:|
-| 8092083 | -1.0820364 |  7.542657 | -5.645397 | 2.00e-07 | 0.0070167 | 6.370124 |
-| 8003667 |  0.9597603 |  7.607950 |  5.324140 | 9.00e-07 | 0.0113253 | 5.226567 |
-| 7987405 | -0.7089442 |  6.938990 | -5.260069 | 1.20e-06 | 0.0113253 | 5.001737 |
-| 8077270 | -0.9326136 |  6.612667 | -5.114337 | 2.10e-06 | 0.0152371 | 4.494733 |
-| 8010903 | -0.3603214 |  7.370847 | -4.977567 | 3.60e-06 | 0.0175575 | 4.024777 |
-| 8104570 | -0.7616175 |  8.660364 | -4.927781 | 4.40e-06 | 0.0175575 | 3.855194 |
-| 7946757 | -0.2300417 |  6.529406 | -4.893138 | 5.10e-06 | 0.0175575 | 3.737676 |
-| 8126244 | -0.5808755 |  6.313708 | -4.865161 | 5.70e-06 | 0.0175575 | 3.643064 |
-| 8119338 | -0.6683442 |  8.113224 | -4.863912 | 5.70e-06 | 0.0175575 | 3.638847 |
-| 8092081 | -0.5436832 |  5.205000 | -4.845625 | 6.10e-06 | 0.0175575 | 3.577155 |
-| 7925342 | -0.6919304 | 10.563772 | -4.798467 | 7.30e-06 | 0.0191650 | 3.418603 |
-| 8126324 |  1.3951374 |  6.871139 |  4.750079 | 8.80e-06 | 0.0211761 | 3.256725 |
-| 8175234 |  0.6839326 |  5.431720 |  4.657215 | 1.26e-05 | 0.0278397 | 2.948426 |
-| 7954377 | -0.7182084 | 13.118733 | -4.638354 | 1.36e-05 | 0.0278397 | 2.886197 |
-| 8005814 | -0.2868982 |  7.471646 | -4.594438 | 1.60e-05 | 0.0306985 | 2.741824 |
-| 7961022 |  0.2320599 | 10.683985 |  4.563856 | 1.80e-05 | 0.0323080 | 2.641724 |
-| 8043995 |  0.5526693 |  8.726264 |  4.537746 | 1.99e-05 | 0.0335526 | 2.556544 |
-| 7927803 | -0.6287643 |  7.426039 | -4.501160 | 2.28e-05 | 0.0363567 | 2.437640 |
-| 8037374 |  0.4251982 |  8.150206 |  4.457912 | 2.68e-05 | 0.0404884 | 2.297771 |
+    ##              logFC   AveExpr         t      P.Value  adj.P.Val        B
+    ## 8092083 -1.0820364  7.542657 -5.645397 2.442294e-07 0.00701671 6.370124
+    ## 8003667  0.9597603  7.607950  5.324140 9.126314e-07 0.01132526 5.226568
+    ## 7987405 -0.7089442  6.938990 -5.260069 1.182589e-06 0.01132526 5.001737
+    ## 8077270 -0.9326136  6.612667 -5.114337 2.121425e-06 0.01523714 4.494733
+    ## 8010903 -0.3603214  7.370847 -4.977567 3.646926e-06 0.01755746 4.024777
+    ## 8104570 -0.7616175  8.660364 -4.927781 4.434594e-06 0.01755746 3.855194
+    ## 7946757 -0.2300417  6.529405 -4.893138 5.078258e-06 0.01755746 3.737676
+    ## 8126244 -0.5808755  6.313708 -4.865161 5.663796e-06 0.01755746 3.643064
+    ## 8119338 -0.6683442  8.113224 -4.863912 5.691417e-06 0.01755746 3.638847
+    ## 8092081 -0.5436832  5.205000 -4.845625 6.111192e-06 0.01755746 3.577155
+    ## 7925342 -0.6919304 10.563772 -4.798467 7.337808e-06 0.01916502 3.418603
+    ## 8126324  1.3951374  6.871139  4.750079 8.844854e-06 0.02117606 3.256725
+    ## 8175234  0.6839326  5.431720  4.657215 1.262553e-05 0.02783969 2.948426
+    ## 7954377 -0.7182084 13.118733 -4.638354 1.356616e-05 0.02783969 2.886197
+    ## 8005814 -0.2868982  7.471646 -4.594438 1.602777e-05 0.03069851 2.741824
+    ## 7961022  0.2320599 10.683985  4.563856 1.799263e-05 0.03230802 2.641724
+    ## 8043995  0.5526693  8.726264  4.537746 1.985361e-05 0.03355260 2.556544
+    ## 7927803 -0.6287643  7.426039 -4.501160 2.277832e-05 0.03635673 2.437640
+    ## 8037374  0.4251982  8.150206  4.457913 2.677620e-05 0.04048844 2.297771
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
