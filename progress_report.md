@@ -57,7 +57,7 @@ Gene Set Enrichment Analysis (aim2):
 
 Three PCA plots were generated([Plot 1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [Plot 2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [Plot 3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)). Within, PC1 vs 2 and 2 vs 3, showed that obese individuals are more closely clustered than non-obese. On the other hand, both T2D and healthy donors were evenly spaced out.
 
-As shown in our [MicroarrayLinearRegressionSrc.md file] (https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.md), from the interactive linear model, 1 gene probe was associated with DE in obese vs. non-obese healthy individuals, 13 gene probes were associated with DE in T2D vs. healthy individuals with BMI<30.  
+As shown in our [MicroarrayLinearRegressionSrc.md file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc.md), from the interactive linear model, 1 gene probe was associated with DE in obese vs. non-obese healthy individuals, 13 gene probes were associated with DE in T2D vs. healthy individuals with BMI<30.  
 
 #### Do Our Primary Results Support Hypothesis? 
 
