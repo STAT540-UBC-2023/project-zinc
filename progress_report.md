@@ -60,8 +60,6 @@ PCA Plots [1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Microar
 
 [Table](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/ObvsNonObHealthy.RDS) for Gene Expression Analysis Result
 
-Boxplots [1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-9-1.png)
-
 ## RESULTS
 
 #### Current Results 
