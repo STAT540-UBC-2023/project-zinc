@@ -1,6 +1,6 @@
 GSE41762 Regression Analysis
 ================
-Cindy Zhang
+Cindy Zhang + edit
 2023-02-19
 
 ### Loading Data
@@ -14,6 +14,7 @@ eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
     ## GSE41762_series_matrix.txt.gz
 
 ``` r
+# eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
 head(eset, 10)
 ```
 
@@ -217,16 +218,83 @@ identical(MetaData$sample_id, colnames(express))
 
     ## [1] TRUE
 
+``` r
+experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
+MetaData$experiment = experiment_labels
+```
+
 ## Perform PCA to analyze batch effect
 
 ``` r
-pca_res <- prcomp(t(express), scale=TRUE)
-autoplot(pca_res)
+# pca_res_new <- prcomp(express, scale=TRUE)
+# autoplot(pca_res_new)
+# autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
+# autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
+
+express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
+s <- svd(express_scaled)
+
+loadings <- s$v[, 1:3]
+
+scores <- express_scaled %*% loadings
+
+pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
+```
+
+    ## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if
+    ## `.name_repair` is omitted as of tibble 2.0.0.
+    ## ℹ Using compatibility `.name_repair`.
+
+``` r
+pca_data$sample_id = colnames(express)
+
+pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+
+ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
+<<<<<<< HEAD
+``` r
+ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
+```
+
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+```
+
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
+``` r
+#geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+
+# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+```
+
+``` r
+pca_res <- prcomp(t(express), scale=TRUE)
+
+
+group <- c(rep("A",48), rep("B",29))
+
+meta2 <- MetaData %>%
+cbind(.,group)
+
+ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
+  geom_point(size = 3)
+```
+
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+- No discernable batch effect is observed. Thus, can combine thedata
+=======
 - No discernable batch effect is observed. Thus, can combine the data
+>>>>>>> main
   from both cohorts for the following study:
 
 # Samples in each group
@@ -258,8 +326,9 @@ toLonger(express) %>%
   labs(x = "sample", y = "Gene Expression") 
 ```
 
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
-\# linear model
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+# linear model
 
 ``` r
 modm <- model.matrix(~BMI*status, MetaData)
@@ -271,27 +340,45 @@ lmFitEb <- eBayes(lmFit(express, modm))
 ``` r
 DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
 
-DEobH %>% kable()
+DEobH 
 ```
 
-|         |    logFC |  AveExpr |       t | P.Value | adj.P.Val |        B |
-|:--------|---------:|---------:|--------:|--------:|----------:|---------:|
-| 8105842 | 0.838843 | 3.723151 | 5.38427 |   7e-07 | 0.0215372 | 5.009532 |
+    ##            logFC  AveExpr       t      P.Value  adj.P.Val        B
+    ## 8105842 0.838843 3.723151 5.38427 7.496431e-07 0.02153725 5.009532
 
 ### DE genes in obese vs. nonobese T2D samples
 
 ``` r
 DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
+DEObT2d
 ```
+
+    ## data frame with 0 columns and 0 rows
 
 ### DE genes in T2D vs. Healthy in nonobese samples
 
 ``` r
 degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
-degT2dNonOb %>% kable()
+degT2dNonOb
 ```
 
+<<<<<<< HEAD
+    ##              logFC  AveExpr         t      P.Value   adj.P.Val        B
+    ## 8126324  1.7876132 6.871139  5.435329 6.094995e-07 0.008479442 5.434372
+    ## 7987405 -0.8180883 6.938990 -5.424617 6.365888e-07 0.008479442 5.397516
+    ## 8003667  1.0519296 7.607950  5.281525 1.134188e-06 0.008479442 4.907905
+    ## 8092083 -1.1402907 7.542657 -5.259422 1.239325e-06 0.008479442 4.832737
+    ## 8169504  1.4197096 5.804192  5.215783 1.475712e-06 0.008479442 4.684705
+    ## 8092081 -0.6426602 5.205000 -5.020353 3.200400e-06 0.015324581 4.028178
+    ## 8122457  0.4473233 6.351325  4.737638 9.577256e-06 0.034431932 3.098696
+    ## 7930413  0.4717516 8.707440  4.683055 1.179353e-05 0.034431932 2.922250
+    ## 8077270 -0.9436999 6.612667 -4.681199 1.187705e-05 0.034431932 2.916268
+    ## 7946757 -0.2548382 6.529405 -4.674108 1.220150e-05 0.034431932 2.893426
+    ## 8139087  1.3069289 4.833279  4.652862 1.322613e-05 0.034431932 2.825087
+    ## 8115355 -1.1866442 6.787113 -4.618620 1.505589e-05 0.034431932 2.715284
+    ## 8098246  1.0475308 5.734678  4.609555 1.558006e-05 0.034431932 2.686286
+=======
 |         |      logFC |  AveExpr |         t |  P.Value | adj.P.Val |        B |
 |:--------|-----------:|---------:|----------:|---------:|----------:|---------:|
 | 8126324 |  1.7876132 | 6.871139 |  5.435329 | 6.00e-07 | 0.0084794 | 5.434372 |
@@ -307,11 +394,16 @@ degT2dNonOb %>% kable()
 | 8139087 |  1.3069289 | 4.833279 |  4.652862 | 1.32e-05 | 0.0344319 | 2.825087 |
 | 8115355 | -1.1866442 | 6.787113 | -4.618620 | 1.51e-05 | 0.0344319 | 2.715284 |
 | 8098246 |  1.0475308 | 5.734678 |  4.609555 | 1.56e-05 | 0.0344319 | 2.686287 |
+>>>>>>> main
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ``` r
+<<<<<<< HEAD
+saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
+=======
 saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS") 
+>>>>>>> main
 ```
 
 - Note: Result can be loaded into Aim 2 analysis using the following
