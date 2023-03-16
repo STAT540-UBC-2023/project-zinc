@@ -6,7 +6,7 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)Cancel changes
+knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(tidyverse)
 library(GEOquery)
