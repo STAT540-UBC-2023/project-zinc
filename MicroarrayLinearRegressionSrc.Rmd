@@ -54,7 +54,7 @@ pData(eset) <- pData(eset) %>%
   mutate(status = as.factor(status))
 ```
 
-### match ID between matrixes
+### match ID between matrices
 
 ```{r}
 identical(colnames(exprs(eset)), pData(eset)$sample_id)
@@ -102,14 +102,9 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
+# PCA for data visualization
 
-# PCA for data visualization 
 ```{r}
-# pca_res_new <- prcomp(express, scale=TRUE)
-# autoplot(pca_res_new)
-# autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
-# autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
-
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 
@@ -132,7 +127,9 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
+
 ## Perform PCA to analyze batch effect
+
 ```{r}
 
 pca_res <- prcomp(t(express), scale=TRUE)
@@ -146,11 +143,15 @@ meta2 <- MetaData %>%
 ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
   geom_point(size = 3)
 
+pca_res_new <- prcomp(express, scale=TRUE)
+autoplot(pca_res_new)
+autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
+autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
 ```
 
 -   No discernable batch effect is observed. Thus, can combine the data from both cohorts for the following study:
 
-# Samples in each group
+## samples in each group
 
 ```{r, echo=FALSE}
 table(MetaData$BMI, MetaData$status)
@@ -178,7 +179,7 @@ toLonger(express) %>%
   labs(x = "sample", y = "Gene Expression") 
 ```
 
-# linear model
+## linear models
 
 ```{r}
 modm <- model.matrix(~BMI*status, MetaData)
@@ -215,3 +216,61 @@ saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
 ```
 
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
+
+## Gene Sets for Downstream Gene Set Enrichment Analysis
+
+### Obtain Molecular Signature Database - Species
+
+```{r}
+knitr::kable(msigdbr::msigdbr_species())
+
+KEGG.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:KEGG")
+```
+
+### Obtain GWAS Catalog Information about T2D Disease
+
+```{r}
+gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
+run.if.needed(gwas.tidy.file, {
+
+    gwas.file <- "gwas_catalog_v1.0-associations_e105_r2022-02-02.tsv.gz"
+
+    run.if.needed(gwas.file, {
+        url <- "https://www.ebi.ac.uk/gwas/api/search/downloads/full"
+        .file <- str_remove(gwas.file, ".gz$")
+        download.file(url, destfile = .file)
+        gzip(.file)
+        unlink(.file)
+    })
+
+    .dt <-
+        fread(gwas.file, sep="\t", quote="") %>%
+        dplyr::select(`MAPPED_GENE`, `DISEASE/TRAIT`, `PVALUE_MLOG`)
+
+    .dt <- .dt[order(.dt$PVALUE_MLOG, decreasing = TRUE),
+               head(.SD, 1),
+               by = .(`MAPPED_GENE`, `DISEASE/TRAIT`)]
+
+    .count <- .dt[, .(.N), by = .(`DISEASE/TRAIT`)]
+    .dt <- left_join(.count[`N` >= 100, ], .dt)[nchar(`MAPPED_GENE`)> 0,]
+
+    .dt <- .dt[,
+               .(gene_symbol = unlist(strsplit(`MAPPED_GENE`, split="[ ,.-]+"))),
+               by = .(`DISEASE/TRAIT`, PVALUE_MLOG)]
+    .dt[, p.value := 10^(-PVALUE_MLOG)]
+
+    fwrite(.dt, file=gwas.tidy.file)
+})
+
+gwas.db <- fread(gwas.tidy.file)    
+gwas.db[, gs_name := `DISEASE/TRAIT`]
+
+gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
+    head() %>%
+    mutate(p.value = num.sci(p.value)) %>%
+    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
+    knitr::kable()
+
+```
