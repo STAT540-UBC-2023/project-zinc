@@ -1,6 +1,6 @@
 GSE41762 Regression Analysis
 ================
-Cindy Zhang
+Cindy Zhang + edit
 2023-02-19
 
 ### Loading Data
@@ -224,7 +224,7 @@ MetaData$experiment = experiment_labels
 ```
 
 
-
+## PCA for data visualization
 ``` r
 # pca_res_new <- prcomp(express, scale=TRUE)
 # autoplot(pca_res_new)
@@ -245,7 +245,7 @@ pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3)
     ## `.name_repair` is omitted as of tibble 2.0.0.
     ## ℹ Using compatibility `.name_repair`.
 
-##PCA for data visualization
+
 ``` r
 pca_data$sample_id = colnames(express)
 
