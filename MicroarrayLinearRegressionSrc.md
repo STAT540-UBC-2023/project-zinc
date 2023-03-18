@@ -224,7 +224,7 @@ MetaData$experiment = experiment_labels
 ```
 
 
-## PCA for data visualization
+## PCA for data visualization and batch effect evaluation 
 ``` r
 # pca_res_new <- prcomp(express, scale=TRUE)
 # autoplot(pca_res_new)
@@ -275,21 +275,6 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
-## Perform PCA to analyze batch effect
-``` r
-pca_res <- prcomp(t(express), scale=TRUE)
-
-
-group <- c(rep("A",48), rep("B",29)) 
-  
-meta2 <- MetaData %>% 
-  cbind(.,group)
-
-ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
-  geom_point(size = 3)
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 - No discernable batch effect is observed. Thus, can combine the data
   from both cohorts for the following study:
