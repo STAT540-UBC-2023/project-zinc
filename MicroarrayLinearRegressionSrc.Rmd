@@ -1,6 +1,6 @@
 ---
 title: "GSE41762 Regression Analysis"
-author: "Cindy Zhang"
+author: "Cindy Zhang + edit"
 date: "2023-02-19"
 output: github_document
 ---
@@ -102,7 +102,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-# PCA for data visualization
+# PCA for data visualization and batch effect analysis  
 
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
@@ -127,28 +127,6 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
-
-## Perform PCA to analyze batch effect
-
-```{r}
-
-pca_res <- prcomp(t(express), scale=TRUE)
-
-
-group <- c(rep("A",48), rep("B",29)) 
-  
-meta2 <- MetaData %>% 
-  cbind(.,group)
-
-ggplot(data = pca_res, aes(x = PC1, y=PC2, color = meta2$group)) +
-  geom_point(size = 3)
-
-pca_res_new <- prcomp(express, scale=TRUE)
-autoplot(pca_res_new)
-autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
-autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
-```
-
 -   No discernable batch effect is observed. Thus, can combine the data from both cohorts for the following study:
 
 ## samples in each group
