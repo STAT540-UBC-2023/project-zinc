@@ -181,15 +181,3 @@ saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
 
 
-
-<<<<<<< HEAD
-
-
-=======
-```{r}
-knitr::kable(msigdbr::msigdbr_species())
-kegg.human.db <- msigdbr::msigdbr(species = "human",
-                                  category = "C2",
-                                  subcategory = "CP:KEGG")
-```
-
