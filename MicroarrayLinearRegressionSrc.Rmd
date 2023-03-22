@@ -102,7 +102,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-# PCA for data visualization and batch effect analysis  
+# SVD for data visualization and batch effect analysis  
 
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
@@ -123,16 +123,20 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 
 #geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
 
-# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
--   No discernable batch effect is observed. Thus, can combine the data from both cohorts for the following study:
+-   Moderate batch effect was observed. Thus, for the following, only sample 1 to 48 are used in the analysis 
+```{r}
+meta <- pData(eset)[1:48,]
+```
+
 
 ## samples in each group
 
 ```{r, echo=FALSE}
-table(MetaData$BMI, MetaData$status)
+table(meta$BMI, meta$status)
 ```
 
 ### pivot data format
@@ -150,7 +154,7 @@ toLonger <- function(expressionMatrix) {
 
 options(repr.plot.width = 30, repr.plot.height =2)
 
-toLonger(express) %>% 
+toLonger(express[1:48]) %>% 
   ggplot(aes(x=sample_id, y= Expression, color=sample_id)) +
   geom_boxplot() + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
@@ -160,95 +164,25 @@ toLonger(express) %>%
 ## linear models
 
 ```{r}
-modm <- model.matrix(~BMI*status, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
+modm <- model.matrix(~status, meta)
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
-### DE genes in obese vs. nonobese healthy samples
+### DE genes in T2D vs. Healthy 
 
 ```{r}
-DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
+degT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
-DEobH 
-```
+degT2d
+dim(degT2d)
 
-### DE genes in obese vs. nonobese T2D samples
-
-```{r}
-DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
-DEObT2d
-```
-
-### DE genes in T2D vs. Healthy in nonobese samples
-
-```{r}
-degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-
-degT2dNonOb
 ```
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ```{r}
-saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
+saveRDS(degT2d, file = "t2d.RDS")
 ```
 
--   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
-## Gene Sets for Downstream Gene Set Enrichment Analysis
-
-### Obtain Molecular Signature Database - Species
-
-```{r}
-knitr::kable(msigdbr::msigdbr_species())
-
-KEGG.human.db <- msigdbr::msigdbr(species = "human",
-                                  category = "C2",
-                                  subcategory = "CP:KEGG")
-```
-
-### Obtain GWAS Catalog Information about T2D Disease
-
-```{r}
-gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
-run.if.needed(gwas.tidy.file, {
-
-    gwas.file <- "gwas_catalog_v1.0-associations_e105_r2022-02-02.tsv.gz"
-
-    run.if.needed(gwas.file, {
-        url <- "https://www.ebi.ac.uk/gwas/api/search/downloads/full"
-        .file <- str_remove(gwas.file, ".gz$")
-        download.file(url, destfile = .file)
-        gzip(.file)
-        unlink(.file)
-    })
-
-    .dt <-
-        fread(gwas.file, sep="\t", quote="") %>%
-        dplyr::select(`MAPPED_GENE`, `DISEASE/TRAIT`, `PVALUE_MLOG`)
-
-    .dt <- .dt[order(.dt$PVALUE_MLOG, decreasing = TRUE),
-               head(.SD, 1),
-               by = .(`MAPPED_GENE`, `DISEASE/TRAIT`)]
-
-    .count <- .dt[, .(.N), by = .(`DISEASE/TRAIT`)]
-    .dt <- left_join(.count[`N` >= 100, ], .dt)[nchar(`MAPPED_GENE`)> 0,]
-
-    .dt <- .dt[,
-               .(gene_symbol = unlist(strsplit(`MAPPED_GENE`, split="[ ,.-]+"))),
-               by = .(`DISEASE/TRAIT`, PVALUE_MLOG)]
-    .dt[, p.value := 10^(-PVALUE_MLOG)]
-
-    fwrite(.dt, file=gwas.tidy.file)
-})
-
-gwas.db <- fread(gwas.tidy.file)    
-gwas.db[, gs_name := `DISEASE/TRAIT`]
-
-gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
-    head() %>%
-    mutate(p.value = num.sci(p.value)) %>%
-    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
-    knitr::kable()
-
-```
