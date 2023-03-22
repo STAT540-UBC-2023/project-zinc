@@ -31,10 +31,8 @@ pData(eset) <- pData(eset) %>%
   mutate(sample_id = geo_accession) %>% 
   select("status:ch1",sample_id,"Sex:ch1", "bmi:ch1", "age:ch1") 
 colnames(pData(eset)) <- c("statu","sample_id","sex","bmi","age")
-
 pData(eset)$bmi %>% as.double()
 pData(eset)$age %>% as.double()
-
 pData(eset) <- pData(eset) %>% 
   mutate(status = case_when(
          grepl("Non-diabetic donor", statu) ~ "nont2d",
@@ -81,7 +79,6 @@ MetaData <- pData(eset) %>%
   select(sample_id, status, BMI) %>% 
   mutate(samples = sample_id) %>% 
   filter(sample_id %in% id)
-
 toLongerMeta <- function(expset) {
     stopifnot(class(expset) == "ExpressionSet")
     expressionMatrix <- longExpressionMatrix <- express %>% 
@@ -93,11 +90,9 @@ toLongerMeta <- function(expset) {
     left_join(MetaData)
   return(expressionMatrix)
 }
-
 joint <- toLongerMeta(eset)
 head(joint, 3) %>% kable()
 identical(MetaData$sample_id, colnames(express))
-
 # experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
 # MetaData$experiment = experiment_labels
 ```
@@ -107,22 +102,15 @@ identical(MetaData$sample_id, colnames(express))
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
-
 loadings <- s$v[, 1:3]
-
 scores <- express_scaled %*% loadings
-
 pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
 pca_data$sample_id = colnames(express)
-
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
-
 ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
-
 #geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
-
 # ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
@@ -148,9 +136,7 @@ toLonger <- function(expressionMatrix) {
                  names_to = "sample_id") 
   return(expressionMatrix)
 }
-
 options(repr.plot.width = 30, repr.plot.height =2)
-
 toLonger(express) %>% 
   ggplot(aes(x=sample_id, y= Expression, color=sample_id)) +
   geom_boxplot() + 
@@ -169,7 +155,6 @@ lmFitEb <- eBayes(lmFit(express, modm))
 
 ```{r}
 DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-
 DEobH 
 ```
 
@@ -184,7 +169,6 @@ DEObT2d
 
 ```{r}
 degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-
 degT2dNonOb
 ```
 
@@ -198,18 +182,14 @@ saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
 
 
 
+<<<<<<< HEAD
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+=======
+```{r}
+knitr::kable(msigdbr::msigdbr_species())
+kegg.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:KEGG")
+```
 
