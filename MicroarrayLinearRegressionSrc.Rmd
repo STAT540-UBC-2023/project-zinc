@@ -114,6 +114,24 @@ ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size
 # ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 # ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+
+```
+
+### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for GSEA analysis 
+
+```{r}
+experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
+MetaData$experiment = experiment_labels
+
+selected_genes <- MetaData %>% filter(experiment == "Experiment 1 Samples")
+
+selected_modm <- model.matrix(~BMI*status, MetaData)
+selected_lmFitEb <- eBayes(lmFit(express, selected_modm))
+
+DEgenes <- topTable(selected_lmFitEb, number = Inf, coef= "statust2d")
+DEgenes
+
+saveRDS(DEgenes, file = "DEgenes.RDS")
 ```
 
 -   Observe the sample distribution from T2D and BMI. Combine the data for the following study:
@@ -179,5 +197,3 @@ saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
 ```
 
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
-
-
