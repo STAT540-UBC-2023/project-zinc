@@ -159,7 +159,8 @@ lmFitEb <- eBayes(lmFit(express[1:48], modm))
 
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-degT2d %>% kable()
+degT2d %>% head(10) 
+  
 ```
 
 ### Saving relevant data for aim 2 gene enrichment analysis
