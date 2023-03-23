@@ -97,7 +97,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-## PCA to Evaluate Batch Effect 
+## PCA to Evaluate Batch Effect
 
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
@@ -114,18 +114,19 @@ ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 
 ```
 
-### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis 
-
+### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis
 
 ```{r}
 meta <- pData(eset)[1:48,]
 ```
+
 ## Samples in Each Group
 
 ```{r, echo=FALSE}
 table(meta$BMI, meta$status)
 ```
-There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on ~ T2D status  
+
+There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on \~ T2D status
 
 ### Pivot Data Format
 
@@ -154,8 +155,7 @@ modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
-
-### DE genes in T2D vs. Healthy 
+### DE genes in T2D vs. Healthy
 
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
@@ -167,7 +167,11 @@ degT2d %>% head(10)
 
 ```{r}
 saveRDS(degT2d, file = "t2d.RDS")
+
+degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")
+degT2d_DE
+
+saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
 ```
 
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
-
