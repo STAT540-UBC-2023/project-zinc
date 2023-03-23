@@ -269,8 +269,8 @@ head(fgseaRes[order(pval), ])
 kegg_fgsea_pathway <- as.data.frame(kegg.fgsea)
 kegg_topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
 kegg_topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
-kegg_topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
-plotGseaTable(kegg.lol[topPathways], deg.ranks, fgseaRes,
+kegg_topPathways <- c(kegg_topPathwaysUp, rev(kegg_topPathwaysDown))
+plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
               gseaParam=0.5)
 
 # collapsedPathways <- collapsePathways(fgseaRes_gwas[order(pval)][padj < 0.05], 

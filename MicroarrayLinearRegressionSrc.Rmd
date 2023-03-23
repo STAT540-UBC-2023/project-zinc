@@ -93,8 +93,8 @@ toLongerMeta <- function(expset) {
 joint <- toLongerMeta(eset)
 head(joint, 3) %>% kable()
 identical(MetaData$sample_id, colnames(express))
-# experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
-# MetaData$experiment = experiment_labels
+experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
+MetaData$experiment = experiment_labels
 ```
 
 ## PCA for Data Visualization
@@ -107,13 +107,13 @@ scores <- express_scaled %*% loadings
 pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
 pca_data$sample_id = colnames(express)
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
-ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
-ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
-ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
-#geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
-# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+
+ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 
 ```
 
