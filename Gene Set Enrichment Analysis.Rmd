@@ -27,6 +27,14 @@ kegg.human.db <- msigdbr::msigdbr(species = "human",
                                   subcategory = "CP:KEGG")
 ```
 
+```{r}
+#Access the REACTOME gene sets. 
+#A standardized vocabulary of terms that describe gene function, cellular components, and biological processes.
+reactome.human.db <- msigdbr(species = "human", 
+                            category = "C2", 
+                            subcategory = "CP:REACTOME")
+```
+
 ### Obtain GWAS Catalog Information
 
 ```{r}
@@ -73,6 +81,13 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
+
+#' Convert a number into a scientifically-formatted string
+#' @param x number
+num.sci <- function(x) {
+    format(x, scientific=TRUE, digits = 2)
+}
+
 gwas.db <- fread(gwas.tidy.file)    
 gwas.db[, gs_name := `DISEASE/TRAIT`]
 
@@ -86,6 +101,7 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
 ### Genes associated with obesity (\### might not need this \###)
 
 ```{r}
+
 gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
     head() %>%
     mutate(p.value = num.sci(p.value)) %>%
@@ -96,7 +112,7 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
 ### Load DE Gene List
 
 ```{r}
-readRDS("DEgenes.RDS")
+DEgenes<-readRDS("DEgenes.RDS")
 ```
 
 ### Data formatting for fgsea analysis
@@ -109,7 +125,9 @@ DEgenes$test = rownames(DEgenes)
 # matched Ensembl IDs to probeIDs
 DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
 DEgenes
+```
 
+```{r}
 # convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
 
 library(biomaRt)
