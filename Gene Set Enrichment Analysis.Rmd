@@ -1,0 +1,300 @@
+---
+title: "Gene Set Enrichment Analysis"
+author: "Lucy"
+date: "2023-03-22"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(tidyverse)
+library(GEOquery)
+library(limma)
+library(ggfortify)
+library(msigdbr) 
+```
+
+## Gene Sets for Downstream Gene Set Enrichment Analysis
+
+### Obtain Molecular Signature Database - Species
+
+```{r}
+knitr::kable(msigdbr::msigdbr_species())
+
+kegg.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:KEGG")
+```
+
+### Obtain GWAS Catalog Information
+
+```{r}
+run.if.needed <- function(.file, .code) {
+    if(!file.exists(.file)) { .code }
+    stopifnot(file.exists(.file))
+}
+```
+
+```{r}
+gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
+run.if.needed(gwas.tidy.file, {
+
+    gwas.file <- "gwas_catalog_v1.0-associations_e105_r2022-02-02.tsv.gz"
+
+    run.if.needed(gwas.file, {
+        url <- "https://www.ebi.ac.uk/gwas/api/search/downloads/full"
+        .file <- str_remove(gwas.file, ".gz$")
+        download.file(url, destfile = .file)
+        gzip(.file)
+        unlink(.file)
+    })
+
+    .dt <-
+        fread(gwas.file, sep="\t", quote="") %>%
+        dplyr::select(`MAPPED_GENE`, `DISEASE/TRAIT`, `PVALUE_MLOG`)
+
+    .dt <- .dt[order(.dt$PVALUE_MLOG, decreasing = TRUE),
+               head(.SD, 1),
+               by = .(`MAPPED_GENE`, `DISEASE/TRAIT`)]
+
+    .count <- .dt[, .(.N), by = .(`DISEASE/TRAIT`)]
+    .dt <- left_join(.count[`N` >= 100, ], .dt)[nchar(`MAPPED_GENE`)> 0,]
+
+    .dt <- .dt[,
+               .(gene_symbol = unlist(strsplit(`MAPPED_GENE`, split="[ ,.-]+"))),
+               by = .(`DISEASE/TRAIT`, PVALUE_MLOG)]
+    .dt[, p.value := 10^(-PVALUE_MLOG)]
+
+    fwrite(.dt, file=gwas.tidy.file)
+})
+```
+
+### Genes associated with T2D disease
+
+```{r}
+gwas.db <- fread(gwas.tidy.file)    
+gwas.db[, gs_name := `DISEASE/TRAIT`]
+
+gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
+    head() %>%
+    mutate(p.value = num.sci(p.value)) %>%
+    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
+    knitr::kable()
+```
+
+### Genes associated with obesity (\### might not need this \###)
+
+```{r}
+gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
+    head() %>%
+    mutate(p.value = num.sci(p.value)) %>%
+    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
+    knitr::kable()
+```
+
+### Load DE Gene List
+
+```{r}
+readRDS("DEgenes.RDS")
+```
+
+### Data formatting for fgsea analysis
+
+```{r}
+# read data frame for the DE genes
+DEgenes
+DEgenes$test = rownames(DEgenes)
+
+# matched Ensembl IDs to probeIDs
+DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
+DEgenes
+
+# convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
+
+library(biomaRt)
+ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
+ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol"),
+      filters = "affy_hugene_1_0_st_v1",
+      values = rownames(DEgenes),
+      useCache=FALSE,
+      mart=ensembl_human)
+
+# removed the redundant Ensembl gene ID
+ensembl_geneIDs <- ensemble_genes[-9,]
+ensembl_geneIDs$affy_hugene_1_0_st_v1 <- as.character(ensembl_geneIDs$affy_hugene_1_0_st_v1)
+
+
+ensembl_geneIDs <- ensembl_geneIDs %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
+ensembl_geneIDs
+
+saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
+
+```
+
+## Rank-based Gene Set Enrichment Analysis
+
+### Graphical Visualization
+
+```{r}
+ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
+    geom_point(stroke=0) +
+    xlab("genes") +
+    geom_hline(yintercept = 1, lty = 2, colour="red") +
+  geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
+    geom_hline(yintercept = 2, lty = 2, colour="green") +
+    scale_y_continuous("adjusted p-value",
+                       breaks = c(1, 2, 4),
+                       labels=function(x) num.sci(10^(-x)))
+
+# ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(P.Value))) +
+#     geom_point(stroke=0) +
+#     xlab("genes") +
+#     geom_hline(yintercept = 1, lty = 2, colour="red") +
+#   geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
+#     geom_hline(yintercept = 2, lty = 2, colour="green") +
+#     geom_hline(yintercept = 3, lty = 2, colour="white") +
+#     scale_y_continuous("adjusted p-value",
+#                        breaks = c(1, 2, 4),
+#                        labels=function(x) num.sci(10^(-x)))
+
+```
+
+### KEGG Pathway Analysis
+
+```{r}
+make.gs.lol <- function(.dt) {
+    .dt <- as.data.table(.dt) %>% unique()
+    .list <-
+        .dt[, .(gene = .(gene_symbol)), by = .(gs_name)] %>%
+        as.list()
+    .names <- .list$gs_name
+    .ret <- .list$gene
+    names(.ret) <- .names
+    return(.ret)
+}
+
+kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+
+deg.ranks <- ensembl_geneIDs %>%
+    arrange(P.Value) %>% 
+    as.data.table 
+  
+deg.ranks<-  deg.ranks %>% mutate(log_adjP = -log10(adj.P.Val))
+
+deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$hgnc_symbol; log_adjP })
+
+kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
+```
+
+### KEGG `fgsea` Analysis
+
+```{r}
+kegg.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+
+kegg.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge) %>% head()
+kegg.fgsea
+```
+
+-   186 pathways are identified that are involved in genetic mechanisms for T2D using KEGG pathway
+
+### GWAS pathway Analysis
+
+```{r}
+gwas.lol <- gwas.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+gwas.fgsea <- fgsea::fgsea(pathways = gwas.lol, stats = deg.ranks, scoreType = "pos")
+
+gwas.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+```
+
+### GWAS `fgsea` Analysis
+
+```{r}
+gwas.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge) %>% head()
+
+gwas.fgsea
+```
+
+-   400 pathways are identified using GWAS pathway
+
+### Enrichment Score Plots for KEGG Pathways (incomplete)
+
+```{r}
+#some examples from KEGG pathway
+
+plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
+               deg.ranks)
+plotEnrichment(kegg.lol[["KEGG_MATURITY_ONSET_DIABETES_OF_THE_YOUNG"]],
+               deg.ranks)
+plotEnrichment(kegg.lol[["KEGG_NEUROACTIVE_LIGAND_RECEPTOR_INTERACTION"]],
+               deg.ranks)
+plotEnrichment(kegg.lol[["KEGG_SNARE_INTERACTIONS_IN_VESICULAR_TRANSPORT"]],
+               deg.ranks)
+plotEnrichment(kegg.lol[["KEGG_T_CELL_RECEPTOR_SIGNALING_PATHWAY"]],
+               deg.ranks)
+plotEnrichment(kegg.lol[["KEGG_WNT_SIGNALING_PATHWAY"]],
+               deg.ranks)
+
+```
+
+```{r}
+fgseaRes_gwas <- fgsea(pathways = gwas.lol, 
+                  stats    = deg.ranks,
+                  nperm=10000, maxSize=500,
+                  scoreType = "pos")
+head(fgseaRes_gwas[order(pval), ])
+gwas_fgsea_pathway <- as.data.frame(gwas.fgsea)
+gwas_topPathwaysUp <- fgseaRes_gwas[ES > 0][head(order(pval), n=10), gwas_fgsea_pathway$pathway]
+gwas_topPathwaysDown <- fgseaRes_gwas[ES < 0][head(order(pval), n=10), gwas_fgsea_pathway$pathway]
+gwas_topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+# plotGseaTable(gwas.lol[topPathways], deg.ranks, fgseaRes,
+#               gseaParam=0.5)
+
+
+fgseaRes <- fgsea(pathways = kegg.lol, 
+                  stats    = deg.ranks,
+                  nperm=10000, maxSize=500,
+                  scoreType = "pos")
+head(fgseaRes[order(pval), ])
+kegg_fgsea_pathway <- as.data.frame(kegg.fgsea)
+kegg_topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
+kegg_topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
+kegg_topPathways <- c(kegg_topPathwaysUp, rev(kegg_topPathwaysDown))
+plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
+              gseaParam=0.5)
+
+# collapsedPathways <- collapsePathways(fgseaRes_gwas[order(pval)][padj < 0.05], 
+#                                       gwas.lol, deg.ranks)
+# mainPathways <- fgseaRes[kegg_fgsea_pathway %in% collapsedPathways$mainPathways][
+#                          order(-NES), kegg_fgsea_pathway]
+# plotGseaTable(examplePathways[mainPathways], exampleRanks, fgseaRes, 
+#               gseaParam = 0.5)
+```
+
+```{r}
+rnk.file <- system.file("extdata", "naive.vs.th1.rnk", package="fgsea")
+gmt.file <- system.file("extdata", "human.reactome.gmt", package="fgsea")
+
+ranks <- read.table(rnk.file,
+                    header=TRUE, colClasses = c("character", "numeric"))
+ranks <- setNames(ranks$t, ranks$ID)
+str(ranks)
+
+pathways <- gmtPathways(gmt.file)
+str(head(pathways))
+
+fgseaRes <- fgsea(pathways, ranks, minSize=15, maxSize=500)
+head(fgseaRes)
+
+# pathways <- reactomePathways(names(deg.ranks))
+```

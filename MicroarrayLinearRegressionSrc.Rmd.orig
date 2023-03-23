@@ -97,7 +97,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-## PCA to Evaluate Batch Effect 
+## PCA for Data Visualization
 
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
@@ -107,6 +107,9 @@ scores <- express_scaled %*% loadings
 pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
 pca_data$sample_id = colnames(express)
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+# ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
+# ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
 
 ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
@@ -131,17 +134,20 @@ DEgenes
 saveRDS(DEgenes, file = "DEgenes.RDS")
 ```
 
+<<<<<<< HEAD
 ```{r}
 meta <- pData(eset)[1:48,]
 ```
 
+=======
+-   Observe the sample distribution from T2D and BMI. Combine the data for the following study:
+>>>>>>> 3a9689902d33eede0090091e2d9b985a3bbd0ae9
 
 ## Samples in Each Group
 
 ```{r, echo=FALSE}
-table(meta$BMI, meta$status)
+table(MetaData$BMI, MetaData$status)
 ```
-There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on ~ T2D status  
 
 ### Pivot Data Format
 
@@ -156,34 +162,67 @@ toLonger <- function(expressionMatrix) {
   return(expressionMatrix)
 }
 options(repr.plot.width = 30, repr.plot.height =2)
-toLonger(express[1:48]) %>% 
+toLonger(express) %>% 
   ggplot(aes(x=sample_id, y= Expression, color=sample_id)) +
   geom_boxplot() + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
   labs(x = "sample", y = "Gene Expression") 
 ```
 
-## Linear Models can only ealu
+## Linear Models
 
 ```{r}
+<<<<<<< HEAD
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
+modm <- model.matrix(~status, meta)
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
+=======
+modm <- model.matrix(~BMI*status, MetaData)
+lmFitEb <- eBayes(lmFit(express, modm))
+>>>>>>> 3a9689902d33eede0090091e2d9b985a3bbd0ae9
 ```
 
-
-### DE genes in T2D vs. Healthy 
+### DE genes in obese vs. nonobese healthy samples
 
 ```{r}
-degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-degT2d %>% kable()
+<<<<<<< HEAD
+degT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
+degT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
+=======
+DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
+DEobH 
+```
+>>>>>>> 3a9689902d33eede0090091e2d9b985a3bbd0ae9
+
+### DE genes in obese vs. nonobese T2D samples
+
+```{r}
+DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
+DEObT2d
+```
+
+### DE genes in T2D vs. Healthy in nonobese samples
+
+```{r}
+degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
+degT2dNonOb
 ```
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ```{r}
+<<<<<<< HEAD
+saveRDS(degT2d, file = "t2d.RDS")
 saveRDS(degT2d, file = "t2d.RDS")
 ```
 
--   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
+=======
+saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
+```
+
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
+>>>>>>> 3a9689902d33eede0090091e2d9b985a3bbd0ae9
