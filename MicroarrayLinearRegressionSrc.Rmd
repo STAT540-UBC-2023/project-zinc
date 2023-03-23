@@ -1,6 +1,6 @@
 ---
 title: "GSE41762 Regression Analysis"
-author: "Cindy Zhang + edit"
+author: "Cindy Zhang"
 date: "2023-02-19"
 output: github_document
 ---
@@ -184,6 +184,5 @@ degT2d %>% kable()
 saveRDS(degT2d, file = "t2d.RDS")
 ```
 
--   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
