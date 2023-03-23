@@ -1,6 +1,6 @@
 GSE41762 Regression Analysis
 ================
-Cindy Zhang + edit
+Cindy Zhang
 2023-02-19
 
 ### Loading Data
