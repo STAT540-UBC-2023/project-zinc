@@ -12,6 +12,7 @@ library(tidyverse)
 library(GEOquery)
 library(limma)
 library(ggfortify)
+library(msigdbr) 
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -27,6 +28,13 @@ kegg.human.db <- msigdbr::msigdbr(species = "human",
 ```
 
 ### Obtain GWAS Catalog Information
+
+```{r}
+run.if.needed <- function(.file, .code) {
+    if(!file.exists(.file)) { .code }
+    stopifnot(file.exists(.file))
+}
+```
 
 ```{r}
 gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
@@ -85,16 +93,22 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
     knitr::kable()
 ```
 
+### Load DE Gene List
+
+```{r}
+readRDS("DEgenes.RDS")
+```
+
 ### Data formatting for fgsea analysis
 
 ```{r}
 # read data frame for the DE genes
-degT2dNonOb
-degT2dNonOb$test = rownames(degT2dNonOb)
+DEgenes
+DEgenes$test = rownames(DEgenes)
 
 # matched Ensembl IDs to probeIDs
-degT2dNonOb$affy_hugene_1_0_st_v1 <- row.names(degT2dNonOb) 
-degT2dNonOb
+DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
+DEgenes
 
 # convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
 
@@ -102,16 +116,16 @@ library(biomaRt)
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
 ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol"),
       filters = "affy_hugene_1_0_st_v1",
-      values = rownames(degT2dNonOb),
+      values = rownames(DEgenes),
       useCache=FALSE,
       mart=ensembl_human)
 
 # removed the redundant Ensembl gene ID
 ensembl_geneIDs <- ensemble_genes[-9,]
-ensembl_geneIDs$affy_hugene_1_0_st_v1 <- as.character(.ensembl_geneIDs$affy_hugene_1_0_st_v1)
+ensembl_geneIDs$affy_hugene_1_0_st_v1 <- as.character(ensembl_geneIDs$affy_hugene_1_0_st_v1)
 
 
-ensembl_geneIDs <- ensembl_geneIDs %>% left_join(degT2dNonOb, by = "affy_hugene_1_0_st_v1") 
+ensembl_geneIDs <- ensembl_geneIDs %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
 ensembl_geneIDs
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
@@ -129,7 +143,6 @@ ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
     geom_hline(yintercept = 1, lty = 2, colour="red") +
   geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
     geom_hline(yintercept = 2, lty = 2, colour="green") +
-    geom_hline(yintercept = 3, lty = 2, colour="white") +
     scale_y_continuous("adjusted p-value",
                        breaks = c(1, 2, 4),
                        labels=function(x) num.sci(10^(-x)))
@@ -188,7 +201,7 @@ kegg.fgsea %>%
 kegg.fgsea
 ```
 
--   7 pathways are identified that are involved in genetic mechanisms for T2D using KEGG pathway
+-   186 pathways are identified that are involved in genetic mechanisms for T2D using KEGG pathway
 
 ### GWAS pathway Analysis
 
@@ -212,9 +225,13 @@ gwas.fgsea %>%
 gwas.fgsea
 ```
 
-### Plotting (incomplete)
+-   400 pathways are identified using GWAS pathway
+
+### Enrichment Score Plots for KEGG Pathways (incomplete)
 
 ```{r}
+#some examples from KEGG pathway
+
 plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
                deg.ranks)
 plotEnrichment(kegg.lol[["KEGG_MATURITY_ONSET_DIABETES_OF_THE_YOUNG"]],
