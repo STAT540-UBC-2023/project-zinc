@@ -255,7 +255,7 @@ ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
-### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for GSEA analysis
+### Since PCA showed a moderate batch effect, the first 48 samples will be used for downstream analysis
 
 ``` r
 experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
