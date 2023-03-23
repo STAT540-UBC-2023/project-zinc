@@ -1,7 +1,7 @@
 ---
 title: "GSE41762 Regression Analysis"
-author: "Cindy Zhang + edit"
-date: "2023-02-19"
+author: "Cindy Zhang"
+date: "2023-03-23"
 output: github_document
 ---
 
@@ -114,28 +114,12 @@ ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 
 ```
 
-### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for GSEA analysis 
+### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis 
 
-```{r}
-experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
-MetaData$experiment = experiment_labels
-
-selected_genes <- MetaData %>% filter(experiment == "Experiment 1 Samples")
-
-selected_modm <- model.matrix(~BMI*status, MetaData)
-selected_lmFitEb <- eBayes(lmFit(express, selected_modm))
-
-DEgenes <- topTable(selected_lmFitEb, number = Inf, coef= "statust2d")
-DEgenes
-
-saveRDS(DEgenes, file = "DEgenes.RDS")
-```
 
 ```{r}
 meta <- pData(eset)[1:48,]
 ```
-
-
 ## Samples in Each Group
 
 ```{r, echo=FALSE}
@@ -184,6 +168,5 @@ degT2d %>% kable()
 saveRDS(degT2d, file = "t2d.RDS")
 ```
 
--   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("ObvsNonObHealthy.RDS")`
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
