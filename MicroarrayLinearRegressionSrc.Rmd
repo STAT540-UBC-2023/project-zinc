@@ -132,6 +132,10 @@ ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 meta <- pData(eset)[1:48,]
 ```
 
+```{r}
+meta <- pData(eset)[1:48,]
+```
+
 
 ## samples in each group
 
@@ -166,11 +170,14 @@ toLonger(express[1:48]) %>%
 ```{r}
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
+modm <- model.matrix(~status, meta)
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
 ### DE genes in T2D vs. Healthy 
 
 ```{r}
+degT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 
 degT2d
@@ -182,7 +189,9 @@ dim(degT2d)
 
 ```{r}
 saveRDS(degT2d, file = "t2d.RDS")
+saveRDS(degT2d, file = "t2d.RDS")
 ```
 
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
