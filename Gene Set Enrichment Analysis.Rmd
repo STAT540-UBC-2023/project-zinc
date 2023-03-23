@@ -13,8 +13,6 @@ library(GEOquery)
 library(limma)
 library(ggfortify)
 library(msigdbr) 
-library(data.table)
-library(R.utils)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -226,30 +224,42 @@ kegg.fgsea
 ### Graph the KEGG Analysis result
 
 ```{r}
+BiocManager::install("clusterProfiler", version = "3.16")
+BiocManager::install("pathview")
+BiocManager::install("enrichplot")
+library(clusterProfiler)
 library(enrichplot)
-
-# Convert KEGG pathway names to more readable labels
-pathway_labels <- kegg.human.db %>% 
-  as.data.frame() %>% 
-  subset(gs_name %in% kegg.fgsea$pathway) %>% 
-  dplyr::select(gs_name, gene_symbol) %>% 
-  setNames(c("pathway", "label"))
-
-# Merge pathway labels with fgsea results
-kegg.fgsea_labeled <- merge(kegg.fgsea, pathway_labels, by = "pathway")
-
-# Plot top enriched pathways
-enrichplot(kegg.fgsea_labeled,
-           title = "Enriched KEGG Pathways",
-           x = "padj",
-           y = "label",
-           pointSize = 4,
-           showCategory = 10,
-           color = "blue",
-           cutoff = 0.05)
 ```
 
 
+```{r}
+# SET THE DESIRED ORGANISM HERE
+organism = "org.Dm.eg.db"
+# BiocManager::install(organism, character.only = TRUE)
+library(organism, character.only = TRUE)
+# Convert gene IDs for gseKEGG function
+ids<-bitr(names(ensembl_geneIDs), fromType = "ENSEMBL", toType = "ENTREZID", OrgDb=organism)
+ # remove duplicate IDS
+dedup_ids = ids[!duplicated(ids[c("esembl_gene_id")]),]
+
+# Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
+df2 = df[df$X %in% dedup_ids$ENSEMBL,]
+
+# Create a new column in df2 with the corresponding ENTREZ IDs
+df2$Y = dedup_ids$ENTREZID
+
+# Create a vector of the gene unuiverse
+kegg_gene_list <- df2$log2FoldChange
+
+# Name vector with ENTREZ ids
+names(kegg_gene_list) <- df2$Y
+
+# omit any NA values 
+kegg_gene_list<-na.omit(kegg_gene_list)
+
+# sort the list in decreasing order (required for clusterProfiler)
+kegg_gene_list = sort(kegg_gene_list, decreasing = TRUE)
+```
 ### GWAS pathway Analysis
 
 ```{r}
