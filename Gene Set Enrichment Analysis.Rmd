@@ -13,6 +13,8 @@ library(GEOquery)
 library(limma)
 library(ggfortify)
 library(msigdbr) 
+library(data.table)
+library(R.utils)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -25,6 +27,14 @@ knitr::kable(msigdbr::msigdbr_species())
 kegg.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:KEGG")
+```
+
+```{r}
+#Access the REACTOME gene sets. 
+#A standardized vocabulary of terms that describe gene function, cellular components, and biological processes.
+reactome.human.db <- msigdbr(species = "human", 
+                            category = "C2", 
+                            subcategory = "CP:REACTOME")
 ```
 
 ### Obtain GWAS Catalog Information
@@ -73,6 +83,13 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
+
+#' Convert a number into a scientifically-formatted string
+#' @param x number
+num.sci <- function(x) {
+    format(x, scientific=TRUE, digits = 2)
+}
+
 gwas.db <- fread(gwas.tidy.file)    
 gwas.db[, gs_name := `DISEASE/TRAIT`]
 
@@ -86,6 +103,7 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
 ### Genes associated with obesity (\### might not need this \###)
 
 ```{r}
+
 gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
     head() %>%
     mutate(p.value = num.sci(p.value)) %>%
@@ -96,7 +114,7 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
 ### Load DE Gene List
 
 ```{r}
-readRDS("DEgenes.RDS")
+DEgenes<-readRDS("DEgenes.RDS")
 ```
 
 ### Data formatting for fgsea analysis
@@ -109,7 +127,9 @@ DEgenes$test = rownames(DEgenes)
 # matched Ensembl IDs to probeIDs
 DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
 DEgenes
+```
 
+```{r}
 # convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
 
 library(biomaRt)
@@ -203,6 +223,33 @@ kegg.fgsea
 
 -   186 pathways are identified that are involved in genetic mechanisms for T2D using KEGG pathway
 
+### Graph the KEGG Analysis result
+
+```{r}
+library(enrichplot)
+
+# Convert KEGG pathway names to more readable labels
+pathway_labels <- kegg.human.db %>% 
+  as.data.frame() %>% 
+  subset(gs_name %in% kegg.fgsea$pathway) %>% 
+  dplyr::select(gs_name, gene_symbol) %>% 
+  setNames(c("pathway", "label"))
+
+# Merge pathway labels with fgsea results
+kegg.fgsea_labeled <- merge(kegg.fgsea, pathway_labels, by = "pathway")
+
+# Plot top enriched pathways
+enrichplot(kegg.fgsea_labeled,
+           title = "Enriched KEGG Pathways",
+           x = "padj",
+           y = "label",
+           pointSize = 4,
+           showCategory = 10,
+           color = "blue",
+           cutoff = 0.05)
+```
+
+
 ### GWAS pathway Analysis
 
 ```{r}
@@ -227,23 +274,23 @@ gwas.fgsea
 
 -   400 pathways are identified using GWAS pathway
 
-### Enrichment Score Plots for KEGG Pathways (incomplete)
+### Enrichment Score Plots for KEGG Pathways 
 
 ```{r}
 #some examples from KEGG pathway
 
-plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
-               deg.ranks)
-plotEnrichment(kegg.lol[["KEGG_MATURITY_ONSET_DIABETES_OF_THE_YOUNG"]],
-               deg.ranks)
-plotEnrichment(kegg.lol[["KEGG_NEUROACTIVE_LIGAND_RECEPTOR_INTERACTION"]],
-               deg.ranks)
-plotEnrichment(kegg.lol[["KEGG_SNARE_INTERACTIONS_IN_VESICULAR_TRANSPORT"]],
-               deg.ranks)
-plotEnrichment(kegg.lol[["KEGG_T_CELL_RECEPTOR_SIGNALING_PATHWAY"]],
-               deg.ranks)
-plotEnrichment(kegg.lol[["KEGG_WNT_SIGNALING_PATHWAY"]],
-               deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
+#              deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_MATURITY_ONSET_DIABETES_OF_THE_YOUNG"]],
+#               deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_NEUROACTIVE_LIGAND_RECEPTOR_INTERACTION"]],
+#               deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_SNARE_INTERACTIONS_IN_VESICULAR_TRANSPORT"]],
+#              deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_T_CELL_RECEPTOR_SIGNALING_PATHWAY"]],
+#              deg.ranks)
+#plotEnrichment(kegg.lol[["KEGG_WNT_SIGNALING_PATHWAY"]],
+#             deg.ranks)
 
 ```
 
