@@ -181,6 +181,7 @@ ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
 ### KEGG Pathway Analysis
 
 ```{r}
+# Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
 make.gs.lol <- function(.dt) {
     .dt <- as.data.table(.dt) %>% unique()
     .list <-
@@ -192,6 +193,7 @@ make.gs.lol <- function(.dt) {
     return(.ret)
 }
 
+#Convert the KEGG pathway tibble. 
 kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
 
 deg.ranks <- ensembl_geneIDs %>%
@@ -219,47 +221,58 @@ kegg.fgsea %>%
 kegg.fgsea
 ```
 
--   186 pathways are identified that are involved in genetic mechanisms for T2D using KEGG pathway
+```{r}
+# filter significant pathways. Set p<0.05. 
+kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
+kegg_significant_pathways
 
-### Graph the KEGG Analysis result
+```
+
+There are 10 significant pathways. 
+
+### Reactome `fgsea` Analysis 
 
 ```{r}
-BiocManager::install("clusterProfiler", version = "3.16")
-BiocManager::install("pathview")
-BiocManager::install("enrichplot")
-library(clusterProfiler)
-library(enrichplot)
+#Convert the REACTOME pathway tibble with the make.gs.lol function made previously. 
+REACTOME.lol <- reactome.human.db %>% 
+  dplyr :: select(gene_symbol, gs_name) %>% 
+  make.gs.lol()
+```
+
+```{r}
+# GSEA with fgsea()
+reactome.fgsea <- fgsea::fgsea(pathways = REACTOME.lol, stats = deg.ranks, scoreType = "pos")
 ```
 
 
+
 ```{r}
-# SET THE DESIRED ORGANISM HERE
-organism = "org.Dm.eg.db"
-# BiocManager::install(organism, character.only = TRUE)
-library(organism, character.only = TRUE)
-# Convert gene IDs for gseKEGG function
-ids<-bitr(names(ensembl_geneIDs), fromType = "ENSEMBL", toType = "ENTREZID", OrgDb=organism)
- # remove duplicate IDS
-dedup_ids = ids[!duplicated(ids[c("esembl_gene_id")]),]
-
-# Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
-df2 = df[df$X %in% dedup_ids$ENSEMBL,]
-
-# Create a new column in df2 with the corresponding ENTREZ IDs
-df2$Y = dedup_ids$ENTREZID
-
-# Create a vector of the gene unuiverse
-kegg_gene_list <- df2$log2FoldChange
-
-# Name vector with ENTREZ ids
-names(kegg_gene_list) <- df2$Y
-
-# omit any NA values 
-kegg_gene_list<-na.omit(kegg_gene_list)
-
-# sort the list in decreasing order (required for clusterProfiler)
-kegg_gene_list = sort(kegg_gene_list, decreasing = TRUE)
+#Show top 5 genes for each pathway:
+# Here, we are "pasting" the first five genes in the leadingEdge column
+kegg.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
 ```
+
+```{r}
+#Show result in table. 
+reactome.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge) %>% 
+    knitr::kable()
+```
+
+```{r}
+# filter significant pathways. Set p<0.05. 
+reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
+reactome_significant_pathways
+```
+
+There are 85 significant pathways from REACTOME 'fgsea' analysis. 
+
+### 
+
 ### GWAS pathway Analysis
 
 ```{r}
