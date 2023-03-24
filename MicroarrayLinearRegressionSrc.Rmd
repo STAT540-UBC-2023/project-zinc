@@ -204,4 +204,3 @@ saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
 ```
 
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
->>>>>>> cf583f0b956814e01279a86995400bd33c4e3c56
