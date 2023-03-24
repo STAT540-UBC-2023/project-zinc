@@ -1,13 +1,13 @@
 ---
 title: "Gene Set Enrichment Analysis"
-author: "Lucy"
+author: "Lucy Chi"
 date: "2023-03-22"
 output: html_document
 ---
 
 ```{r}
-# BiocManager::install("enrichplot")
-# BiocManager::install("clusterProfiler")
+BiocManager::install("enrichplot")
+BiocManager::install("clusterProfiler")
 ```
 
 ```{r}

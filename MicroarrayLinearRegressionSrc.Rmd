@@ -13,9 +13,7 @@ library(GEOquery)
 library(limma)
 library(ggfortify)
 ```
-
 ### Loading Data
-
 ```{r}
 eset <- getGEO("GSE41762", getGPL = FALSE)[[1]]
 # eset <- getGEO(filename = "~/Downloads/GSE41762_series_matrix.txt.gz", getGPL = FALSE)
@@ -23,9 +21,7 @@ head(eset, 10)
 str(pData(eset))
 head(pData(eset)[1:3,1:5]) %>% kable()
 ```
-
 ### Data Wrangling
-
 ```{r}
 pData(eset) <- pData(eset) %>%
   mutate(sample_id = geo_accession) %>% 
@@ -43,25 +39,18 @@ pData(eset) <- pData(eset) %>%
   )) %>% 
   select(-c(bmi,statu))
 ```
-
-### Arrange Factor Levels
-
+Arrange Factor Levels
 ```{r}
 pData(eset) <- pData(eset) %>% 
   mutate(BMI = fct_relevel(BMI, "below30", "over30")) %>% 
   mutate(status = as.factor(status))
 ```
-
-### match ID between matrices
-
+Match ID between matrices
 ```{r}
 identical(colnames(exprs(eset)), pData(eset)$sample_id)
 ```
-
-### Missing Values
-
+Missing Values
 -   The missing data are found in sample ID 49 through 77
-
 ```{r}
 express <- exprs(eset) %>% 
   as.data.frame() 
@@ -69,9 +58,7 @@ express <- exprs(eset) %>%
 names(colSums(is.na(express))>0)
 express <- na.omit(express)
 ```
-
-### Combine Data
-
+Combine Data
 ```{r}
 # metaData
 id <- colnames(express)
@@ -96,39 +83,31 @@ identical(MetaData$sample_id, colnames(express))
 experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Samples", 29))
 MetaData$experiment = experiment_labels
 ```
-
-## PCA to Evaluate Batch Effect
-
+The first 48 samples were from one experiment cohort while the remaining 29 samples were from another. The batch effect between the two cohorts were evaluated   
 ```{r}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 loadings <- s$v[, 1:3]
 scores <- express_scaled %*% loadings
-pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
-pca_data$sample_id = colnames(express)
-pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+svd <- as_data_frame(scores) %>% rename(u1 = V1, u2 = V2, u3 = V3) 
+svd$sample_id = colnames(express)
+svd <- left_join(svd, MetaData, by = "sample_id")
 
-ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
-ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
-ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u1, y=u2, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u2, y=u3, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
 ```
 
-### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis
-
+- A moderate batch effect was observed for u2 vs. u1, the first 48 samples will be used for downstream analysis 
 ```{r}
 meta <- pData(eset)[1:48,]
 ```
-
-## Samples in Each Group
-
+Samples in Each Group
+- There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on ~ T2D status
 ```{r, echo=FALSE}
 table(meta$BMI, meta$status)
 ```
-
-There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on \~ T2D status
-
-### Pivot Data Format
-
+Pivot Data Format
 ```{r}
 toLonger <- function(expressionMatrix) {
     expressionMatrix <- longExpressionMatrix <- expressionMatrix %>% 
@@ -147,37 +126,19 @@ toLonger(express[1:48]) %>%
   labs(x = "sample", y = "Gene Expression") 
 ```
 
-## Linear Models can only ealu
-
+### Linear Model Fitting
 ```{r}
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
-
-### DE genes in T2D vs. Healthy
-
+Significant DE genes in T2D vs. Healthy
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d %>% head(10) 
-
 ```
-
-### DE genes in T2D vs. Healthy
-
+Saving all DE gene for aim 2 gene set enrichment analysis
 ```{r}
-degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-degT2d %>% head(10) 
-  
-```
-
-### Saving relevant data for aim 2 gene enrichment analysis
-
-```{r}
-saveRDS(degT2d, file = "t2d.RDS")
-
 degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")
-degT2d_DE
 saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
 ```
-
--   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
+Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("degT2d_DE")`

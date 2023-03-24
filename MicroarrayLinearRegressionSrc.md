@@ -126,7 +126,7 @@ pData(eset) <- pData(eset) %>%
   select(-c(bmi,statu))
 ```
 
-### Arrange Factor Levels
+Arrange Factor Levels
 
 ``` r
 pData(eset) <- pData(eset) %>% 
@@ -134,7 +134,7 @@ pData(eset) <- pData(eset) %>%
   mutate(status = as.factor(status))
 ```
 
-### match ID between matrices
+Match ID between matrices
 
 ``` r
 identical(colnames(exprs(eset)), pData(eset)$sample_id)
@@ -142,9 +142,7 @@ identical(colnames(exprs(eset)), pData(eset)$sample_id)
 
     ## [1] TRUE
 
-### Missing Values
-
-- The missing data are found in sample ID 49 through 77
+Missing Values - The missing data are found in sample ID 49 through 77
 
 ``` r
 express <- exprs(eset) %>% 
@@ -174,7 +172,7 @@ names(colSums(is.na(express))>0)
 express <- na.omit(express)
 ```
 
-### Combine Data
+Combine Data
 
 ``` r
 # metaData
@@ -220,58 +218,65 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
-## PCA to Evaluate Batch Effect
+The first 48 samples were from one experiment cohort while the remaining
+29 samples were from another. The batch effect between the two cohorts
+were evaluated
 
 ``` r
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 loadings <- s$v[, 1:3]
 scores <- express_scaled %*% loadings
-pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
+svd <- as_data_frame(scores) %>% rename(u1 = V1, u2 = V2, u3 = V3) 
 ```
+
+    ## Warning: `as_data_frame()` was deprecated in tibble 2.0.0.
+    ## ℹ Please use `as_tibble()` instead.
+    ## ℹ The signature and semantics have changed, see `?as_tibble`.
 
     ## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if
     ## `.name_repair` is omitted as of tibble 2.0.0.
     ## ℹ Using compatibility `.name_repair`.
+    ## ℹ The deprecated feature was likely used in the tibble package.
+    ##   Please report the issue at <]8;;https://github.com/tidyverse/tibble/issueshttps://github.com/tidyverse/tibble/issues]8;;>.
 
 ``` r
-pca_data$sample_id = colnames(express)
-pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+svd$sample_id = colnames(express)
+svd <- left_join(svd, MetaData, by = "sample_id")
 
-ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u1, y=u2, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u2, y=u3, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
-ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
-### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis
+- A moderate batch effect was observed for u2 vs. u1. The first 48
+  samples will be used for downstream analysis
 
 ``` r
 meta <- pData(eset)[1:48,]
 ```
 
-## Samples in Each Group
+Samples in Each Group - There are insufficient sample to fit an model
+with BMI as a covariate. Thus, a model will be focused on \~ T2D status
 
     ##          
     ##           nont2d t2d
     ##   below30     38   8
     ##   over30       0   2
 
-There are insufficient sample to fit an model with BMI as a covariate.
-Thus, a model will be focused on \~ T2D status
-
-### Pivot Data Format
+Pivot Data Format
 
 ``` r
 toLonger <- function(expressionMatrix) {
@@ -293,14 +298,14 @@ toLonger(express[1:48]) %>%
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-## Linear Models can only ealu
+### Linear Model Fitting
 
 ``` r
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
-### DE genes in T2D vs. Healthy
+Significant DE genes in T2D vs. Healthy
 
 ``` r
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
@@ -319,11 +324,12 @@ degT2d %>% head(10)
     ## 7954377 -0.9860317 13.168026 -5.059747 5.945901e-06 0.018906487 3.672402
     ## 8156848  0.4525494  5.989503  5.007422 7.129418e-06 0.018906487 3.514405
 
-### Saving relevant data for aim 2 gene enrichment analysis
+Saving all DE gene for aim 2 gene set enrichment analysis
 
 ``` r
-saveRDS(degT2d, file = "t2d.RDS")
+degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")
+saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
 ```
 
-- Note: Result can be loaded into Aim 2 analysis using the following
-  code `readRDS("t2d.RDS")`
+Note: Result can be loaded into Aim 2 analysis using the following code
+`readRDS("degT2d_DE")`
