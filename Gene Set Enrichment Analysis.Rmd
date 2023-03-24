@@ -6,6 +6,11 @@ output: html_document
 ---
 
 ```{r}
+# BiocManager::install("enrichplot")
+install.packages("enrichplot")
+```
+
+```{r}
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(tidyverse)
@@ -13,11 +18,14 @@ library(GEOquery)
 library(limma)
 library(ggfortify)
 library(msigdbr) 
+library(data.table)
+library(R.utils)
+library(enrichplot)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
 
-### Obtain Molecular Signature Database - Species
+### Obtain Molecular Signature Database (KEGG and reactome pathways)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
@@ -81,7 +89,6 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
-
 #' Convert a number into a scientifically-formatted string
 #' @param x number
 num.sci <- function(x) {
@@ -101,7 +108,6 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
 ### Genes associated with obesity (\### might not need this \###)
 
 ```{r}
-
 gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
     head() %>%
     mutate(p.value = num.sci(p.value)) %>%
@@ -125,6 +131,7 @@ DEgenes$test = rownames(DEgenes)
 # matched Ensembl IDs to probeIDs
 DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
 DEgenes
+
 ```
 
 ```{r}
@@ -148,6 +155,8 @@ ensembl_geneIDs
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
 
+gene_id <- pull(ensembl_geneIDs, ensembl_gene_id)
+gene_values <- as.numeric(DEgenes$logFC)
 ```
 
 ## Rank-based Gene Set Enrichment Analysis
@@ -228,9 +237,9 @@ kegg_significant_pathways
 
 ```
 
-There are 10 significant pathways. 
+There are 10 significant pathways.
 
-### Reactome `fgsea` Analysis 
+### Reactome `fgsea` Analysis
 
 ```{r}
 #Convert the REACTOME pathway tibble with the make.gs.lol function made previously. 
@@ -243,8 +252,6 @@ REACTOME.lol <- reactome.human.db %>%
 # GSEA with fgsea()
 reactome.fgsea <- fgsea::fgsea(pathways = REACTOME.lol, stats = deg.ranks, scoreType = "pos")
 ```
-
-
 
 ```{r}
 #Show top 5 genes for each pathway:
@@ -269,9 +276,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 85 significant pathways from REACTOME 'fgsea' analysis. 
-
-### 
+There are 85 significant pathways from REACTOME 'fgsea' analysis.
 
 ### GWAS pathway Analysis
 
@@ -297,9 +302,27 @@ gwas.fgsea
 
 -   400 pathways are identified using GWAS pathway
 
-### Enrichment Score Plots for KEGG Pathways 
+### Enrichment Score Plots for KEGG Pathways
 
 ```{r}
+BiocManager::install("clusterProfiler")
+library(clusterProfiler)
+# gene_sets <- read.gmt("path/to/gene/set/file.gmt")
+result <- enricher(gene = gene_id, TERM2GENE = DEgenes)
+emap <- emapplot(result, cutoff = 0.05, nodeSize = 3, edgeSize = 0.2, n = 3)
+
+plot(emap)
+
+library(DOSE)
+gene_values
+data(gene_values)
+de <- names(DEgenes)[abs(DEgenes) > 2]
+
+edo <- enrichDGN(de)
+```
+
+```{r}
+
 #some examples from KEGG pathway
 
 #plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
