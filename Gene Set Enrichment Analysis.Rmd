@@ -157,6 +157,9 @@ ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1",
       useCache=FALSE,
       mart=ensembl_human)
 
+```
+
+```{r}
 ## TODO: removed the redundant Ensembl gene ID
 
 ensemble_genes$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes$affy_hugene_1_0_st_v1)
@@ -210,7 +213,9 @@ make.gs.lol <- function(.dt) {
     names(.ret) <- .names
     return(.ret)
 }
+```
 
+```{r}
 #Convert the KEGG pathway tibble. 
 kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
 
@@ -258,7 +263,7 @@ kegg_significant_pathways
 
 ```
 
-There are 57 significant pathways.
+There are 80 significant pathways.
 
 ### Reactome `fgsea` Analysis
 
