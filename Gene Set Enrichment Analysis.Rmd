@@ -7,7 +7,7 @@ output: html_document
 
 ```{r}
 # BiocManager::install("enrichplot")
-install.packages("enrichplot")
+# BiocManager::install("clusterProfiler")
 ```
 
 ```{r}
@@ -15,11 +15,14 @@ knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(tidyverse)
 library(GEOquery)
-library(limma)
+library(fgsea)
 library(ggfortify)
 library(msigdbr) 
 library(data.table)
 library(R.utils)
+library(enrichplot)
+library(DOSE)
+library(clusterProfiler)
 library(enrichplot)
 ```
 
@@ -139,24 +142,32 @@ DEgenes
 
 library(biomaRt)
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
-ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol"),
+ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id"),
       filters = "affy_hugene_1_0_st_v1",
       values = rownames(DEgenes),
       useCache=FALSE,
       mart=ensembl_human)
 
-# removed the redundant Ensembl gene ID
-ensembl_geneIDs <- ensemble_genes[-9,]
-ensembl_geneIDs$affy_hugene_1_0_st_v1 <- as.character(ensembl_geneIDs$affy_hugene_1_0_st_v1)
+## TODO: removed the redundant Ensembl gene ID
 
+ensemble_genes$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes$affy_hugene_1_0_st_v1)
 
-ensembl_geneIDs <- ensembl_geneIDs %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
-ensembl_geneIDs
+ensembl_geneIDs <- ensemble_genes %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
+# ensembl_geneIDs
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
 
-gene_id <- pull(ensembl_geneIDs, ensembl_gene_id)
-gene_values <- as.numeric(DEgenes$logFC)
+# gene_id <- pull(ensembl_geneIDs, ensembl_gene_id)
+# gene_values <- as.numeric(DEgenes$logFC)
+
+sum(is.na(ensemble_genes$entrezgene_id))
+summary(ensemble_genes$entrezgene_id)
+```
+
+### Heat Map for T2D vs Healthy DE genes
+
+```{r}
+## TODO
 ```
 
 ## Rank-based Gene Set Enrichment Analysis
@@ -173,17 +184,6 @@ ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
     scale_y_continuous("adjusted p-value",
                        breaks = c(1, 2, 4),
                        labels=function(x) num.sci(10^(-x)))
-
-# ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(P.Value))) +
-#     geom_point(stroke=0) +
-#     xlab("genes") +
-#     geom_hline(yintercept = 1, lty = 2, colour="red") +
-#   geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
-#     geom_hline(yintercept = 2, lty = 2, colour="green") +
-#     geom_hline(yintercept = 3, lty = 2, colour="white") +
-#     scale_y_continuous("adjusted p-value",
-#                        breaks = c(1, 2, 4),
-#                        labels=function(x) num.sci(10^(-x)))
 
 ```
 
@@ -216,6 +216,18 @@ deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_
 kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
 ```
 
+```{r}
+# enriched KEGG pathway
+kegg_enrich <- enrichKEGG(gene = filtered_genes$entrezgene_id[1:30],
+                 organism     = 'human',
+                 pvalueCutoff = 0.05)
+
+# visualize the enriched pathway
+## Type II diabetes mellitus
+browseKEGG(kegg_enrich, 'hsa04930')
+
+```
+
 ### KEGG `fgsea` Analysis
 
 ```{r}
@@ -237,7 +249,7 @@ kegg_significant_pathways
 
 ```
 
-There are 10 significant pathways.
+There are 57 significant pathways.
 
 ### Reactome `fgsea` Analysis
 
@@ -305,31 +317,24 @@ gwas.fgsea
 ### Enrichment Score Plots for KEGG Pathways
 
 ```{r}
-BiocManager::install("clusterProfiler")
-library(clusterProfiler)
-# gene_sets <- read.gmt("path/to/gene/set/file.gmt")
-result <- enricher(gene = gene_id, TERM2GENE = DEgenes)
-emap <- emapplot(result, cutoff = 0.05, nodeSize = 3, edgeSize = 0.2, n = 3)
-
-plot(emap)
-
-library(DOSE)
-gene_values
-data(gene_values)
-de <- names(DEgenes)[abs(DEgenes) > 2]
-
-edo <- enrichDGN(de)
+data$entrez = mapIds(kegg.human.db,
+                    keys=row.names(data), #Column containing Ensembl gene ids
+                    column="ENTREZID",
+                    keytype="ENSEMBL",
+                    multiVals="first")
 ```
 
 ```{r}
-
 #some examples from KEGG pathway
 
-#plotEnrichment(kegg.lol[["KEGG_MAPK_SIGNALING_PATHWAY"]],
-#              deg.ranks)
-#plotEnrichment(kegg.lol[["KEGG_MATURITY_ONSET_DIABETES_OF_THE_YOUNG"]],
-#               deg.ranks)
-#plotEnrichment(kegg.lol[["KEGG_NEUROACTIVE_LIGAND_RECEPTOR_INTERACTION"]],
+plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
+             deg.ranks) 
+plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
+              deg.ranks)
+
+library(gridExtra)
+grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
+#plotEnrichment(kegg.lol[["KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM"]],
 #               deg.ranks)
 #plotEnrichment(kegg.lol[["KEGG_SNARE_INTERACTIONS_IN_VESICULAR_TRANSPORT"]],
 #              deg.ranks)
@@ -340,20 +345,22 @@ edo <- enrichDGN(de)
 
 ```
 
+### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Databse
+
 ```{r}
-fgseaRes_gwas <- fgsea(pathways = gwas.lol, 
-                  stats    = deg.ranks,
-                  nperm=10000, maxSize=500,
-                  scoreType = "pos")
-head(fgseaRes_gwas[order(pval), ])
-gwas_fgsea_pathway <- as.data.frame(gwas.fgsea)
-gwas_topPathwaysUp <- fgseaRes_gwas[ES > 0][head(order(pval), n=10), gwas_fgsea_pathway$pathway]
-gwas_topPathwaysDown <- fgseaRes_gwas[ES < 0][head(order(pval), n=10), gwas_fgsea_pathway$pathway]
-gwas_topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
-# plotGseaTable(gwas.lol[topPathways], deg.ranks, fgseaRes,
-#               gseaParam=0.5)
+filtered_genes <- ensembl_geneIDs %>% filter(P.Value < 0.01) 
+filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
+filtered_genes$entrezgene_id[1:30]
 
+# de <- names(geneList)[abs(geneList) > 2]
 
+edo <- enrichDGN(filtered_genes$entrezgene_id[1:30])
+
+barplot(edo, showCategory=20, font.size = 8) 
+
+```
+
+```{r}
 fgseaRes <- fgsea(pathways = kegg.lol, 
                   stats    = deg.ranks,
                   nperm=10000, maxSize=500,
@@ -372,22 +379,4 @@ plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
 #                          order(-NES), kegg_fgsea_pathway]
 # plotGseaTable(examplePathways[mainPathways], exampleRanks, fgseaRes, 
 #               gseaParam = 0.5)
-```
-
-```{r}
-rnk.file <- system.file("extdata", "naive.vs.th1.rnk", package="fgsea")
-gmt.file <- system.file("extdata", "human.reactome.gmt", package="fgsea")
-
-ranks <- read.table(rnk.file,
-                    header=TRUE, colClasses = c("character", "numeric"))
-ranks <- setNames(ranks$t, ranks$ID)
-str(ranks)
-
-pathways <- gmtPathways(gmt.file)
-str(head(pathways))
-
-fgseaRes <- fgsea(pathways, ranks, minSize=15, maxSize=500)
-head(fgseaRes)
-
-# pathways <- reactomePathways(names(deg.ranks))
 ```
