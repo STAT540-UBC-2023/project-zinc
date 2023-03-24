@@ -302,7 +302,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 85 significant pathways from REACTOME 'fgsea' analysis.
+There are 240 significant pathways from REACTOME 'fgsea' analysis.
 
 ### GO `fgsea` Analysis 
 
@@ -328,7 +328,7 @@ GO.fgsea[,
 
 ```{r}
 #Show result in table. 
-reactome.fgsea %>%
+GO.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge) %>% 
@@ -337,9 +337,12 @@ reactome.fgsea %>%
 
 ```{r}
 # filter significant pathways. Set p<0.05. 
-reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
-reactome_significant_pathways
+GO_significant_pathways <- GO.fgsea[padj < 0.05]
+GO_significant_pathways
 ```
+
+There are 3506 significant pathways present in the GO gene sets. 
+
 ### GWAS pathway Analysis
 
 ```{r}
