@@ -433,3 +433,14 @@ plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
 # plotGseaTable(examplePathways[mainPathways], exampleRanks, fgseaRes, 
 #               gseaParam = 0.5)
 ```
+
+## Test Over-representation
+
+#### KEGG `goseq` analysis  
+
+
+
+```{r}
+
+```
+
