@@ -261,7 +261,7 @@ ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
-- A moderate batch effect was observed for u2 vs. u1, the first 48
+- A moderate batch effect was observed for u2 vs. u1. The first 48
   samples will be used for downstream analysis
 
 ``` r
