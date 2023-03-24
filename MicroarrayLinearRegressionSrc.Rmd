@@ -97,7 +97,8 @@ ggplot(svd, aes(x=u1, y=u2, color = experiment)) + geom_point(size=3)
 ggplot(svd, aes(x=u2, y=u3, color = experiment)) + geom_point(size=3)
 ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
 ```
-* A moderate batch effect was observed, the first 48 samples will be used for downstream analysis 
+
+- A moderate batch effect was observed for u2 vs. u1, the first 48 samples will be used for downstream analysis 
 ```{r}
 meta <- pData(eset)[1:48,]
 ```
@@ -124,12 +125,13 @@ toLonger(express[1:48]) %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
   labs(x = "sample", y = "Gene Expression") 
 ```
+
 ### Linear Model Fitting
 ```{r}
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
-Significnat DE genes in T2D vs. Healthy
+Significant DE genes in T2D vs. Healthy
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d %>% head(10) 
