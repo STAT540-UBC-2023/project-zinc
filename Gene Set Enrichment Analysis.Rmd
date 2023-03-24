@@ -46,6 +46,13 @@ reactome.human.db <- msigdbr(species = "human",
                             subcategory = "CP:REACTOME")
 ```
 
+```{r}
+#Access the GO gene sets. 
+#Using all GO gene sets: biological process, cellular component, and molecular function. 
+GO.human.db <- msigdbr(species = "human", 
+                            category = "C5")
+
+```
 ### Obtain GWAS Catalog Information
 
 ```{r}
