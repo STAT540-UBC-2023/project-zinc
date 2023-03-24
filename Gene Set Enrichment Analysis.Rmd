@@ -112,7 +112,7 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
 ### Load DE Gene List
 
 ```{r}
-DEgenes<-readRDS("DEgenes.RDS")
+DEgenes<-readRDS("degT2d_DE.RDS")
 ```
 
 ### Data formatting for fgsea analysis
