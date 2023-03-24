@@ -1,7 +1,7 @@
 GSE41762 Regression Analysis
 ================
-Cindy Zhang + edit
-2023-02-19
+Cindy Zhang
+2023-03-23
 
 ### Loading Data
 
@@ -95,7 +95,6 @@ pData(eset) <- pData(eset) %>%
   mutate(sample_id = geo_accession) %>% 
   select("status:ch1",sample_id,"Sex:ch1", "bmi:ch1", "age:ch1") 
 colnames(pData(eset)) <- c("statu","sample_id","sex","bmi","age")
-
 pData(eset)$bmi %>% as.double()
 ```
 
@@ -127,7 +126,7 @@ pData(eset) <- pData(eset) %>%
   select(-c(bmi,statu))
 ```
 
-### Arrange factor levels
+### Arrange Factor Levels
 
 ``` r
 pData(eset) <- pData(eset) %>% 
@@ -135,7 +134,7 @@ pData(eset) <- pData(eset) %>%
   mutate(status = as.factor(status))
 ```
 
-### match ID between matrixes
+### match ID between matrices
 
 ``` r
 identical(colnames(exprs(eset)), pData(eset)$sample_id)
@@ -175,7 +174,7 @@ names(colSums(is.na(express))>0)
 express <- na.omit(express)
 ```
 
-### Combine data
+### Combine Data
 
 ``` r
 # metaData
@@ -184,7 +183,6 @@ MetaData <- pData(eset) %>%
   select(sample_id, status, BMI) %>% 
   mutate(samples = sample_id) %>% 
   filter(sample_id %in% id)
-
 toLongerMeta <- function(expset) {
     stopifnot(class(expset) == "ExpressionSet")
     expressionMatrix <- longExpressionMatrix <- express %>% 
@@ -196,7 +194,6 @@ toLongerMeta <- function(expset) {
     left_join(MetaData)
   return(expressionMatrix)
 }
-
 joint <- toLongerMeta(eset)
 ```
 
@@ -223,21 +220,13 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 
+## PCA to Evaluate Batch Effect
 
-## PCA for data visualization and batch effect evaluation 
 ``` r
-# pca_res_new <- prcomp(express, scale=TRUE)
-# autoplot(pca_res_new)
-# autoplot(pca_res, loadings.label = TRUE, x = 1, y = 2)
-# autoplot(pca_res, loadings = TRUE, loadings.label = TRUE, x = 3, y = 4)
-
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
-
 loadings <- s$v[, 1:3]
-
 scores <- express_scaled %*% loadings
-
 pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
 ```
 
@@ -245,48 +234,44 @@ pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3)
     ## `.name_repair` is omitted as of tibble 2.0.0.
     ## ℹ Using compatibility `.name_repair`.
 
-
 ``` r
 pca_data$sample_id = colnames(express)
-
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
 
-ggplot(pca_data, aes(x=PC2, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ggplot(pca_data, aes(x=PC3, y=PC2, shape=status, color = BMI)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
-ggplot(pca_data, aes(x=PC3, y=PC1, shape=status, color = BMI)) + geom_point(size=3)
+ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
-``` r
-#geom_text(aes(label = sample_id), size=2, nudge_y = 0.05)
+### Since PCA showed a moderate batch effect, we decided to focus on the first 48 samples for downstream analysis
 
-# ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
-# ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
+``` r
+meta <- pData(eset)[1:48,]
 ```
 
-- No discernable batch effect is observed. Thus, can combine the data
-  from both cohorts for the following study:
-
-# Samples in each group
+## Samples in Each Group
 
     ##          
     ##           nont2d t2d
-    ##   below30     53  14
-    ##   over30       4   6
+    ##   below30     38   8
+    ##   over30       0   2
 
-### pivot data format
+There are insufficient sample to fit an model with BMI as a covariate.
+Thus, a model will be focused on \~ T2D status
+
+### Pivot Data Format
 
 ``` r
 toLonger <- function(expressionMatrix) {
@@ -298,10 +283,8 @@ toLonger <- function(expressionMatrix) {
                  names_to = "sample_id") 
   return(expressionMatrix)
 }
-
 options(repr.plot.width = 30, repr.plot.height =2)
-
-toLonger(express) %>% 
+toLonger(express[1:48]) %>% 
   ggplot(aes(x=sample_id, y= Expression, color=sample_id)) +
   geom_boxplot() + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
@@ -310,61 +293,37 @@ toLonger(express) %>%
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-# linear model
+## Linear Models can only ealu
 
 ``` r
-modm <- model.matrix(~BMI*status, MetaData)
-lmFitEb <- eBayes(lmFit(express, modm))
+modm <- model.matrix(~status, meta)
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
-### DE genes in obese vs. nonobese healthy samples
+### DE genes in T2D vs. Healthy
 
 ``` r
-DEobH <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30")
-
-DEobH 
+degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
+degT2d %>% head(10) 
 ```
 
-    ##            logFC  AveExpr       t      P.Value  adj.P.Val        B
-    ## 8105842 0.838843 3.723151 5.38427 7.496431e-07 0.02153725 5.009532
-
-### DE genes in obese vs. nonobese T2D samples
-
-``` r
-DEObT2d <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "BMIover30:statust2d") 
-DEObT2d
-```
-
-    ## data frame with 0 columns and 0 rows
-
-### DE genes in T2D vs. Healthy in nonobese samples
-
-``` r
-degT2dNonOb <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
-
-degT2dNonOb
-```
-
-    ##              logFC  AveExpr         t      P.Value   adj.P.Val        B
-    ## 8126324  1.7876132 6.871139  5.435329 6.094995e-07 0.008479442 5.434372
-    ## 7987405 -0.8180883 6.938990 -5.424617 6.365888e-07 0.008479442 5.397516
-    ## 8003667  1.0519296 7.607950  5.281525 1.134188e-06 0.008479442 4.907905
-    ## 8092083 -1.1402907 7.542657 -5.259422 1.239325e-06 0.008479442 4.832737
-    ## 8169504  1.4197096 5.804192  5.215783 1.475712e-06 0.008479442 4.684705
-    ## 8092081 -0.6426602 5.205000 -5.020353 3.200400e-06 0.015324581 4.028178
-    ## 8122457  0.4473233 6.351325  4.737638 9.577256e-06 0.034431932 3.098696
-    ## 7930413  0.4717516 8.707440  4.683055 1.179353e-05 0.034431932 2.922250
-    ## 8077270 -0.9436999 6.612667 -4.681199 1.187705e-05 0.034431932 2.916268
-    ## 7946757 -0.2548382 6.529405 -4.674108 1.220150e-05 0.034431932 2.893426
-    ## 8139087  1.3069289 4.833279  4.652862 1.322613e-05 0.034431932 2.825087
-    ## 8115355 -1.1866442 6.787113 -4.618620 1.505589e-05 0.034431932 2.715284
-    ## 8098246  1.0475308 5.734678  4.609555 1.558006e-05 0.034431932 2.686286
+    ##              logFC   AveExpr         t      P.Value   adj.P.Val        B
+    ## 8003667  1.4034296  7.609690  6.316668 6.816466e-08 0.001958371 7.545931
+    ## 8095080  1.0921294  7.404872  5.542533 1.090848e-06 0.007738258 5.146712
+    ## 8043995  0.8684121  8.800716  5.529337 1.143097e-06 0.007738258 5.106089
+    ## 7938608  1.2241985  7.428053  5.511468 1.217814e-06 0.007738258 5.051107
+    ## 7952341  1.0060584  7.362819  5.435595 1.592742e-06 0.007738258 4.817966
+    ## 8139087  1.8199810  4.825679  5.431479 1.616065e-06 0.007738258 4.805336
+    ## 8097282  0.4422703  7.180575  5.191681 3.754117e-06 0.015407968 4.072531
+    ## 7974090 -0.3208450  7.017336 -5.150541 4.334315e-06 0.015565609 3.947504
+    ## 7954377 -0.9860317 13.168026 -5.059747 5.945901e-06 0.018906487 3.672402
+    ## 8156848  0.4525494  5.989503  5.007422 7.129418e-06 0.018906487 3.514405
 
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ``` r
-saveRDS(degT2dNonOb, file = "ObvsNonObHealthy.RDS")
+saveRDS(degT2d, file = "t2d.RDS")
 ```
 
 - Note: Result can be loaded into Aim 2 analysis using the following
-  code `readRDS("ObvsNonObHealthy.RDS")`
+  code `readRDS("t2d.RDS")`

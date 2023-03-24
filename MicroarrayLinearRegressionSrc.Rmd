@@ -107,6 +107,10 @@ scores <- express_scaled %*% loadings
 pca_data <- as_tibble(scores) %>% rename(PC1 = V1, PC2 = V2, PC3 = V3) 
 pca_data$sample_id = colnames(express)
 pca_data <- left_join(pca_data, MetaData, by = "sample_id")
+<<<<<<< HEAD
+=======
+
+>>>>>>> cf583f0b956814e01279a86995400bd33c4e3c56
 ggplot(pca_data, aes(x=PC1, y=PC2, color = experiment)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC2, y=PC3, color = experiment)) + geom_point(size=3)
 ggplot(pca_data, aes(x=PC3, y=PC1, color = experiment)) + geom_point(size=3)
@@ -147,6 +151,7 @@ toLonger(express[1:48]) %>%
 ```
 
 ## Linear Models can only ealu
+<<<<<<< HEAD
 
 ```{r}
 modm <- model.matrix(~status, meta)
@@ -161,10 +166,27 @@ degT2d %>% head(10)
   
 ```
 
+=======
+
+```{r}
+modm <- model.matrix(~status, meta)
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
+```
+
+### DE genes in T2D vs. Healthy
+
+```{r}
+degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
+degT2d %>% head(10) 
+  
+```
+
+>>>>>>> cf583f0b956814e01279a86995400bd33c4e3c56
 ### Saving relevant data for aim 2 gene enrichment analysis
 
 ```{r}
 saveRDS(degT2d, file = "t2d.RDS")
+<<<<<<< HEAD
 degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")
 degT2d_DE
 saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
@@ -173,3 +195,13 @@ saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
 -   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
 
 
+=======
+
+degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")
+degT2d_DE
+
+saveRDS(degT2d_DE, file = "degT2d_DE.RDS")
+```
+
+-   Note: Result can be loaded into Aim 2 analysis using the following code `readRDS("t2d.RDS")`
+>>>>>>> cf583f0b956814e01279a86995400bd33c4e3c56
