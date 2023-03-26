@@ -156,6 +156,9 @@ ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1",
       useCache=FALSE,
       mart=ensembl_human)
 
+```
+
+```{r}
 ## TODO: removed the redundant Ensembl gene ID
 
 ensembl_genes <-
@@ -228,7 +231,9 @@ make.gs.lol <- function(.dt) {
     names(.ret) <- .names
     return(.ret)
 }
+```
 
+```{r}
 #Convert the KEGG pathway tibble. 
 kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
 
@@ -276,7 +281,32 @@ kegg_significant_pathways
 
 ```
 
-There are 57 significant pathways.
+There are 80 significant pathways.
+
+```{r}
+#heatmap for KEGG pathway. 
+
+# Create the heatmap
+ggplot(kegg_significant_pathways, aes(x = pathway, y = 1, fill=NES )) +
+  geom_tile() +
+  
+  # Customize the color scheme
+  scale_fill_gradient(low = "white", high = "blue") +
+  
+  # Remove x-axis label and tick marks
+  xlab(NULL) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank()) +
+  
+  # Add a title and adjust other plot settings
+  ggtitle("KEGG GSEA Results Heatmap") +
+  theme(plot.title = element_text(hjust = 0.5, size = 16),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+```
 
 ### Reactome `fgsea` Analysis
 
@@ -315,7 +345,12 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 85 significant pathways from REACTOME 'fgsea' analysis.
+There are 240 significant pathways from REACTOME 'fgsea' analysis.
+
+```{r}
+
+
+```
 
 ### GO `fgsea` Analysis
 
@@ -341,7 +376,7 @@ GO.fgsea[,
 
 ```{r}
 #Show result in table. 
-reactome.fgsea %>%
+GO.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge) %>% 
@@ -350,10 +385,15 @@ reactome.fgsea %>%
 
 ```{r}
 # filter significant pathways. Set p<0.05. 
-reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
-reactome_significant_pathways
+GO_significant_pathways <- GO.fgsea[padj < 0.05]
+GO_significant_pathways
 ```
 
+<<<<<<< HEAD
+=======
+There are 3506 significant pathways present in the GO gene sets. 
+
+>>>>>>> 4589fe5a3f6d8e371ed0699955a125a945991bd0
 ### GWAS pathway Analysis
 
 ```{r}
@@ -444,3 +484,10 @@ plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
 # plotGseaTable(examplePathways[mainPathways], exampleRanks, fgseaRes, 
 #               gseaParam = 0.5)
 ```
+
+## Test Over-representation
+
+#### KEGG `goseq` analysis  
+
+
+
