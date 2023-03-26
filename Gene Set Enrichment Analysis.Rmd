@@ -116,16 +116,6 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
     knitr::kable()
 ```
 
-### Genes associated with obesity (\### might not need this \###)
-
-```{r}
-gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
-    head() %>%
-    mutate(p.value = num.sci(p.value)) %>%
-    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
-    knitr::kable()
-```
-
 ### Load DE Gene List
 
 ```{r}
@@ -250,6 +240,7 @@ kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "
 
 ```{r}
 # enriched KEGG pathway
+## TODO: FILTERED GENE DOESN'T EXIST YET
 kegg_enrich <- enrichKEGG(gene = filtered_genes$entrezgene_id[1:30],
                  organism     = 'human',
                  pvalueCutoff = 0.05)
@@ -389,11 +380,8 @@ GO_significant_pathways <- GO.fgsea[padj < 0.05]
 GO_significant_pathways
 ```
 
-<<<<<<< HEAD
-=======
-There are 3506 significant pathways present in the GO gene sets. 
+There are 3506 significant pathways present in the GO gene sets.
 
->>>>>>> 4589fe5a3f6d8e371ed0699955a125a945991bd0
 ### GWAS pathway Analysis
 
 ```{r}
@@ -452,15 +440,16 @@ grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
 ### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Databse
 
 ```{r}
-filtered_genes <- ensembl_geneIDs %>% filter(P.Value < 0.01) 
+filtered_genes <- ensembl_geneIDs %>% filter(P.Value < 0.05) 
 filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
 filtered_genes$entrezgene_id[1:30]
 
 # de <- names(geneList)[abs(geneList) > 2]
+unique(filtered_genes$entrezgene_id)
 
-edo <- enrichDGN(filtered_genes$entrezgene_id[1:30])
+edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
-barplot(edo, showCategory=20, font.size = 8) 
+barplot(edo, showCategory=25, font.size = 7) 
 
 ```
 
@@ -487,7 +476,4 @@ plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
 
 ## Test Over-representation
 
-#### KEGG `goseq` analysis  
-
-
-
+#### KEGG `goseq` analysis
