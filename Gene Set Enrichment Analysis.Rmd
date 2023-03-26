@@ -24,6 +24,7 @@ library(enrichplot)
 library(DOSE)
 library(clusterProfiler)
 library(enrichplot)
+library(biomaRt)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -119,28 +120,23 @@ gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
 ### Load DE Gene List
 
 ```{r}
+# read data frame for the DE genes
 DEgenes<-readRDS("degT2d_DE.RDS")
 ```
 
 ### Data formatting for fgsea analysis
 
 ```{r}
-# read data frame for the DE genes
-DEgenes
-DEgenes$test = rownames(DEgenes)
-
 # matched Ensembl IDs to probeIDs
 DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
-DEgenes
+head(DEgenes)
 
 ```
 
 ```{r}
-# convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
-
-library(biomaRt)
+# convert transcript cluster IDs (also desribed as probeIDs) into other gene ids
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
-ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id", "transcript_length", "chromosome_name"),
+ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id"),
       filters = "affy_hugene_1_0_st_v1",
       values = rownames(DEgenes),
       useCache=FALSE,
@@ -151,36 +147,19 @@ ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1",
 ```{r}
 ## TODO: removed the redundant Ensembl gene ID
 
-ensembl_genes <-
+ensemble_genes_clean <-
     ensemble_genes %>%  
-    dplyr::rename(probe = affy_hugene_1_0_st_v1) %>%   # Change the var. name
-    dplyr::rename(chr = chromosome_name) %>%     # shorten the chr name
     dplyr::rename(gene_symbol = hgnc_symbol) %>% # Will use human gene symbol
     as.data.table()
 
+ensemble_genes_clean$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes_clean$affy_hugene_1_0_st_v1)
 
-ensembl_genes <-
-    ensemble_genes[order(ensemble_genes$transcript_length, decreasing = TRUE),
-                   head(.SD, 1),
-                   by = .(probe, gene_symbol, chr)]
-
-ensembl_genes <- ensembl_genes %>%
-  group_by(probe, gene_symbol, chr) %>%
-  slice_max(transcript_length) %>%
-  arrange(desc(transcript_length))
-    
-
-ensemble_genes$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes$affy_hugene_1_0_st_v1)
-
-ensembl_geneIDs <- ensemble_genes %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
-# ensembl_geneIDs
+## Add on the p-values & other information in DEgenes
+ensembl_geneIDs <- ensemble_genes_clean %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
 
-# gene_id <- pull(ensembl_geneIDs, ensembl_gene_id)
-# gene_values <- as.numeric(DEgenes$logFC)
-
-sum(is.na(ensemble_genes$entrezgene_id))
+# Show NA's & other stats
 summary(ensemble_genes$entrezgene_id)
 ```
 
@@ -195,31 +174,41 @@ summary(ensemble_genes$entrezgene_id)
 ### Graphical Visualization
 
 ```{r}
-ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
+ensembl_geneIDs %>% 
+  arrange(adj.P.Val) %>% 
+  ggplot(aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
     geom_point(stroke=0) +
     xlab("genes") +
     geom_hline(yintercept = 1, lty = 2, colour="red") +
   geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
     geom_hline(yintercept = 2, lty = 2, colour="green") +
-    scale_y_continuous("adjusted p-value",
+    scale_y_continuous("negative log adjusted p-value",
                        breaks = c(1, 2, 4),
                        labels=function(x) num.sci(10^(-x)))
 
+```
+
+### Filtering for significantly differentially expressed genes 
+
+```{r}
+FDR <- 0.05
+
+filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR) 
 ```
 
 ### KEGG Pathway Analysis
 
 ```{r}
 # Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
-make.gs.lol <- function(.dt) {
-    .dt <- as.data.table(.dt) %>% unique()
-    .list <-
-        .dt[, .(gene = .(gene_symbol)), by = .(gs_name)] %>%
+make.gs.lol <- function(data) {
+    data <- as.data.table(data) %>% unique()
+    data_list <-
+        data[, .(gene = .(gene_symbol)), by = .(gs_name)] %>%
         as.list()
-    .names <- .list$gs_name
-    .ret <- .list$gene
-    names(.ret) <- .names
-    return(.ret)
+    names <- data_list$gs_name
+    return_value <- data_list$gene
+    names(return_value) <- names
+    return(return_value)
 }
 ```
 
@@ -233,7 +222,7 @@ deg.ranks <- ensembl_geneIDs %>%
   
 deg.ranks<-  deg.ranks %>% mutate(log_adjP = -log10(adj.P.Val))
 
-deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$hgnc_symbol; log_adjP })
+deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$gene_symbol; log_adjP })
 
 kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
 ```
@@ -272,7 +261,15 @@ kegg_significant_pathways
 
 ```
 
-There are 80 significant pathways.
+There are 77 significant pathways.
+
+### KEGG Pathway Visualization
+
+```{r}
+# for (gene_list in 1:length(kegg.fgsea$leadingEdge)) {
+#   print(kegg.fgsea$leadingEdge[[gene_list]])
+# }
+```
 
 ```{r}
 #heatmap for KEGG pathway. 
@@ -440,7 +437,7 @@ grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
 ### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Databse
 
 ```{r}
-filtered_genes <- ensembl_geneIDs %>% filter(P.Value < 0.05) 
+
 filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
 filtered_genes$entrezgene_id[1:30]
 
