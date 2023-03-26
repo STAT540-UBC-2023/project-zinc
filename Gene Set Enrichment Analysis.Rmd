@@ -54,7 +54,6 @@ GO.human.db <- msigdbr(species = "human",
 
 ```
 
-
 ### Obtain GWAS Catalog Information
 
 ```{r}
@@ -151,13 +150,32 @@ DEgenes
 
 library(biomaRt)
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
-ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id"),
+ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id", "transcript_length", "chromosome_name"),
       filters = "affy_hugene_1_0_st_v1",
       values = rownames(DEgenes),
       useCache=FALSE,
       mart=ensembl_human)
 
 ## TODO: removed the redundant Ensembl gene ID
+
+ensembl_genes <-
+    ensemble_genes %>%  
+    dplyr::rename(probe = affy_hugene_1_0_st_v1) %>%   # Change the var. name
+    dplyr::rename(chr = chromosome_name) %>%     # shorten the chr name
+    dplyr::rename(gene_symbol = hgnc_symbol) %>% # Will use human gene symbol
+    as.data.table()
+
+
+ensembl_genes <-
+    ensemble_genes[order(ensemble_genes$transcript_length, decreasing = TRUE),
+                   head(.SD, 1),
+                   by = .(probe, gene_symbol, chr)]
+
+ensembl_genes <- ensembl_genes %>%
+  group_by(probe, gene_symbol, chr) %>%
+  slice_max(transcript_length) %>%
+  arrange(desc(transcript_length))
+    
 
 ensemble_genes$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes$affy_hugene_1_0_st_v1)
 
@@ -299,7 +317,7 @@ reactome_significant_pathways
 
 There are 85 significant pathways from REACTOME 'fgsea' analysis.
 
-### GO `fgsea` Analysis 
+### GO `fgsea` Analysis
 
 ```{r}
 #Convert the GO tibble with the make.gs.lol function made previously. 
@@ -335,6 +353,7 @@ reactome.fgsea %>%
 reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
+
 ### GWAS pathway Analysis
 
 ```{r}
