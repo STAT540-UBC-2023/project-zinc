@@ -323,34 +323,6 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
 
-```{r}
-
-# filter significant pathways. Set p<0.05. 
-kegg.fgsea.sig <- kegg.fgsea[padj < 0.05]
-
-# Create the heatmap
-
-ggplot(kegg.fgsea.sig, aes(x = pathway, y = 1, fill = NES)) +
-  geom_tile() +
-  
-  # Customize the color scheme
-  scale_fill_gradient(low = "white", high = "blue") +
-  
-  # Remove x-axis label and tick marks
-  xlab(NULL) +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()) +
-  
-  # Add a title and adjust other plot settings
-  ggtitle("GSEA Results Heatmap") +
-  theme(plot.title = element_text(hjust = 0.5, size = 16),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank())
-```
-
 ### Reactome `fgsea` Analysis
 
 ```{r}
@@ -457,7 +429,7 @@ GO_significant_pathways <- GO.fgsea[padj < 0.05]
 GO_significant_pathways
 ```
 
-There are 3506 significant pathways present in the GO gene sets.
+There are 3358 significant pathways present in the GO gene sets.
 
 ### GO Analysis Visualization
 
@@ -489,7 +461,7 @@ go <- gseGO(geneList= go_gene_list,
 # dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
 
 # enrichment map
-emapplot(pairwise_termsim(go), cex_label_category = 0.5)
+emapplot(pairwise_termsim(go), cex.params = list(category_label = 0.01))
 
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
 ```
