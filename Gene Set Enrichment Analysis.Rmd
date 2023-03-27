@@ -22,7 +22,7 @@ library(data.table)
 library(R.utils)
 library(enrichplot)
 library(DOSE)
-# library(clusterProfiler)
+library(clusterProfiler)
 library(enrichplot)
 library(biomaRt)
 library(ggridges)
@@ -388,7 +388,6 @@ reactome_significant_pathways
 ```
 
 There are 257 significant pathways from REsACTOME 'fgsea' analysis.
-
 
 ### Reactome Visualization
 
