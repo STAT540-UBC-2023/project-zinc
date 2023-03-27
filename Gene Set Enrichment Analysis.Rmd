@@ -396,8 +396,6 @@ library(ReactomePA)
 library(org.Hs.eg.db)
 # BiocManager::install("ReactomePA")
 
-# unique(filtered_genes$entrezgene_id)
-
 reactome_gene_list <- gene_names$logFC
 # Name vector with ENTREZ ids
 names(reactome_gene_list) <- gene_names$entrezgene_id
@@ -420,53 +418,6 @@ reactome <- gsePathway(geneList = reactome_gene_list,
 ```{r}
 #enrichment map
 emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
-```
-
-```{r}
-# Create a bar chart of the enrichment scores for the top 10 pathways
-top_pathways <- head(reactome_significant_pathways[order(reactome_significant_pathways$ES, decreasing = TRUE), ], 20)
-ggplot(top_pathways, aes(x = pathway, y = ES)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 3))
-
-# dotplot
-dotplot(enriched_rc_genes, showCategory = 25, font.size = 8)
-## x-label: (count of core enrichment genes) / (count of pathway genes)
-
-# cnetplot
-cnetplot(enriched_rc_genes, showCategory = 20, max.overlaps = 40, cex_category = 1, cex_label_category = 0.35, cex_label_gene = 0.15)
-
-# # Extract the enrichment scores for each pathway as a matrix
-# pathway_matrix <- t(matrix(reactome_significant_pathways$ES, nrow = length(unique(reactome_significant_pathways$pathway))))
-# 
-# # Set the row and column names for the pathway matrix
-# colnames(pathway_matrix) <- unique(reactome_significant_pathways$pathway)
-# rownames(pathway_matrix) <- unique(reactome_significant_pathways$topGenes)
-# 
-# # Create a heatmap of the pathway enrichment scores
-# pheatmap(pathway_matrix, scale = "row", cluster_cols = FALSE)
-```
-
-```{r}
-install.packages("pheatmap")
-# Heatmap for reactome pathway. 
-library(pheatmap)
-
-# Sort the pathways by NES
-reactome_significant_pathways <- reactome_significant_pathways[order(NES)]
-
-# Create a matrix of NES scores for significant pathways
-nes_matrix <- t(reactome_significant_pathways[, .(NES)]) 
-
-# Create a color palette
-my_palette <- colorRampPalette(c("white", "red"))(n = 100)
-
-# Draw the heatmap
-pheatmap(nes_matrix,
-         cluster_cols = FALSE, 
-         cluster_rows = FALSE,
-         color = my_palette,
-         fontsize = 10)
 ```
 
 ### GO `fgsea` Analysis
