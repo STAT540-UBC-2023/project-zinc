@@ -463,31 +463,33 @@ There are 3506 significant pathways present in the GO gene sets.
 
 ```{r}
 # take the log2 fold change 
-go_gene_list <- ensembl_geneIDs$logFC
+go_gene_list <- gene_names$logFC
 # name the vector
-names(go_gene_list) <- ensembl_geneIDs$entrezgene_id
+names(go_gene_list) <- gene_names$entrezgene_id
 # omit any NA values 
 go_gene_list<-na.omit(go_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
-go_gene_list = sort(gene_list, decreasing = TRUE)
+go_gene_list = sort(go_gene_list, decreasing = TRUE)
+```
 
+```{r}
 # keytypes(org.Hs.eg.db)
 
-gse <- gseGO(geneList= go_gene_list,
+go <- gseGO(geneList= go_gene_list,
              ont ="ALL",
-             keyType = "ENSEMBL",
-             minGSSize = 3,
-             maxGSSize = 100,
+             minGSSize = 100,
+             maxGSSize = 500,
              pvalueCutoff = 0.05,
-             verbose = TRUE,
-             OrgDb = organism,
-             pAdjustMethod = "BH")
+             OrgDb = org.Hs.eg.db, 
+             verbose = FALSE)
+```
 
+```{r}
 # dotplot
-dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
+# dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
 
 # enrichment map
-emapplot(gse, showCategory = 10)
+emapplot(pairwise_termsim(go), cex_label_category = 0.5)
 
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
 ```
