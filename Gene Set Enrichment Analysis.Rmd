@@ -8,9 +8,9 @@ output: html_document
 ---
 
 ```{r}
-BiocManager::install("enrichplot")
-BiocManager::install("clusterProfiler")
-BiocManager::install("ggridges")
+# BiocManager::install("enrichplot")
+# BiocManager::install("clusterProfiler")
+# BiocManager::install("ggridges")
 ```
 
 ```{r}
@@ -324,12 +324,9 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
-
 ```{r}
-#heatmap for KEGG pathway. 
-
 # Create the heatmap
-ggplot(kegg_significant_pathways, aes(x = pathway, y = 1, fill=NES )) +
+ggplot(kegg.fgsea, aes(x = pathway, y = 1, fill = NES)) +
   geom_tile() +
   
   # Customize the color scheme
@@ -341,14 +338,13 @@ ggplot(kegg_significant_pathways, aes(x = pathway, y = 1, fill=NES )) +
         axis.ticks.x = element_blank()) +
   
   # Add a title and adjust other plot settings
-  ggtitle("KEGG GSEA Results Heatmap") +
+  ggtitle("GSEA Results Heatmap") +
   theme(plot.title = element_text(hjust = 0.5, size = 16),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         panel.background = element_blank())
-
 ```
 
 ### Reactome `fgsea` Analysis
@@ -388,7 +384,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 240 significant pathways from REACTOME 'fgsea' analysis.
+There are 215 significant pathways from REACTOME 'fgsea' analysis.
 
 ```{r}
 # library(ReactomePA)
@@ -396,6 +392,29 @@ There are 240 significant pathways from REACTOME 'fgsea' analysis.
 # unique(filtered_genes$entrezgene_id)
 
 ```
+
+
+```{r}
+# Heatmap for reactome pathway. 
+library(pheatmap)
+
+# Sort the pathways by NES
+reactome_significant_pathways <- reactome_significant_pathways[order(NES)]
+
+# Create a matrix of NES scores for significant pathways
+nes_matrix <- t(reactome_significant_pathways[, .(NES)]) 
+
+# Create a color palette
+my_palette <- colorRampPalette(c("white", "red"))(n = 100)
+
+# Draw the heatmap
+pheatmap(nes_matrix,
+         cluster_cols = FALSE, 
+         cluster_rows = FALSE,
+         color = my_palette,
+         fontsize = 10)
+```
+
 
 ### GO `fgsea` Analysis
 
