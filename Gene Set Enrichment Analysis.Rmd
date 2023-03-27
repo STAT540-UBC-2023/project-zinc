@@ -387,15 +387,8 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-<<<<<<< HEAD
 There are 257 significant pathways from REACTOME 'fgsea' analysis.
-=======
-<<<<<<< HEAD
-There are 259 significant pathways from REACTOME `fgsea` analysis.
-=======
-There are 215 significant pathways from REACTOME 'fgsea' analysis.
->>>>>>> 41961a94b72fa8a3264ef566450a290599f56f38
->>>>>>> 7f0f4eb648d314a4391d0b6919c46aec1c504f1d
+
 
 ```{r}
 
