@@ -417,8 +417,6 @@ reactome_gene_list = sort(reactome_gene_list, decreasing = TRUE)
 #plotting
 reactome <- gsePathway(geneList = reactome_gene_list, 
               organism     = "human",
-               minGSSize    = 3,
-               maxGSSize    = 100,
                pvalueCutoff = 0.05,
                pAdjustMethod = "BH", 
               verbose=False)
