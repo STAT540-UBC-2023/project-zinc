@@ -325,8 +325,13 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
 ```{r}
+
+# filter significant pathways. Set p<0.05. 
+kegg.fgsea.sig <- kegg.fgsea[padj < 0.05]
+
 # Create the heatmap
-ggplot(kegg.fgsea, aes(x = pathway, y = 1, fill = NES)) +
+
+ggplot(kegg.fgsea.sig, aes(x = pathway, y = 1, fill = NES)) +
   geom_tile() +
   
   # Customize the color scheme
@@ -384,13 +389,39 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 215 significant pathways from REACTOME 'fgsea' analysis.
+There are 257 significant pathways from REACTOME 'fgsea' analysis.
 
 ```{r}
-# library(ReactomePA)
+
 # BiocManager::install("ReactomePA")
+library(ReactomePA)
 # unique(filtered_genes$entrezgene_id)
 
+reactome_gene_list <- gene_names$logFC
+# Name vector with ENTREZ ids
+names(reactome_gene_list) <- gene_names$entrezgene_id
+# omit any NA values 
+reactome_gene_list<-na.omit(reactome_gene_list)
+# sort the list in decreasing order (required for clusterProfiler)
+reactome_gene_list = sort(reactome_gene_list, decreasing = TRUE)
+
+```
+
+```{r}
+#plotting
+reactome <- gsePathway(geneList = reactome_gene_list, 
+              organism     = "human",
+               minGSSize    = 3,
+               maxGSSize    = 100,
+               pvalueCutoff = 0.05,
+               pAdjustMethod = "BH", 
+              verbose=False)
+```
+
+
+```{r}
+#enrichment map
+emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
 ```
 
 
