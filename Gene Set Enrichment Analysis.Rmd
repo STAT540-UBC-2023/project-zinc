@@ -403,7 +403,6 @@ There are 215 significant pathways from REACTOME 'fgsea' analysis.
 library(ReactomePA)
 # unique(filtered_genes$entrezgene_id)
 
-<<<<<<< HEAD
 reactome_gene_list <- gene_names$logFC
 # Name vector with ENTREZ ids
 names(reactome_gene_list) <- gene_names$entrezgene_id
@@ -429,7 +428,10 @@ reactome <- gsePathway(geneList = reactome_gene_list,
 ```{r}
 #enrichment map
 emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
-=======
+```
+
+
+```{r}
 
 # Create a bar chart of the enrichment scores for the top 10 pathways
 top_pathways <- head(reactome_significant_pathways[order(reactome_significant_pathways$ES, decreasing = TRUE), ], 20)
@@ -448,10 +450,6 @@ rownames(pathway_matrix) <- unique(reactome_significant_pathways$topGenes)
 # Create a heatmap of the pathway enrichment scores
 pheatmap(pathway_matrix, scale = "row", cluster_cols = FALSE)
 
-
-
-
->>>>>>> 7f0f4eb648d314a4391d0b6919c46aec1c504f1d
 ```
 
 
