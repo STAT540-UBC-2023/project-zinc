@@ -395,8 +395,6 @@ There are 257 significant pathways from REsACTOME 'fgsea' analysis.
 library(ReactomePA)
 library(org.Hs.eg.db)
 # BiocManager::install("ReactomePA")
-rc_gene_list <- unique(filtered_genes$entrezgene_id)
-enriched_rc_genes <- enrichPathway(gene=rc_gene_list, pvalueCutoff = 0.05, readable=TRUE)
 
 # unique(filtered_genes$entrezgene_id)
 
@@ -413,10 +411,10 @@ reactome_gene_list = sort(reactome_gene_list, decreasing = TRUE)
 ```{r}
 #plotting
 reactome <- gsePathway(geneList = reactome_gene_list, 
-              organism     = "human",
+                       organism = "human", 
                pvalueCutoff = 0.05,
                pAdjustMethod = "BH", 
-              verbose=False)
+              verbose=FALSE)
 ```
 
 ```{r}
