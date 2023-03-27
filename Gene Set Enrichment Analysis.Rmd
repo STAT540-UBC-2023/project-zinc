@@ -22,7 +22,7 @@ library(data.table)
 library(R.utils)
 library(enrichplot)
 library(DOSE)
-library(clusterProfiler)
+# library(clusterProfiler)
 library(enrichplot)
 library(biomaRt)
 library(ggridges)
@@ -322,6 +322,7 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
+
 ```{r}
 # Create the heatmap
 ggplot(kegg.fgsea, aes(x = pathway, y = 1, fill = NES)) +
@@ -372,8 +373,7 @@ reactome.fgsea[,
 reactome.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
-    dplyr::select(-leadingEdge) %>% 
-    knitr::kable()
+    dplyr::select(-leadingEdge)
 ```
 
 ```{r}
@@ -382,16 +382,27 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-<<<<<<< HEAD
-There are 259 significant pathways from REACTOME `fgsea` analysis.
-=======
 There are 215 significant pathways from REACTOME 'fgsea' analysis.
->>>>>>> 41961a94b72fa8a3264ef566450a290599f56f38
+
+### Reactome Visualization
 
 ```{r}
-# library(ReactomePA)
+library(ReactomePA)
+library(org.Hs.eg.db)
 # BiocManager::install("ReactomePA")
-# unique(filtered_genes$entrezgene_id)
+rc_gene_list <- unique(filtered_genes$entrezgene_id)
+enriched_rc_genes <- enrichPathway(gene=rc_gene_list, pvalueCutoff = 0.05, readable=TRUE)
+
+y <- mutate(enriched_rc_genes, ordering = abs(NES)) %>%
+        arrange(desc(ordering)) 
+
+# Visualize the results using gseaplot
+gseaplot(enriched_rc_genes, 
+         title = "Reactome Pathway Enrichment Analysis",
+         top_term = 10, 
+         yaxis_scale = "log2")
+
+enrichMap(enriched_rc_genes, layout=igraph::layout.kamada.kawai, vertex.label.cex = 1)
 
 
 # Create a bar chart of the enrichment scores for the top 10 pathways
@@ -401,23 +412,26 @@ ggplot(top_pathways, aes(x = pathway, y = ES)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 3))
 
 
-# Extract the enrichment scores for each pathway as a matrix
-pathway_matrix <- t(matrix(reactome_significant_pathways$ES, nrow = length(unique(reactome_significant_pathways$pathway))))
+# # Extract the enrichment scores for each pathway as a matrix
+# pathway_matrix <- t(matrix(reactome_significant_pathways$ES, nrow = length(unique(reactome_significant_pathways$pathway))))
+# 
+# # Set the row and column names for the pathway matrix
+# colnames(pathway_matrix) <- unique(reactome_significant_pathways$pathway)
+# rownames(pathway_matrix) <- unique(reactome_significant_pathways$topGenes)
+# 
+# # Create a heatmap of the pathway enrichment scores
+# pheatmap(pathway_matrix, scale = "row", cluster_cols = FALSE)
 
-# Set the row and column names for the pathway matrix
-colnames(pathway_matrix) <- unique(reactome_significant_pathways$pathway)
-rownames(pathway_matrix) <- unique(reactome_significant_pathways$topGenes)
+# dotplot
+dotplot(enriched_rc_genes, showCategory = 25, font.size = 8)
+## x-label: (count of core enrichment genes) / (count of pathway genes)
 
-# Create a heatmap of the pathway enrichment scores
-pheatmap(pathway_matrix, scale = "row", cluster_cols = FALSE)
-
-
-
-
+# cnetplot
+cnetplot(enriched_rc_genes, showCategory = 20, max.overlaps = 40, cex_category = 1, cex_label_category = 0.35, cex_label_gene = 0.15)
 ```
 
-
 ```{r}
+install.packages("pheatmap")
 # Heatmap for reactome pathway. 
 library(pheatmap)
 
@@ -437,7 +451,6 @@ pheatmap(nes_matrix,
          color = my_palette,
          fontsize = 10)
 ```
-
 
 ### GO `fgsea` Analysis
 
@@ -490,7 +503,7 @@ go_gene_list<-na.omit(go_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
 go_gene_list = sort(gene_list, decreasing = TRUE)
 
-keytypes(org.Hs.eg.db)
+# keytypes(org.Hs.eg.db)
 
 gse <- gseGO(geneList= go_gene_list,
              ont ="ALL",
