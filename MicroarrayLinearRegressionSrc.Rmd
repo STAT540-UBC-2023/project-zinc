@@ -98,15 +98,19 @@ ggplot(svd, aes(x=U2, y=U3, color = experiment)) + geom_point(size=3)
 ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
 ```
 
-- A moderate batch effect was observed for U2 vs. U1, the first 48 samples will be used for downstream analysis 
-```{r}
+- A moderate batch effect was observed for U2 vs. U1 and U3 vs. U1. Thus, the two experiments will be analyzed separately 
+
+```{r echo = False}
 meta <- pData(eset)[1:48,]
 meta_2 <- pData(eset)[49:77,]
 ```
-Samples in Each Group
+Samples in Each Experiment
 - There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on ~ T2D status
+
 ```{r, echo=FALSE}
+# Experiment 1
 table(meta$BMI, meta$status)
+#Experiment 2
 table(meta_2$BMI, meta_2$status)
 ```
 Pivot Data Format
@@ -135,7 +139,7 @@ For experiment 1 (sample 1 to 48)
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
-Significant DE genes in T2D vs. Healthy 
+Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d %>% head(10) 
@@ -147,7 +151,7 @@ modm_2<- model.matrix(~BMI*status, meta_2)
 lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
 ```
 
-No Significant DE were observed for BMI, T2D or their interactions
+No Significant DE were observed for BMI, T2D or their interactions in experiment 2(n=29)
 ```{r}
 degOB <- topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
 

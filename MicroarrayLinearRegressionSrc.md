@@ -270,13 +270,9 @@ ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
 - A moderate batch effect was observed for U2 vs. U1 and U3 vs. U1.
   Thus, the two experiments will be analyzed separately
 
-``` r
-meta <- pData(eset)[1:48,]
-meta_2 <- pData(eset)[49:77,]
-```
-
-Samples in Each Group - There are insufficient sample to fit an model
-with BMI as a covariate. Thus, a model will be focused on \~ T2D status
+Samples in Each Experiment - There are insufficient sample to fit an
+model with BMI as a covariate. Thus, a model will be focused on \~ T2D
+status
 
     ##          
     ##           nont2d t2d
