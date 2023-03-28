@@ -89,23 +89,25 @@ express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 loadings <- s$v[, 1:3]
 scores <- express_scaled %*% loadings
-svd <- as_data_frame(scores) %>% rename(u1 = V1, u2 = V2, u3 = V3) 
+svd <- as_data_frame(scores) %>% rename(U1 = V1, U2 = V2, U3 = V3) 
 svd$sample_id = colnames(express)
 svd <- left_join(svd, MetaData, by = "sample_id")
 
-ggplot(svd, aes(x=u1, y=u2, color = experiment)) + geom_point(size=3)
-ggplot(svd, aes(x=u2, y=u3, color = experiment)) + geom_point(size=3)
-ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U1, y=U2, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U2, y=U3, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
 ```
 
-- A moderate batch effect was observed for u2 vs. u1, the first 48 samples will be used for downstream analysis 
+- A moderate batch effect was observed for U2 vs. U1, the first 48 samples will be used for downstream analysis 
 ```{r}
 meta <- pData(eset)[1:48,]
+meta_2 <- pData(eset)[49:77,]
 ```
 Samples in Each Group
 - There are insufficient sample to fit an model with BMI as a covariate. Thus, a model will be focused on ~ T2D status
 ```{r, echo=FALSE}
 table(meta$BMI, meta$status)
+table(meta_2$BMI, meta_2$status)
 ```
 Pivot Data Format
 ```{r}
@@ -127,15 +129,31 @@ toLonger(express[1:48]) %>%
 ```
 
 ### Linear Model Fitting
+
+For experiment 1 (sample 1 to 48)
 ```{r}
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
-Significant DE genes in T2D vs. Healthy
+Significant DE genes in T2D vs. Healthy 
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d %>% head(10) 
 ```
+
+For Experiment 2 (Sample 49 to 77)
+```{r}
+modm_2<- model.matrix(~BMI*status, meta_2)
+lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
+```
+
+No Significant DE were observed for BMI, T2D or their interactions
+```{r}
+degOB <- topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
+
+degOB %>% head(10) 
+```
+
 Saving all DE gene for aim 2 gene set enrichment analysis
 ```{r}
 degT2d_DE  <- topTable(lmFitEb, number = Inf, coef= "statust2d")

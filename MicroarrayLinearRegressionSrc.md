@@ -227,45 +227,52 @@ express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 loadings <- s$v[, 1:3]
 scores <- express_scaled %*% loadings
-svd <- as_data_frame(scores) %>% rename(u1 = V1, u2 = V2, u3 = V3) 
+svd <- as_data_frame(scores) %>% rename(U1 = V1, U2 = V2, U3 = V3) 
 ```
 
     ## Warning: `as_data_frame()` was deprecated in tibble 2.0.0.
     ## ℹ Please use `as_tibble()` instead.
     ## ℹ The signature and semantics have changed, see `?as_tibble`.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
 
     ## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if
     ## `.name_repair` is omitted as of tibble 2.0.0.
     ## ℹ Using compatibility `.name_repair`.
     ## ℹ The deprecated feature was likely used in the tibble package.
     ##   Please report the issue at <]8;;https://github.com/tidyverse/tibble/issueshttps://github.com/tidyverse/tibble/issues]8;;>.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
 
 ``` r
 svd$sample_id = colnames(express)
 svd <- left_join(svd, MetaData, by = "sample_id")
 
-ggplot(svd, aes(x=u1, y=u2, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U1, y=U2, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ggplot(svd, aes(x=u2, y=u3, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U2, y=U3, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
-ggplot(svd, aes(x=u3, y=u1, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
-- A moderate batch effect was observed for u2 vs. u1. The first 48
-  samples will be used for downstream analysis
+- A moderate batch effect was observed for U2 vs. U1 and U3 vs. U1.
+  Thus, the two experiments will be analyzed separately
 
 ``` r
 meta <- pData(eset)[1:48,]
+meta_2 <- pData(eset)[49:77,]
 ```
 
 Samples in Each Group - There are insufficient sample to fit an model
@@ -275,6 +282,11 @@ with BMI as a covariate. Thus, a model will be focused on \~ T2D status
     ##           nont2d t2d
     ##   below30     38   8
     ##   over30       0   2
+
+    ##          
+    ##           nont2d t2d
+    ##   below30     15   6
+    ##   over30       4   4
 
 Pivot Data Format
 
@@ -300,12 +312,14 @@ toLonger(express[1:48]) %>%
 
 ### Linear Model Fitting
 
+For experiment 1 (sample 1 to 48)
+
 ``` r
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
 ```
 
-Significant DE genes in T2D vs. Healthy
+Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
 
 ``` r
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
@@ -323,6 +337,24 @@ degT2d %>% head(10)
     ## 7974090 -0.3208450  7.017336 -5.150541 4.334315e-06 0.015565609 3.947504
     ## 7954377 -0.9860317 13.168026 -5.059747 5.945901e-06 0.018906487 3.672402
     ## 8156848  0.4525494  5.989503  5.007422 7.129418e-06 0.018906487 3.514405
+
+For Experiment 2 (Sample 49 to 77)
+
+``` r
+modm_2<- model.matrix(~BMI*status, meta_2)
+lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
+```
+
+No Significant DE were observed for BMI, T2D or their interactions in
+experiment 2(n=29)
+
+``` r
+degOB <- topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
+
+degOB %>% head(10) 
+```
+
+    ## data frame with 0 columns and 0 rows
 
 Saving all DE gene for aim 2 gene set enrichment analysis
 
