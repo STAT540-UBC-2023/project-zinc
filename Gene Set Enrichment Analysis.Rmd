@@ -1,3 +1,5 @@
+------------------------------------------------------------------------
+
 ---
 title: "Gene Set Enrichment Analysis"
 author: "Lucy Chi"
@@ -6,15 +8,13 @@ output: html_document
 ---
 
 ```{r}
-BiocManager::install("enrichplot")
-BiocManager::install("clusterProfiler")
+# BiocManager::install("enrichplot")
+# BiocManager::install("clusterProfiler")
+# BiocManager::install("ggridges")
 ```
 
 ```{r}
-knitr::opts_chunk$set(echo = TRUE)
-library(knitr)
 library(tidyverse)
-library(GEOquery)
 library(fgsea)
 library(ggfortify)
 library(msigdbr) 
@@ -24,11 +24,13 @@ library(enrichplot)
 library(DOSE)
 library(clusterProfiler)
 library(enrichplot)
+library(biomaRt)
+library(ggridges)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
 
-### Obtain Molecular Signature Database (KEGG and reactome pathways)
+### Obtain Molecular Signature Database (KEGG, reactome and GO pathways)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
@@ -44,6 +46,14 @@ kegg.human.db <- msigdbr::msigdbr(species = "human",
 reactome.human.db <- msigdbr(species = "human", 
                             category = "C2", 
                             subcategory = "CP:REACTOME")
+```
+
+```{r}
+#Access the GO gene sets. 
+#Using all GO gene sets: biological process, cellular component, and molecular function. 
+GO.human.db <- msigdbr(species = "human", 
+                            category = "C5")
+
 ```
 
 ### Obtain GWAS Catalog Information
@@ -102,45 +112,30 @@ gwas.db <- fread(gwas.tidy.file)
 gwas.db[, gs_name := `DISEASE/TRAIT`]
 
 gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
-    head() %>%
     mutate(p.value = num.sci(p.value)) %>%
-    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
-    knitr::kable()
-```
+    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) 
 
-### Genes associated with obesity (\### might not need this \###)
-
-```{r}
-gwas.db[str_detect(`DISEASE/TRAIT`, "[Oo]besity") & !is.na(gene_symbol)] %>%
-    head() %>%
-    mutate(p.value = num.sci(p.value)) %>%
-    dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) %>%
-    knitr::kable()
+## 3388 genes identified
 ```
 
 ### Load DE Gene List
 
 ```{r}
+# read data frame for the DE genes
 DEgenes<-readRDS("degT2d_DE.RDS")
 ```
 
-### Data formatting for fgsea analysis
+### Data formatting for `fgsea` analysis
 
 ```{r}
-# read data frame for the DE genes
-DEgenes
-DEgenes$test = rownames(DEgenes)
-
 # matched Ensembl IDs to probeIDs
 DEgenes$affy_hugene_1_0_st_v1 <- row.names(DEgenes) 
-DEgenes
+head(DEgenes)
 
 ```
 
 ```{r}
-# convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
-
-# library(biomaRt)
+# convert transcript cluster IDs (also desribed as probeIDs) into other gene ids
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
 ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id"),
       filters = "affy_hugene_1_0_st_v1",
@@ -148,20 +143,48 @@ ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1",
       useCache=FALSE,
       mart=ensembl_human)
 
-## TODO: removed the redundant Ensembl gene ID
+```
 
-ensemble_genes$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes$affy_hugene_1_0_st_v1)
+```{r}
+# data clean up and rename
+ensemble_genes_clean <-
+    ensemble_genes %>%  
+    dplyr::rename(gene_symbol = hgnc_symbol) %>% # Will use human gene symbol
+    as.data.table()
 
-ensembl_geneIDs <- ensemble_genes %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
-# ensembl_geneIDs
+ensemble_genes_clean$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes_clean$affy_hugene_1_0_st_v1)
+
+## Add on the p-values & other information in DEgenes
+ensembl_geneIDs <- ensemble_genes_clean %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
 
-# gene_id <- pull(ensembl_geneIDs, ensembl_gene_id)
-# gene_values <- as.numeric(DEgenes$logFC)
-
-sum(is.na(ensemble_genes$entrezgene_id))
+# Show NA's & other stats
 summary(ensemble_genes$entrezgene_id)
+```
+
+```{r}
+#remove duplicated gene names
+logFC_genes <- ensembl_geneIDs$logFC
+# name the vector
+names(logFC_genes) <- ensembl_geneIDs$ensembl_gene_id
+# omit any NA values 
+gene_list<-na.omit(logFC_genes)
+
+# sort the list in decreasing order (required for clusterProfiler)
+gene_list = sort(gene_list, decreasing = TRUE)
+```
+
+```{r}
+# make deg.ranks for gfsea analysis later
+deg.ranks <- ensembl_geneIDs %>%
+    arrange(P.Value) %>% 
+    as.data.table 
+  
+deg.ranks <- deg.ranks %>% mutate(log_adjP = -log10(adj.P.Val))
+
+deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$gene_symbol; log_adjP })
+
 ```
 
 ### Heat Map for T2D vs Healthy DE genes
@@ -175,57 +198,56 @@ summary(ensemble_genes$entrezgene_id)
 ### Graphical Visualization
 
 ```{r}
-ggplot(ensembl_geneIDs, aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
+ensembl_geneIDs %>% 
+  arrange(adj.P.Val) %>% 
+  ggplot(aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
     geom_point(stroke=0) +
-    xlab("genes") +
+    labs(x = "ranked genes", y = "-log(adj.P)") +
     geom_hline(yintercept = 1, lty = 2, colour="red") +
   geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
     geom_hline(yintercept = 2, lty = 2, colour="green") +
-    scale_y_continuous("adjusted p-value",
+    scale_y_continuous("negative log adjusted p-value",
                        breaks = c(1, 2, 4),
                        labels=function(x) num.sci(10^(-x)))
 
 ```
 
-### KEGG Pathway Analysis
+### View KEGG Enriched Pathways Associated with T2D
 
 ```{r}
-# Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
-make.gs.lol <- function(.dt) {
-    .dt <- as.data.table(.dt) %>% unique()
-    .list <-
-        .dt[, .(gene = .(gene_symbol)), by = .(gs_name)] %>%
-        as.list()
-    .names <- .list$gs_name
-    .ret <- .list$gene
-    names(.ret) <- .names
-    return(.ret)
-}
+# FDR <- 0.05
+# filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR) 
 
-#Convert the KEGG pathway tibble. 
-kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
-
-deg.ranks <- ensembl_geneIDs %>%
-    arrange(P.Value) %>% 
-    as.data.table 
-  
-deg.ranks<-  deg.ranks %>% mutate(log_adjP = -log10(adj.P.Val))
-
-deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$hgnc_symbol; log_adjP })
-
-kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
-```
-
-```{r}
-# enriched KEGG pathway
-kegg_enrich <- enrichKEGG(gene = filtered_genes$entrezgene_id[1:30],
+kegg_enrich <- enrichKEGG(gene = ensembl_geneIDs$entrezgene_id,
                  organism     = 'human',
                  pvalueCutoff = 0.05)
 
-# visualize the enriched pathway
-## Type II diabetes mellitus
+# visualize the enriched pathway - find the T2D pathway
 browseKEGG(kegg_enrich, 'hsa04930')
+```
 
+### `fgsea` analysis
+
+```{r}
+# Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
+make.gs.lol <- function(data) {
+    data <- as.data.table(data) %>% unique()
+    data_list <-
+        data[, .(gene = .(gene_symbol)), by = .(gs_name)] %>%
+        as.list()
+    names <- data_list$gs_name
+    return_value <- data_list$gene
+    names(return_value) <- names
+    return(return_value)
+}
+```
+
+### KEGG Pathway Analysis
+
+```{r}
+#Convert the KEGG pathway tibble
+kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
 ```
 
 ### KEGG `fgsea` Analysis
@@ -238,18 +260,68 @@ kegg.fgsea[,
 kegg.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
-    dplyr::select(-leadingEdge) %>% head()
-kegg.fgsea
+    dplyr::select(-leadingEdge)
 ```
 
 ```{r}
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
-kegg_significant_pathways
 
+kegg_significant_pathways <- sort(kegg_significant_pathways$padj, decreasing = TRUE)
+kegg_significant_pathways
 ```
 
-There are 57 significant pathways.
+There are 77 significant pathways.
+
+### KEGG Pathway Visualization
+
+```{r}
+#some examples from KEGG pathway
+plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
+             deg.ranks) 
+plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
+              deg.ranks)
+
+library(gridExtra)
+grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
+```
+
+```{r}
+geneids <-bitr(names(logFC_genes), fromType = "ENSEMBL", toType = "ENTREZID", OrgDb="org.Hs.eg.db")
+
+#delete duplicate IDs
+dedup_ids = geneids[!duplicated(geneids[c("ENSEMBL")]),]
+# Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
+gene_names = ensembl_geneIDs[ensembl_geneIDs$ensembl_gene_id %in% dedup_ids$ENSEMBL,]
+# Create a vector of the gene unuiverse
+kegg_gene_list <- gene_names$logFC
+# Name vector with ENTREZ ids
+names(kegg_gene_list) <- gene_names$entrezgene_id
+# omit any NA values 
+kegg_gene_list<-na.omit(kegg_gene_list)
+# sort the list in decreasing order (required for clusterProfiler)
+kegg_gene_list = sort(kegg_gene_list, decreasing = TRUE)
+
+#plotting
+kk2 <- gseKEGG(geneList     = kegg_gene_list,
+               organism     = "hsa",
+               minGSSize    = 3,
+               maxGSSize    = 100,
+               pvalueCutoff = 0.05,
+               pAdjustMethod = "none",
+               keyType       = "ncbi-geneid")
+#enrichment map
+emapplot(pairwise_termsim(kk2), cex_label_category = 0.5)
+
+# category netplot
+cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5) # this is prob not very useful
+
+# Ridgeplot
+ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
+## isoleucine degradation is down-regulated - a branched amino acid that will cause maple syrup urine disease when its concentration is too high
+
+# https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
+```
 
 ### Reactome `fgsea` Analysis
 
@@ -268,7 +340,7 @@ reactome.fgsea <- fgsea::fgsea(pathways = REACTOME.lol, stats = deg.ranks, score
 ```{r}
 #Show top 5 genes for each pathway:
 # Here, we are "pasting" the first five genes in the leadingEdge column
-kegg.fgsea[,
+reactome.fgsea[,
            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
            by = .(pathway)]
 ```
@@ -278,8 +350,7 @@ kegg.fgsea[,
 reactome.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
-    dplyr::select(-leadingEdge) %>% 
-    knitr::kable()
+    dplyr::select(-leadingEdge)
 ```
 
 ```{r}
@@ -288,7 +359,122 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 85 significant pathways from REACTOME 'fgsea' analysis.
+There are 257 significant pathways from REsACTOME 'fgsea' analysis.
+
+### Reactome Visualization
+
+```{r}
+library(ReactomePA)
+library(org.Hs.eg.db)
+# BiocManager::install("ReactomePA")
+
+reactome_gene_list <- gene_names$logFC
+# Name vector with ENTREZ ids
+names(reactome_gene_list) <- gene_names$entrezgene_id
+# omit any NA values 
+reactome_gene_list<-na.omit(reactome_gene_list)
+# sort the list in decreasing order (required for clusterProfiler)
+reactome_gene_list = sort(reactome_gene_list, decreasing = TRUE)
+
+```
+
+```{r}
+#plotting
+reactome <- gsePathway(geneList = reactome_gene_list, 
+                       organism = "human", 
+               pvalueCutoff = 0.05,
+               pAdjustMethod = "BH", 
+              verbose=FALSE)
+```
+
+```{r}
+#enrichment map
+emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
+```
+
+```{r}
+# category netplot
+cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5)
+
+# Ridgeplot
+ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
+
+```
+
+### GO `fgsea` Analysis
+
+
+```{r}
+#Convert the GO tibble with the make.gs.lol function made previously. 
+GO.lol <- GO.human.db %>% 
+  dplyr :: select(gene_symbol, gs_name) %>% 
+  make.gs.lol()
+```
+
+```{r}
+# GSEA with fgsea()
+GO.fgsea <- fgsea::fgsea(pathways = GO.lol, stats = deg.ranks, scoreType = "pos")
+```
+
+```{r}
+#Show top 5 genes for each pathway:
+# Here, we are "pasting" the first five genes in the leadingEdge column
+GO.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+```
+
+```{r}
+#Show result in table. 
+GO.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge) %>% 
+    knitr::kable()
+```
+
+```{r}
+# filter significant pathways. Set p<0.05. 
+GO_significant_pathways <- GO.fgsea[padj < 0.05]
+GO_significant_pathways
+```
+
+There are 3358 significant pathways present in the GO gene sets.
+
+### GO Analysis Visualization
+
+```{r}
+# take the log2 fold change 
+go_gene_list <- gene_names$logFC
+# name the vector
+names(go_gene_list) <- gene_names$entrezgene_id
+# omit any NA values 
+go_gene_list<-na.omit(go_gene_list)
+# sort the list in decreasing order (required for clusterProfiler)
+go_gene_list = sort(go_gene_list, decreasing = TRUE)
+```
+
+```{r}
+# keytypes(org.Hs.eg.db)
+
+go <- gseGO(geneList= go_gene_list,
+             ont ="ALL",
+             minGSSize = 100,
+             maxGSSize = 500,
+             pvalueCutoff = 0.05,
+             OrgDb = org.Hs.eg.db, 
+             verbose = FALSE)
+```
+
+```{r}
+# dotplot
+# dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
+
+# enrichment map
+emapplot(pairwise_termsim(go), cex.params = list(category_label = 0.01))
+
+# https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
+```
 
 ### GWAS pathway Analysis
 
@@ -314,69 +500,25 @@ gwas.fgsea
 
 -   400 pathways are identified using GWAS pathway
 
-### Enrichment Score Plots for KEGG Pathways
+### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Database
 
 ```{r}
-data$entrez = mapIds(kegg.human.db,
-                    keys=row.names(data), #Column containing Ensembl gene ids
-                    column="ENTREZID",
-                    keytype="ENSEMBL",
-                    multiVals="first")
-```
+FDR <- 0.05
+filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR)
 
-```{r}
-#some examples from KEGG pathway
-
-plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
-             deg.ranks) 
-plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
-              deg.ranks)
-
-library(gridExtra)
-grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
-#plotEnrichment(kegg.lol[["KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM"]],
-#               deg.ranks)
-#plotEnrichment(kegg.lol[["KEGG_SNARE_INTERACTIONS_IN_VESICULAR_TRANSPORT"]],
-#              deg.ranks)
-#plotEnrichment(kegg.lol[["KEGG_T_CELL_RECEPTOR_SIGNALING_PATHWAY"]],
-#              deg.ranks)
-#plotEnrichment(kegg.lol[["KEGG_WNT_SIGNALING_PATHWAY"]],
-#             deg.ranks)
-
-```
-
-### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Databse
-
-```{r}
-filtered_genes <- ensembl_geneIDs %>% filter(P.Value < 0.01) 
 filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
 filtered_genes$entrezgene_id[1:30]
 
 # de <- names(geneList)[abs(geneList) > 2]
+unique(filtered_genes$entrezgene_id)
 
-edo <- enrichDGN(filtered_genes$entrezgene_id[1:30])
+edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
-barplot(edo, showCategory=20, font.size = 8) 
-
+barplot(edo, showCategory=25, font.size = 7) 
 ```
 
-```{r}
-fgseaRes <- fgsea(pathways = kegg.lol, 
-                  stats    = deg.ranks,
-                  nperm=10000, maxSize=500,
-                  scoreType = "pos")
-head(fgseaRes[order(pval), ])
-kegg_fgsea_pathway <- as.data.frame(kegg.fgsea)
-kegg_topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
-kegg_topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), kegg_fgsea_pathway$pathway]
-kegg_topPathways <- c(kegg_topPathwaysUp, rev(kegg_topPathwaysDown))
-plotGseaTable(kegg.lol[kegg_topPathways], deg.ranks, fgseaRes,
-              gseaParam=0.5)
+## Test Over-representation
 
-# collapsedPathways <- collapsePathways(fgseaRes_gwas[order(pval)][padj < 0.05], 
-#                                       gwas.lol, deg.ranks)
-# mainPathways <- fgseaRes[kegg_fgsea_pathway %in% collapsedPathways$mainPathways][
-#                          order(-NES), kegg_fgsea_pathway]
-# plotGseaTable(examplePathways[mainPathways], exampleRanks, fgseaRes, 
-#               gseaParam = 0.5)
-```
+#### KEGG `goseq` analysis
+
+Janet, I think we might not have time for this anymore
