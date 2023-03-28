@@ -392,7 +392,17 @@ reactome <- gsePathway(geneList = reactome_gene_list,
 emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
 ```
 
+```{r}
+# category netplot
+cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5)
+
+# Ridgeplot
+ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
+
+```
+
 ### GO `fgsea` Analysis
+
 
 ```{r}
 #Convert the GO tibble with the make.gs.lol function made previously. 
