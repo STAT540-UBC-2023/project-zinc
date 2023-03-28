@@ -26,6 +26,8 @@ library(clusterProfiler)
 library(enrichplot)
 library(biomaRt)
 library(ggridges)
+library(ReactomePA)
+library(org.Hs.eg.db)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -281,9 +283,6 @@ plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
              deg.ranks) 
 plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
               deg.ranks)
-
-library(gridExtra)
-grid.arrange(plot1, plot2, ncol = 2, widths = c(1, 1), heights = c(1, 1))
 ```
 
 ```{r}
@@ -292,11 +291,16 @@ geneids <-bitr(names(logFC_genes), fromType = "ENSEMBL", toType = "ENTREZID", Or
 #delete duplicate IDs
 dedup_ids = geneids[!duplicated(geneids[c("ENSEMBL")]),]
 # Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
-gene_names = ensembl_geneIDs[ensembl_geneIDs$ensembl_gene_id %in% dedup_ids$ENSEMBL,]
+geneIDs <-
+    ensembl_geneIDs[order(ensembl_geneIDs$logFC, decreasing = TRUE),
+                   head(.SD, 1),
+                   by = .(entrezgene_id)]
+
+# gene_names = ensembl_geneIDs[ensembl_geneIDs$ensembl_gene_id %in% dedup_ids$ENSEMBL,]
 # Create a vector of the gene unuiverse
-kegg_gene_list <- gene_names$logFC
+kegg_gene_list <- geneIDs$logFC
 # Name vector with ENTREZ ids
-names(kegg_gene_list) <- gene_names$entrezgene_id
+names(kegg_gene_list) <- geneIDs$entrezgene_id
 # omit any NA values 
 kegg_gene_list<-na.omit(kegg_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
@@ -306,12 +310,12 @@ kegg_gene_list = sort(kegg_gene_list, decreasing = TRUE)
 kk2 <- gseKEGG(geneList     = kegg_gene_list,
                organism     = "hsa",
                minGSSize    = 3,
-               maxGSSize    = 100,
+               maxGSSize    = 80,
                pvalueCutoff = 0.05,
                pAdjustMethod = "none",
                keyType       = "ncbi-geneid")
 #enrichment map
-emapplot(pairwise_termsim(kk2), cex_label_category = 0.5)
+emapplot(pairwise_termsim(kk2), cex.params = list(category_label = 0.5))
 
 # category netplot
 cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5) # this is prob not very useful
@@ -359,18 +363,14 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 257 significant pathways from REsACTOME 'fgsea' analysis.
+There are 245 significant pathways from REACTOME 'fgsea' analysis.
 
 ### Reactome Visualization
 
 ```{r}
-library(ReactomePA)
-library(org.Hs.eg.db)
-# BiocManager::install("ReactomePA")
-
-reactome_gene_list <- gene_names$logFC
+reactome_gene_list <- geneIDs$logFC
 # Name vector with ENTREZ ids
-names(reactome_gene_list) <- gene_names$entrezgene_id
+names(reactome_gene_list) <- geneIDs$entrezgene_id
 # omit any NA values 
 reactome_gene_list<-na.omit(reactome_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
@@ -402,7 +402,6 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 ```
 
 ### GO `fgsea` Analysis
-
 
 ```{r}
 #Convert the GO tibble with the make.gs.lol function made previously. 
@@ -445,9 +444,9 @@ There are 3358 significant pathways present in the GO gene sets.
 
 ```{r}
 # take the log2 fold change 
-go_gene_list <- gene_names$logFC
+go_gene_list <- geneIDs$logFC
 # name the vector
-names(go_gene_list) <- gene_names$entrezgene_id
+names(go_gene_list) <- geneIDs$entrezgene_id
 # omit any NA values 
 go_gene_list<-na.omit(go_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
