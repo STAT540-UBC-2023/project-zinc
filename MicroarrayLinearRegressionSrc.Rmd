@@ -11,7 +11,7 @@ library(knitr)
 library(tidyverse)
 library(GEOquery)
 library(limma)
-library(ggfortify)
+
 ```
 ### Loading Data
 ```{r}
@@ -100,7 +100,7 @@ ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
 
 - A moderate batch effect was observed for U2 vs. U1 and U3 vs. U1. Thus, the two experiments will be analyzed separately 
 
-```{r echo = False}
+```{r echo = FALSE}
 meta <- pData(eset)[1:48,]
 meta_2 <- pData(eset)[49:77,]
 ```

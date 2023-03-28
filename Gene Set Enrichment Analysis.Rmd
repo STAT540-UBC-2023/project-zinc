@@ -140,7 +140,7 @@ DEgenes
 ```{r}
 # convert transcript cluster IDs(also desribed as probeIDs) into Ensembl IDs
 
-library(biomaRt)
+# library(biomaRt)
 ensembl_human = useMart("ensembl",dataset="hsapiens_gene_ensembl")
 ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1", "hgnc_symbol", "entrezgene_id"),
       filters = "affy_hugene_1_0_st_v1",
