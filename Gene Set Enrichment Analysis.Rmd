@@ -389,15 +389,15 @@ reactome <- gsePathway(geneList = reactome_gene_list,
 
 ```{r}
 #enrichment map
-emapplot(pairwise_termsim(reactome), cex_label_category = 0.5)
+emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 40)
 ```
 
 ```{r}
 # category netplot
-cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5)
+cnetplot(reactome, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5, cex_label_gene = 0.5, node_label = "category")
 
 # Ridgeplot
-ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
+ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
 
 ```
 
