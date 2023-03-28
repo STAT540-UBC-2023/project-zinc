@@ -341,13 +341,26 @@ modm_2<- model.matrix(~BMI*status, meta_2)
 lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
 ```
 
-No Significant DE were observed for BMI, T2D or their interactions in
-experiment 2(n=29)
+No Significant DE were observed under the effect of BMI, T2D or their
+interactions in experiment 2(n=29)
 
 ``` r
-degOB <- topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
+# BMI:T2dstatus   
+topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30:statust2d")
+```
 
-degOB %>% head(10) 
+    ## data frame with 0 columns and 0 rows
+
+``` r
+# BMI  
+topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30") 
+```
+
+    ## data frame with 0 columns and 0 rows
+
+``` r
+#T2dstatus 
+topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "statust2d")
 ```
 
     ## data frame with 0 columns and 0 rows
