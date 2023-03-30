@@ -113,7 +113,7 @@ num.sci <- function(x) {
 gwas.db <- fread(gwas.tidy.file)    
 gwas.db[, gs_name := `DISEASE/TRAIT`]
 
-gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
+t2d_genes<- gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
     mutate(p.value = num.sci(p.value)) %>%
     dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) 
 
@@ -179,13 +179,32 @@ gene_list = sort(gene_list, decreasing = TRUE)
 
 ```{r}
 # make deg.ranks for gfsea analysis later
-deg.ranks <- ensembl_geneIDs %>%
-    arrange(P.Value) %>% 
-    as.data.table 
-  
-deg.ranks <- deg.ranks %>% mutate(log_adjP = -log10(adj.P.Val))
 
-deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$gene_symbol; log_adjP })
+ensembl_geneIDs <- ensembl_geneIDs %>% mutate(log_adjP = -log10(adj.P.Val))
+
+# deg.ranks <- ensembl_geneIDs %>%
+#     arrange(P.Value) %>% 
+#     as.data.table 
+  
+# deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$gene_symbol; log_adjP })
+
+
+# Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
+sorted_genes <-
+    ensembl_geneIDs[order(ensembl_geneIDs$log_adjP, decreasing = TRUE),
+                   head(.SD, 1),
+                   by = .(gene_symbol)]
+
+# gene_names = ensembl_geneIDs[ensembl_geneIDs$ensembl_gene_id %in% dedup_ids$ENSEMBL,]
+# Create a vector of the gene unuiverse
+deg.ranks <- sorted_genes$log_adjP
+# Name vector with ENTREZ ids
+names(deg.ranks) <- sorted_genes$gene_symbol
+# omit any NA values 
+deg.ranks<-na.omit(deg.ranks)
+# sort the list in decreasing order (required for clusterProfiler)
+deg.ranks = sort(deg.ranks, decreasing = TRUE)
+
 
 ```
 
@@ -214,21 +233,87 @@ ensembl_geneIDs %>%
 
 ```
 
-### View KEGG Enriched Pathways Associated with T2D
+### KEGG Enrichment
 
 ```{r}
-# FDR <- 0.05
-# filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR) 
-
+# for ppt presentation
 kegg_enrich <- enrichKEGG(gene = ensembl_geneIDs$entrezgene_id,
                  organism     = 'human',
                  pvalueCutoff = 0.05)
 
-# visualize the enriched pathway - find the T2D pathway
+# visualize the enriched pathway - the T2D pathway
 browseKEGG(kegg_enrich, 'hsa04930')
 ```
 
-### `fgsea` analysis
+```{r}
+.gs <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
+         "KEGG_TYPE_II_DIABETES_MELLITUS",
+         "KEGG_PANCREATIC_CANCER")
+
+CUTOFF <- 1e-2 # q-value cutoff
+
+.dt <-
+    kegg.human.db %>%
+    filter(`gs_name` %in% .gs) %>%
+    left_join(ensembl_geneIDs) %>%    
+    group_by(gs_name) %>%          # for each gene set
+    arrange(adj.P.Val) %>%         # sort genes by p-value
+    mutate(g = 1:n()) %>%          # add gene order index
+    ungroup()
+
+
+#' @param gene.dt gene-level statitsics with `gene_symbol` and `adj.P.Val`
+#' @param geneset.dt gene set membership with `gene_symbol` and `gs_name`
+run.hyper.test <- function(gene.dt, geneset.dt, cutoff = CUTOFF) {
+
+    .genes <- unique(gene.dt[, .(gene_symbol, adj.P.Val)]) %>%
+        na.omit()
+    .sets <- as.data.table(geneset.dt)
+    .sets <- .sets[gene_symbol %in% .genes$gene_symbol,
+                   .(gene_symbol, gs_name)]
+
+    .dt <- left_join(.sets, .genes, by = "gene_symbol") %>% 
+        as.data.table()
+
+    ## Total number of genes
+    ntot <- length(unique(.dt$gene_symbol))
+    ## Total number of significant DEGs
+    nsig <- nrow(unique(.dt[adj.P.Val < cutoff, .(gene_symbol)]))
+    ## Gene set size
+    gs.size <- .dt[,
+                   .(m = length(unique(gene_symbol))),
+                   by = .(gs_name)]
+    ## Gene set overlap size
+    overlap.size <- .dt[adj.P.Val < cutoff,
+                        .(q = length(unique(gene_symbol))),
+                        by = .(gs_name)]
+
+    left_join(gs.size, overlap.size, by = "gs_name") %>%
+        mutate(`q` = if_else(is.na(`q`), 0, as.numeric(`q`))) %>% 
+        mutate(n = `ntot` - `m`) %>%
+        mutate(k = `nsig`) %>%
+        mutate(p.val = phyper(`q`, `m`, `n`, `k`, lower.tail=FALSE)) %>%
+        arrange(p.val) %>%
+        as.data.table
+}
+
+deg_kegg <-
+    ensembl_geneIDs[order(ensembl_geneIDs$adj.P.Val, decreasing = TRUE),
+                   head(.SD, 1),
+                   by = .(affy_hugene_1_0_st_v1)]
+deg_kegg<-na.omit(deg_kegg)
+
+#genes significantly associated with the interaction effect from KEGG pathway
+kegg_path <- run.hyper.test(deg_kegg,
+                                kegg.human.db,
+                                cutoff=1e-2)
+kegg_path
+knitr::kable(head(kegg_path, 10))
+
+# (kegg_path, title="KEGG Pathway Enrichment", top_term=10)
+```
+
+### KEGG `fgsea` analysis
 
 ```{r}
 # Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
@@ -269,11 +354,10 @@ kegg.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 
-kegg_significant_pathways <- sort(kegg_significant_pathways$padj, decreasing = TRUE)
-kegg_significant_pathways
+# barplot(kegg_significant_pathways, showCategory=25, font.size = 7) 
 ```
 
-There are 77 significant pathways.
+There are 34 significant pathways.
 
 ### KEGG Pathway Visualization
 
@@ -363,7 +447,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 245 significant pathways from REACTOME 'fgsea' analysis.
+There are 68 significant pathways from REACTOME 'fgsea' analysis.
 
 ### Reactome Visualization
 
@@ -514,6 +598,8 @@ unique(filtered_genes$entrezgene_id)
 edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
 barplot(edo, showCategory=25, font.size = 7) 
+
+# there seems to be a higher association with female diseases. T2D has a stronger influence on females?
 ```
 
 ## Test Over-representation
