@@ -4,7 +4,7 @@
 title: "Gene Set Enrichment Analysis"
 author: "Lucy Chi"
 date: "2023-03-22"
-output: html_document
+output: github_document
 ---
 
 ```{r}
