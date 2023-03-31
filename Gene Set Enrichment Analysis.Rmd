@@ -542,9 +542,8 @@ go_gene_list = sort(go_gene_list, decreasing = TRUE)
 
 go <- gseGO(geneList= go_gene_list,
              ont ="ALL",
-             minGSSize = 100,
-             maxGSSize = 500,
              pvalueCutoff = 0.05,
+            nPerm = 100000, 
              OrgDb = org.Hs.eg.db, 
              verbose = FALSE)
 ```
@@ -553,10 +552,17 @@ go <- gseGO(geneList= go_gene_list,
 # dotplot
 # dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
 
-# enrichment map
-emapplot(pairwise_termsim(go), cex.params = list(category_label = 0.01))
+# enrichment map 
+
+# emapplot(pairwise_termsim(go), showCategory = 30, color = "p.adjust", cex_label_category = 0.35)
+
 
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
+```
+
+
+```{r}
+# Boxplot to be drawn here. 
 ```
 
 ### GWAS pathway Analysis
