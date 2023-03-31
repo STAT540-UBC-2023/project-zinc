@@ -208,12 +208,6 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 
 ```
 
-### Heat Map for T2D vs Healthy DE genes
-
-```{r}
-## TODO
-```
-
 ## Rank-based Gene Set Enrichment Analysis
 
 ### Graphical Visualization
