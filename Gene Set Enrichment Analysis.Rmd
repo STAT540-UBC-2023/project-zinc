@@ -515,9 +515,22 @@ GO.fgsea %>%
 GO_significant_pathways <- GO.fgsea[padj < 0.05]
 GO_significant_pathways
 ```
+There are 1317 significant pathways present in the GO gene sets.
 
-There are 3358 significant pathways present in the GO gene sets.
 
+```{r}
+# run required library 
+library(stringr)
+```
+
+```{r}
+#  extract the numbers from the gene_set_size column in the GO_significant_pathways data frame. 
+GO_significant_pathways$gene_set_size_num <- as.numeric(str_extract(GO_significant_pathways$gene_set_size, "\\d+"))
+```
+
+```{r}
+
+```
 ### GO Analysis Visualization
 
 ```{r}
