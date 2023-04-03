@@ -210,23 +210,6 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 
 ## Rank-based Gene Set Enrichment Analysis
 
-### Graphical Visualization
-
-```{r}
-ensembl_geneIDs %>% 
-  arrange(adj.P.Val) %>% 
-  ggplot(aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
-    geom_point(stroke=0) +
-    labs(x = "ranked genes", y = "-log(adj.P)") +
-    geom_hline(yintercept = 1, lty = 2, colour="red") +
-  geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
-    geom_hline(yintercept = 2, lty = 2, colour="green") +
-    scale_y_continuous("negative log adjusted p-value",
-                       breaks = c(1, 2, 4),
-                       labels=function(x) num.sci(10^(-x)))
-
-```
-
 ### KEGG Enrichment
 
 ```{r}
@@ -347,13 +330,37 @@ kegg.fgsea %>%
 ```{r}
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
-
-# barplot(kegg_significant_pathways, showCategory=25, font.size = 7) 
+kegg_significant_pathways
 ```
 
 There are 34 significant pathways.
 
+
 ### KEGG Pathway Visualization
+
+```{r}
+# get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
+top20_kegg <- kegg_significant_pathways %>%
+  arrange(desc(NES)) %>%
+  head(20)
+```
+
+```{r}
+# Plot the barplot. 
+# Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
+# Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
+kegg_plot<- ggplot(top20_kegg, aes(x = size, y = pathway, fill = padj)) +
+  geom_bar(stat = "identity") +
+  xlab("number of genes") +
+  ylab("pathway") +  
+  scale_fill_gradient(low = "gray70", high = "red") +
+  ggtitle("REACTOME GSEA result") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 6)) 
+# scale_y_discrete(labels = lab)
+kegg_plot
+```
+
 
 ```{r}
 #some examples from KEGG pathway
@@ -441,9 +448,35 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 68 significant pathways from REACTOME 'fgsea' analysis.
+There are 70 significant pathways from REACTOME 'fgsea' analysis.
 
 ### Reactome Visualization
+
+```{r}
+# get the top 20 pathways from reactome_significant_pathways based on the enrichment score. 
+top20_reactome <- reactome_significant_pathways %>%
+  arrange(desc(NES)) %>%
+  head(20)
+```
+
+```{r}
+lab = c('REACTOME_DEFECTIVE_CHSY1_CAUSES_TPBS', 'REACTOME_MET_RECEPTOR_ACTIVATION', 'REACTOME_DEFECTIVE_CHST14_CAUSES_ \n EDS_MUSCULOCONTRACTURAL_TYPE', 'REACTOME_SYNTHESIS_OF_PROSTAGLANDINS_PG_ \n AND_THROMBOXANES_TX', 'REACTOME_TP53_REGULATES_TRANSCRIPTION_OF_ \n DEATH_RECEPTORS_AND_LIGANDS', 'REACTOME_DERMATAN_SULFATE_BIOSYNTHESIS', 'REACTOME_DEFECTIVE_B4GALT7_CAUSES_EDS_ \n PROGEROID_TYPE', 'REACTOME_CHONDROITIN_SULFATE_BIOSYNTHESIS', 'REACTOME_INTERLEUKIN_7_SIGNALING', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ \n ABERRANT_P13K_IN_CANCER', 'REACTOME_DISEASES_ASSOCIATED_WITH_ \n GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_EGFR_DOWNREGULATION', 'REACTOME_INTERLEUKIN_6_FAMILY_SIGNALING', 'REACTOME_SIGNALING_BY_ERBB2_IN_CANCER', 'REACTOME_CREATION_OF_C4_AND_C2_ACTIVATORS', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_20_FAMILY_SIGNALING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_RAF_INDEPENDENT_MAPK1_3_ACTIVATION', 'REACTOME_DOWNSTREAM_SIGNALING_ \n OF_ACTIVATED_FGFR2')
+
+# Plot the barplot. 
+# Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
+# Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
+reactome_plot<- ggplot(top20_reactome, aes(x = size, y = pathway, fill = padj)) +
+  geom_bar(stat = "identity") +
+  xlab("number of genes") +
+  ylab("pathway") +  
+  scale_fill_gradient(low = "gray70", high = "red") +
+  ggtitle("REACTOME GSEA result") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 6)) + 
+  scale_y_discrete(labels = lab)
+reactome_plot
+```
+
 
 ```{r}
 reactome_gene_list <- geneIDs$logFC
@@ -471,13 +504,10 @@ emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 4
 ```
 
 ```{r}
-# category netplot
-cnetplot(reactome, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5, cex_label_gene = 0.5, node_label = "category")
-
 # Ridgeplot
 ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
-
 ```
+
 
 ### GO `fgsea` Analysis
 
@@ -517,42 +547,53 @@ GO_significant_pathways
 ```
 There are 1317 significant pathways present in the GO gene sets.
 
-
 ```{r}
-# run required library 
-library(stringr)
+# get the top 20 pathways from GO_significant_pathways based on the enrichment score. 
+top20_GO <- GO_significant_pathways %>%
+  arrange(desc(NES)) %>%
+  head(20)
 ```
 
 ```{r}
-#  extract the numbers from the gene_set_size column in the GO_significant_pathways data frame. 
-GO_significant_pathways$gene_set_size_num <- as.numeric(str_extract(GO_significant_pathways$gene_set_size, "\\d+"))
+# Names of the pathways are too long, so breaking them into two lines over here for grpah later. 
+labs = c('GOBP_REGULATION_OF_RETINAL_GANGLION_CELL_ \n AXON_GUIDANCE', 'GOBP_NEGATIVE_REGULATION_OF_CELL_ \n PROLIFERATION_INVOLVED_IN_HEART_MORPHOGENESIS', 'HP_BURKITT_LYMPHOMA', 'GOBP_MONOCYTE_AGGREGATION', 'HP_ELEVATED_PROPORTION_OF_CD4_NEGATIVE_ \n CD8_NEGATIVE_ALPHA_BETA_REGULATORY_T_CELLS', 'GOMF_INTERLEUKIN_1_RECEPTOR_ACTIVITY', 'HP_INCREASED_B_CELL_COUNT', 'GOBP_RESPONSE_TO_CORTICOTROPIN_RELEASING_HORMONE', 'GOBP_POSITIVE_REGULATION_OF_GONAD_ \n DEVELOPMENT', 'GOBP_LEUKOTRIENE_SIGNALING_PATHWAY', 'GOBP_HYALURONAN_CATABOLIC_PROCESS', 'GOBP_ACTIVATION_OF_PROTEIN_KINASE_C_ACTIVITY', 'GOBP_REGULATION_OF_BRANCHING_INVOLVED_IN_ \n PROSTATE_GLAND_MORPHOGENESIS', 'GOBP_REGULATION_OF_MALE_GONAD_DEVELOPMENT', 'HP_ABNORMAL_PROPORTION_OF_DOUBLE_NEGATIVE_ \n ALPHA_BETA_REGULATORY_T_CELL', 'GOBP_NEGATIVE_REGULATION_OF_B_CELL_ \n DIFFERENTIATION', 'GOBP_DICHOTOMOUS_SUBDIVISION_OF_TERMINAL_ \n UNITS_INVOLVED_IN_SALIVARY_GLAND_BRANCHING', 'GOBP_PROSTATE_GLANDULAR_ACINUS_ \n MORPHOGENESIS', 'HP_ELLIPTOCYTOSIS', 'GOBP_RRNA_TRANSPORT')
+      
+# Plot the barplot. 
+# Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
+# Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
+go_barplot<-ggplot(top20_GO, aes(x = size, y = pathway, fill = padj)) +
+  geom_bar(stat = "identity") +
+  xlab("number of genes") +
+  ylab("pathway") +  
+  scale_fill_gradient(low = "gray70", high = "red") +
+  ggtitle("GO GSEA result") +
+  theme(axis.text.y = element_text(size = 6)) +
+  scale_y_discrete(labels = labs)
+go_barplot
 ```
 
-```{r}
-
-```
 ### GO Analysis Visualization
 
 ```{r}
 # take the log2 fold change 
-go_gene_list <- geneIDs$logFC
+# go_gene_list <- geneIDs$logFC
 # name the vector
-names(go_gene_list) <- geneIDs$entrezgene_id
+# names(go_gene_list) <- geneIDs$entrezgene_id
 # omit any NA values 
-go_gene_list<-na.omit(go_gene_list)
+# go_gene_list<-na.omit(go_gene_list)
 # sort the list in decreasing order (required for clusterProfiler)
-go_gene_list = sort(go_gene_list, decreasing = TRUE)
+# go_gene_list = sort(go_gene_list, decreasing = TRUE)
 ```
 
 ```{r}
 # keytypes(org.Hs.eg.db)
 
-go <- gseGO(geneList= go_gene_list,
-             ont ="ALL",
-             pvalueCutoff = 0.05,
-            nPerm = 100000, 
-             OrgDb = org.Hs.eg.db, 
-             verbose = FALSE)
+# go <- gseGO(geneList= go_gene_list,
+#             ont ="ALL",
+#             pvalueCutoff = 0.05,
+#            nPerm = 100000, 
+#             OrgDb = org.Hs.eg.db, 
+#             verbose = FALSE)
 ```
 
 ```{r}
@@ -567,56 +608,3 @@ go <- gseGO(geneList= go_gene_list,
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
 ```
 
-
-```{r}
-# Boxplot to be drawn here. 
-```
-
-### GWAS pathway Analysis
-
-```{r}
-gwas.lol <- gwas.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
-gwas.fgsea <- fgsea::fgsea(pathways = gwas.lol, stats = deg.ranks, scoreType = "pos")
-
-gwas.fgsea[,
-           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
-           by = .(pathway)]
-```
-
-### GWAS `fgsea` Analysis
-
-```{r}
-gwas.fgsea %>%
-    arrange(pval) %>%
-    head(10) %>% 
-    dplyr::select(-leadingEdge) %>% head()
-
-gwas.fgsea
-```
-
--   400 pathways are identified using GWAS pathway
-
-### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Database
-
-```{r}
-FDR <- 0.05
-filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR)
-
-filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
-filtered_genes$entrezgene_id[1:30]
-
-# de <- names(geneList)[abs(geneList) > 2]
-unique(filtered_genes$entrezgene_id)
-
-edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
-
-barplot(edo, showCategory=25, font.size = 7) 
-
-# there seems to be a higher association with female diseases. T2D has a stronger influence on females?
-```
-
-## Test Over-representation
-
-#### KEGG `goseq` analysis
-
-Janet, I think we might not have time for this anymore
