@@ -250,7 +250,7 @@ There are 34 significant pathways.
 ### KEGG Pathway Visualization
 
 ```{r}
-# get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
+# arrange kegg_significant_pathways based on the p.adjust value. 
 kegg_ordered <- kegg_significant_pathways %>%
   arrange(padj) 
 ```
