@@ -36,7 +36,7 @@ library(biomaRt)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
-
+#Access the REACTOME gene sets. 
 kegg.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:KEGG")
@@ -404,8 +404,6 @@ reactome <- gsePathway(geneList = reactome_gene_list,
               verbose=FALSE)
 ```
 
-\<\<\<\<\<\<\< HEAD
-
 ### GO `fgsea` Analysis
 
 ```{r}
@@ -443,25 +441,44 @@ GO_significant_pathways <- GO.fgsea[padj < 0.05]
 GO_significant_pathways
 ```
 
-There are 1317 significant pathways present in the GO gene sets.
+There are 1262 significant pathways present in the GO gene sets.
 
 ### GO Analysis Visualization
 
 ```{r}
 # get the top 20 pathways from GO_significant_pathways based on the enrichment score. 
 top20_GO <- GO_significant_pathways %>%
-  arrange(desc(NES)) %>%
+  arrange(padj) %>%
   head(20)
 ```
 
 ```{r}
 # Names of the pathways are too long, so breaking them into two lines over here for grpah later. 
-labs = c('GOBP_REGULATION_OF_RETINAL_GANGLION_CELL_ \n AXON_GUIDANCE', 'GOBP_NEGATIVE_REGULATION_OF_CELL_ \n PROLIFERATION_INVOLVED_IN_HEART_MORPHOGENESIS', 'HP_BURKITT_LYMPHOMA', 'GOBP_MONOCYTE_AGGREGATION', 'HP_ELEVATED_PROPORTION_OF_CD4_NEGATIVE_ \n CD8_NEGATIVE_ALPHA_BETA_REGULATORY_T_CELLS', 'GOMF_INTERLEUKIN_1_RECEPTOR_ACTIVITY', 'HP_INCREASED_B_CELL_COUNT', 'GOBP_RESPONSE_TO_CORTICOTROPIN_RELEASING_HORMONE', 'GOBP_POSITIVE_REGULATION_OF_GONAD_ \n DEVELOPMENT', 'GOBP_LEUKOTRIENE_SIGNALING_PATHWAY', 'GOBP_HYALURONAN_CATABOLIC_PROCESS', 'GOBP_ACTIVATION_OF_PROTEIN_KINASE_C_ACTIVITY', 'GOBP_REGULATION_OF_BRANCHING_INVOLVED_IN_ \n PROSTATE_GLAND_MORPHOGENESIS', 'GOBP_REGULATION_OF_MALE_GONAD_DEVELOPMENT', 'HP_ABNORMAL_PROPORTION_OF_DOUBLE_NEGATIVE_ \n ALPHA_BETA_REGULATORY_T_CELL', 'GOBP_NEGATIVE_REGULATION_OF_B_CELL_ \n DIFFERENTIATION', 'GOBP_DICHOTOMOUS_SUBDIVISION_OF_TERMINAL_ \n UNITS_INVOLVED_IN_SALIVARY_GLAND_BRANCHING', 'GOBP_PROSTATE_GLANDULAR_ACINUS_ \n MORPHOGENESIS', 'HP_ELLIPTOCYTOSIS', 'GOBP_RRNA_TRANSPORT')
+labs = c('GOBP_REGULATION_OF_CELL_DIFFERENTIATION', 'GOBP_NEGATIVE_REGULATION_OF_MULTICELLULAR_\n
+ORGANISMAL_PROCESS',
+         'GOBP_REGULATION_OF_RESPONSE_TO_STRESS',
+         'GOBP_POSITIVE_REGULATION_OF_DEVELOPMENTAL_PROCESS',
+         'GOBP_B_CELL_ACTIVATION',
+         'GOBP_REGULATION_OF_RESPONSE_TO_EXTERNAL_STIMULUS',
+         'GOBP_RIBOSOME_BIOGENESIS',
+         'GOBP_IMMUNE_RESPONSE',
+         'GOBP_CELL_ACTIVATION',
+         'GOBP_IMMUNE_SYSTEM_DEVELOPMENT',
+         'GOBP_REGULATION_OF_CELL_POPULATION_PROLIFERATION',
+         'GOBP_REGULATION_OF_CELL_ACTIVATION',
+         'GOBP_LYMPHOCYTE_ACTIVATION',
+         'GOBP_LOCOMOTION',
+         'GOBP_REGULATION_OF_CELLULAR_COMPONENT_MOVEMENT',
+         'GOBP_POSITIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS',
+         'GOBP_IMMUNE_EFFECTOR_PROCESS',
+         'GOBP_CELL_MIGRATION',
+         'GOBP_NEGATIVE_REGULATION_OF_RESPONSE_TO_STIMULUS',
+         'GOBP_REGULATION_OF_IMMUNE_SYSTEM_PROCESS')
       
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-go_barplot<-ggplot(top20_GO, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
+go_barplot<-ggplot(top20_GO, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
