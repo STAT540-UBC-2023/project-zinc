@@ -12,6 +12,11 @@ output:
 # BiocManager::install("ggridges")
 ```
 
+```{r include=FALSE}
+knitr::opts_chunk$set(size="scriptsize", fig.align="center")
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+```
+
 ```{r}
 library(tidyverse)
 library(fgsea)
