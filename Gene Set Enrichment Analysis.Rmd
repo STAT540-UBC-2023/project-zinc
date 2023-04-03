@@ -104,6 +104,9 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
+# set seed. 
+set.seed(10)
+
 #' Convert a number into a scientifically-formatted string
 #' @param x number
 num.sci <- function(x) {
@@ -324,23 +327,21 @@ kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 kegg_significant_pathways
 ```
 
-There are 32 significant pathways.
+There are 34 significant pathways.
 
 ### KEGG Pathway Visualization
 
 ```{r}
 # get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
-top20_kegg <- kegg_significant_pathways %>%
-  arrange(desc(NES)) 
-# %>%
-#   head(20)
+kegg_ordered <- kegg_significant_pathways %>%
+  arrange(desc(padj)) 
 ```
 
 ```{r}
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-kegg_plot<- ggplot(top20_kegg, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
+kegg_plot<- ggplot(kegg_ordered, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
