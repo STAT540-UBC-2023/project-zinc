@@ -104,6 +104,9 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
+# set seed.
+set.seed(10)
+
 #' Convert a number into a scientifically-formatted string
 #' @param x number
 num.sci <- function(x) {
@@ -199,89 +202,7 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 
 ## Rank-based Gene Set Enrichment Analysis
 
-### KEGG Enrichment
-
-```{r}
-# # for ppt presentation
-# kegg_enrich <- enrichKEGG(gene = ensembl_geneIDs$entrezgene_id,
-#                  organism     = 'human',
-#                  pvalueCutoff = 0.05)
-# 
-# # visualize the enriched pathway - the T2D pathway
-# browseKEGG(kegg_enrich, 'hsa04930')
-```
-
-```{r}
-#' # take the pathways that represent T2D
-#' .kegg_info <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
-#'          "KEGG_TYPE_II_DIABETES_MELLITUS",
-#'          "KEGG_PANCREATIC_CANCER")
-#' 
-#' # q-value cutoff
-#' CUTOFF <- 1e-2 
-#' 
-#' .dt <-
-#'     kegg.human.db %>%
-#'     filter(`gs_name` %in% .kegg_info) %>%
-#'     left_join(ensembl_geneIDs) %>%    
-#'     group_by(gs_name) %>%          # for each gene set
-#'     arrange(adj.P.Val) %>%         # sort genes by p-value
-#'     mutate(g = 1:n()) %>%          # add gene order index
-#'     ungroup()
-#' 
-#' 
-#' #' @param gene.dt gene-level statitsics with `gene_symbol` and `adj.P.Val`
-#' #' @param geneset.dt gene set membership with `gene_symbol` and `gs_name`
-#' run.hyper.test <- function(gene.dt, geneset.dt, cutoff = CUTOFF) {
-#' 
-#'     .genes <- unique(gene.dt[, .(gene_symbol, adj.P.Val)]) %>%
-#'         na.omit()
-#'     .sets <- as.data.table(geneset.dt)
-#'     .sets <- .sets[gene_symbol %in% .genes$gene_symbol,
-#'                    .(gene_symbol, gs_name)]
-#' 
-#'     .dt <- left_join(.sets, .genes, by = "gene_symbol") %>% 
-#'         as.data.table()
-#' 
-#'     ## Total number of genes
-#'     ntot <- length(unique(.dt$gene_symbol))
-#'     ## Total number of significant DEGs
-#'     nsig <- nrow(unique(.dt[adj.P.Val < cutoff, .(gene_symbol)]))
-#'     ## Gene set size
-#'     gs.size <- .dt[,
-#'                    .(m = length(unique(gene_symbol))),
-#'                    by = .(gs_name)]
-#'     ## Gene set overlap size
-#'     overlap.size <- .dt[adj.P.Val < cutoff,
-#'                         .(q = length(unique(gene_symbol))),
-#'                         by = .(gs_name)]
-#' 
-#'     left_join(gs.size, overlap.size, by = "gs_name") %>%
-#'         mutate(`q` = if_else(is.na(`q`), 0, as.numeric(`q`))) %>% 
-#'         mutate(n = `ntot` - `m`) %>%
-#'         mutate(k = `nsig`) %>%
-#'         mutate(p.val = phyper(`q`, `m`, `n`, `k`, lower.tail=FALSE)) %>%
-#'         arrange(p.val) %>%
-#'         as.data.table
-#' }
-#' 
-#' deg_kegg <-
-#'     ensembl_geneIDs[order(ensembl_geneIDs$adj.P.Val, decreasing = TRUE),
-#'                    head(.SD, 1),
-#'                    by = .(affy_hugene_1_0_st_v1)]
-#' deg_kegg<-na.omit(deg_kegg)
-#' 
-#' #genes significantly associated with the interaction effect from KEGG pathway
-#' kegg_path <- run.hyper.test(deg_kegg,
-#'                                 kegg.human.db,
-#'                                 cutoff=1e-2)
-#' kegg_path
-#' knitr::kable(head(kegg_path, 10))
-#' 
-#' # (kegg_path, title="KEGG Pathway Enrichment", top_term=10)
-```
-
-### `fgsea` analysis
+### `fgsea` analysis set-up
 
 ```{r}
 # Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
@@ -340,7 +261,7 @@ top20_kegg <- kegg_significant_pathways %>%
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-kegg_plot<- ggplot(top20_kegg, aes(x = size, y = pathway, fill = padj)) +
+kegg_plot<- ggplot(top20_kegg, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
@@ -453,7 +374,7 @@ lab = c('REACTOME_DEFECTIVE_CHSY1_CAUSES_TPBS', 'REACTOME_MET_RECEPTOR_ACTIVATIO
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-reactome_plot<- ggplot(top20_reactome, aes(x = size, y = pathway, fill = padj)) +
+reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
@@ -484,6 +405,8 @@ reactome <- gsePathway(geneList = reactome_gene_list,
                pAdjustMethod = "BH", 
               verbose=FALSE)
 ```
+
+\<\<\<\<\<\<\< HEAD
 
 ### GO `fgsea` Analysis
 
@@ -540,7 +463,7 @@ labs = c('GOBP_REGULATION_OF_RETINAL_GANGLION_CELL_ \n AXON_GUIDANCE', 'GOBP_NEG
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-go_barplot<-ggplot(top20_GO, aes(x = size, y = pathway, fill = padj)) +
+go_barplot<-ggplot(top20_GO, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
