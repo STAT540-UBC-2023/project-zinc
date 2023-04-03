@@ -252,7 +252,7 @@ There are 34 significant pathways.
 ```{r}
 # get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
 kegg_ordered <- kegg_significant_pathways %>%
-  arrange(desc(padj)) 
+  arrange(padj) 
 ```
 
 ```{r}
@@ -355,24 +355,24 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 70 significant pathways from REACTOME 'fgsea' analysis.
+There are 80 significant pathways from REACTOME 'fgsea' analysis.
 
 ### Reactome Visualization
 
 ```{r}
-# get the top 20 pathways from reactome_significant_pathways based on the enrichment score. 
+# get the top 20 pathways from reactome_significant_pathways based on the p.adjusted value. 
 top20_reactome <- reactome_significant_pathways %>%
-  arrange(desc(NES)) %>%
+  arrange(padj) %>%
   head(20)
 ```
 
 ```{r}
-lab = c('REACTOME_DEFECTIVE_CHSY1_CAUSES_TPBS', 'REACTOME_MET_RECEPTOR_ACTIVATION', 'REACTOME_DEFECTIVE_CHST14_CAUSES_ \n EDS_MUSCULOCONTRACTURAL_TYPE', 'REACTOME_SYNTHESIS_OF_PROSTAGLANDINS_PG_ \n AND_THROMBOXANES_TX', 'REACTOME_TP53_REGULATES_TRANSCRIPTION_OF_ \n DEATH_RECEPTORS_AND_LIGANDS', 'REACTOME_DERMATAN_SULFATE_BIOSYNTHESIS', 'REACTOME_DEFECTIVE_B4GALT7_CAUSES_EDS_ \n PROGEROID_TYPE', 'REACTOME_CHONDROITIN_SULFATE_BIOSYNTHESIS', 'REACTOME_INTERLEUKIN_7_SIGNALING', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ \n ABERRANT_P13K_IN_CANCER', 'REACTOME_DISEASES_ASSOCIATED_WITH_ \n GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_EGFR_DOWNREGULATION', 'REACTOME_INTERLEUKIN_6_FAMILY_SIGNALING', 'REACTOME_SIGNALING_BY_ERBB2_IN_CANCER', 'REACTOME_CREATION_OF_C4_AND_C2_ACTIVATORS', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_20_FAMILY_SIGNALING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_RAF_INDEPENDENT_MAPK1_3_ACTIVATION', 'REACTOME_DOWNSTREAM_SIGNALING_ \n OF_ACTIVATED_FGFR2')
+lab1 = c('REACTOME_DISEASES_ASSOCIATED_WITH_ \n GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_PROCESSING_OF_CAPPED_INTRON_ \n CONTAINING_PRE_MRNA', 'REACTOME_MRNA_SPLICING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_SIGNALING_BY_RECEPTOR_TYROSINE_KINASES', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_1_FAMILY_SIGNALING', 'REACTOME_INTRACELLULAR_SIGNALING_BY_SECOND_ \n MESSENGERS', 'REACTOME_INTERLEUKIN_4_AND_INTERLEUKIN_13_SIGNALING', 'REACTOME_DISEASES_OF_SIGNAL_TRANSDUCTION_ \n BY_GROWTH_FACTOR_RECEPTORS_AND_SECOND_MESSENGERS', 'REACTOME_PI3K_AKT_SIGNALING_IN_CANCER', 'REACTOME_NEGATIVE_REGULATION_OF_THE_PI3K_ \n AKT_NETWORK', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ABERRANT_ \n P13K_IN_CANCER', 'REACTOME_HEMOSTASIS', 'REACTOME_RRNA_PROCESSING', 'REACTOME_METABOLISM_OF_RNA', 'REACTOME_MAPK_FAMILY_SIGNALING_CASCADES','REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM', 'REACTOME_SIGNALING_BY_INTERLEUKINS')
 
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
+reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
@@ -380,7 +380,7 @@ reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -NES),
   ggtitle("REACTOME GSEA result") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 6)) + 
-  scale_y_discrete(labels = lab)
+  scale_y_discrete(labels = lab1)
 reactome_plot
 ```
 
@@ -404,6 +404,10 @@ reactome <- gsePathway(geneList = reactome_gene_list,
               verbose=FALSE)
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c89fbe9688a5c912f858854ac12447bab91b54f8
 ### GO `fgsea` Analysis
 
 ```{r}
@@ -446,7 +450,7 @@ There are 1262 significant pathways present in the GO gene sets.
 ### GO Analysis Visualization
 
 ```{r}
-# get the top 20 pathways from GO_significant_pathways based on the enrichment score. 
+# get the top 20 pathways from GO_significant_pathways based on the p.adjust value. 
 top20_GO <- GO_significant_pathways %>%
   arrange(padj) %>%
   head(20)
