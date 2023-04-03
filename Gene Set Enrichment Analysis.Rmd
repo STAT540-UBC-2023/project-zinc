@@ -117,7 +117,8 @@ t2d_genes<- gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_sym
     mutate(p.value = num.sci(p.value)) %>%
     dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) 
 
-## 3388 genes identified
+t2d_genes <- t2d_genes %>% filter(t2d_genes$gs_name == "Type 2 diabetes")
+## 2364 genes identified
 ```
 
 ### Load DE Gene List
@@ -213,17 +214,17 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 ### Graphical Visualization
 
 ```{r}
-ensembl_geneIDs %>% 
+sorted_genes %>% 
   arrange(adj.P.Val) %>% 
-  ggplot(aes(1:nrow(ensembl_geneIDs), -log10(adj.P.Val))) +
-    geom_point(stroke=0) +
-    labs(x = "ranked genes", y = "-log(adj.P)") +
-    geom_hline(yintercept = 1, lty = 2, colour="red") +
-  geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
-    geom_hline(yintercept = 2, lty = 2, colour="green") +
-    scale_y_continuous("negative log adjusted p-value",
-                       breaks = c(1, 2, 4),
-                       labels=function(x) num.sci(10^(-x)))
+  ggplot(aes(1:nrow(sorted_genes), -log10(adj.P.Val)))
+    # geom_point(stroke=0) +
+    # labs(x = "ranked genes", y = "-log(adj.P)") +
+    # geom_hline(yintercept = 1, lty = 2, colour="red") +
+    # geom_hline(yintercept = 1.5, lty = 2, colour="blue") +
+    # geom_hline(yintercept = 2, lty = 2, colour="green")
+    # scale_y_continuous("negative log adjusted p-value",
+    #                    breaks = c(1, 2, 4),
+    #                    labels=function(x) num.sci(10^(-x)))
 
 ```
 
@@ -351,7 +352,7 @@ kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 # barplot(kegg_significant_pathways, showCategory=25, font.size = 7) 
 ```
 
-There are 34 significant pathways.
+There are 32 significant pathways.
 
 ### KEGG Pathway Visualization
 
@@ -472,7 +473,7 @@ emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 4
 
 ```{r}
 # category netplot
-cnetplot(reactome, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5, cex_label_gene = 0.5, node_label = "category")
+# cnetplot(reactome, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5, cex_label_gene = 0.5, node_label = "category")
 
 # Ridgeplot
 ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
@@ -515,8 +516,8 @@ GO.fgsea %>%
 GO_significant_pathways <- GO.fgsea[padj < 0.05]
 GO_significant_pathways
 ```
-There are 1317 significant pathways present in the GO gene sets.
 
+There are 1317 significant pathways present in the GO gene sets.
 
 ```{r}
 # run required library 
@@ -531,6 +532,7 @@ GO_significant_pathways$gene_set_size_num <- as.numeric(str_extract(GO_significa
 ```{r}
 
 ```
+
 ### GO Analysis Visualization
 
 ```{r}
@@ -566,7 +568,6 @@ go <- gseGO(geneList= go_gene_list,
 
 # https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
 ```
-
 
 ```{r}
 # Boxplot to be drawn here. 
@@ -614,9 +615,3 @@ barplot(edo, showCategory=25, font.size = 7)
 
 # there seems to be a higher association with female diseases. T2D has a stronger influence on females?
 ```
-
-## Test Over-representation
-
-#### KEGG `goseq` analysis
-
-Janet, I think we might not have time for this anymore
