@@ -1,8 +1,6 @@
-------------------------------------------------------------------------
 
----
 title: "Gene Set Enrichment Analysis"
-author: "Lucy Chi"
+author: "Lucy Chi & Janet Zhang" 
 date: "2023-03-22"
 output: github_document
 ---
