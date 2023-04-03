@@ -212,76 +212,76 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 ```
 
 ```{r}
-# take the pathways that represent T2D
-.kegg_info <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
-         "KEGG_TYPE_II_DIABETES_MELLITUS",
-         "KEGG_PANCREATIC_CANCER")
-
-# q-value cutoff
-CUTOFF <- 1e-2 
-
-.dt <-
-    kegg.human.db %>%
-    filter(`gs_name` %in% .kegg_info) %>%
-    left_join(ensembl_geneIDs) %>%    
-    group_by(gs_name) %>%          # for each gene set
-    arrange(adj.P.Val) %>%         # sort genes by p-value
-    mutate(g = 1:n()) %>%          # add gene order index
-    ungroup()
-
-
-#' @param gene.dt gene-level statitsics with `gene_symbol` and `adj.P.Val`
-#' @param geneset.dt gene set membership with `gene_symbol` and `gs_name`
-run.hyper.test <- function(gene.dt, geneset.dt, cutoff = CUTOFF) {
-
-    .genes <- unique(gene.dt[, .(gene_symbol, adj.P.Val)]) %>%
-        na.omit()
-    .sets <- as.data.table(geneset.dt)
-    .sets <- .sets[gene_symbol %in% .genes$gene_symbol,
-                   .(gene_symbol, gs_name)]
-
-    .dt <- left_join(.sets, .genes, by = "gene_symbol") %>% 
-        as.data.table()
-
-    ## Total number of genes
-    ntot <- length(unique(.dt$gene_symbol))
-    ## Total number of significant DEGs
-    nsig <- nrow(unique(.dt[adj.P.Val < cutoff, .(gene_symbol)]))
-    ## Gene set size
-    gs.size <- .dt[,
-                   .(m = length(unique(gene_symbol))),
-                   by = .(gs_name)]
-    ## Gene set overlap size
-    overlap.size <- .dt[adj.P.Val < cutoff,
-                        .(q = length(unique(gene_symbol))),
-                        by = .(gs_name)]
-
-    left_join(gs.size, overlap.size, by = "gs_name") %>%
-        mutate(`q` = if_else(is.na(`q`), 0, as.numeric(`q`))) %>% 
-        mutate(n = `ntot` - `m`) %>%
-        mutate(k = `nsig`) %>%
-        mutate(p.val = phyper(`q`, `m`, `n`, `k`, lower.tail=FALSE)) %>%
-        arrange(p.val) %>%
-        as.data.table
-}
-
-deg_kegg <-
-    ensembl_geneIDs[order(ensembl_geneIDs$adj.P.Val, decreasing = TRUE),
-                   head(.SD, 1),
-                   by = .(affy_hugene_1_0_st_v1)]
-deg_kegg<-na.omit(deg_kegg)
-
-#genes significantly associated with the interaction effect from KEGG pathway
-kegg_path <- run.hyper.test(deg_kegg,
-                                kegg.human.db,
-                                cutoff=1e-2)
-kegg_path
-knitr::kable(head(kegg_path, 10))
-
-# (kegg_path, title="KEGG Pathway Enrichment", top_term=10)
+#' # take the pathways that represent T2D
+#' .kegg_info <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
+#'          "KEGG_TYPE_II_DIABETES_MELLITUS",
+#'          "KEGG_PANCREATIC_CANCER")
+#' 
+#' # q-value cutoff
+#' CUTOFF <- 1e-2 
+#' 
+#' .dt <-
+#'     kegg.human.db %>%
+#'     filter(`gs_name` %in% .kegg_info) %>%
+#'     left_join(ensembl_geneIDs) %>%    
+#'     group_by(gs_name) %>%          # for each gene set
+#'     arrange(adj.P.Val) %>%         # sort genes by p-value
+#'     mutate(g = 1:n()) %>%          # add gene order index
+#'     ungroup()
+#' 
+#' 
+#' #' @param gene.dt gene-level statitsics with `gene_symbol` and `adj.P.Val`
+#' #' @param geneset.dt gene set membership with `gene_symbol` and `gs_name`
+#' run.hyper.test <- function(gene.dt, geneset.dt, cutoff = CUTOFF) {
+#' 
+#'     .genes <- unique(gene.dt[, .(gene_symbol, adj.P.Val)]) %>%
+#'         na.omit()
+#'     .sets <- as.data.table(geneset.dt)
+#'     .sets <- .sets[gene_symbol %in% .genes$gene_symbol,
+#'                    .(gene_symbol, gs_name)]
+#' 
+#'     .dt <- left_join(.sets, .genes, by = "gene_symbol") %>% 
+#'         as.data.table()
+#' 
+#'     ## Total number of genes
+#'     ntot <- length(unique(.dt$gene_symbol))
+#'     ## Total number of significant DEGs
+#'     nsig <- nrow(unique(.dt[adj.P.Val < cutoff, .(gene_symbol)]))
+#'     ## Gene set size
+#'     gs.size <- .dt[,
+#'                    .(m = length(unique(gene_symbol))),
+#'                    by = .(gs_name)]
+#'     ## Gene set overlap size
+#'     overlap.size <- .dt[adj.P.Val < cutoff,
+#'                         .(q = length(unique(gene_symbol))),
+#'                         by = .(gs_name)]
+#' 
+#'     left_join(gs.size, overlap.size, by = "gs_name") %>%
+#'         mutate(`q` = if_else(is.na(`q`), 0, as.numeric(`q`))) %>% 
+#'         mutate(n = `ntot` - `m`) %>%
+#'         mutate(k = `nsig`) %>%
+#'         mutate(p.val = phyper(`q`, `m`, `n`, `k`, lower.tail=FALSE)) %>%
+#'         arrange(p.val) %>%
+#'         as.data.table
+#' }
+#' 
+#' deg_kegg <-
+#'     ensembl_geneIDs[order(ensembl_geneIDs$adj.P.Val, decreasing = TRUE),
+#'                    head(.SD, 1),
+#'                    by = .(affy_hugene_1_0_st_v1)]
+#' deg_kegg<-na.omit(deg_kegg)
+#' 
+#' #genes significantly associated with the interaction effect from KEGG pathway
+#' kegg_path <- run.hyper.test(deg_kegg,
+#'                                 kegg.human.db,
+#'                                 cutoff=1e-2)
+#' kegg_path
+#' knitr::kable(head(kegg_path, 10))
+#' 
+#' # (kegg_path, title="KEGG Pathway Enrichment", top_term=10)
 ```
 
-### KEGG `fgsea` analysis
+### `fgsea` analysis
 
 ```{r}
 # Make a function that can help us to prepare the gene list to feed into the fgsea arguments. 
@@ -485,16 +485,6 @@ reactome <- gsePathway(geneList = reactome_gene_list,
               verbose=FALSE)
 ```
 
-```{r}
-#enrichment map
-emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 40)
-```
-
-```{r}
-# Ridgeplot
-ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
-```
-
 ### GO `fgsea` Analysis
 
 ```{r}
@@ -534,6 +524,8 @@ GO_significant_pathways
 
 There are 1317 significant pathways present in the GO gene sets.
 
+### GO Analysis Visualization
+
 ```{r}
 # get the top 20 pathways from GO_significant_pathways based on the enrichment score. 
 top20_GO <- GO_significant_pathways %>%
@@ -559,43 +551,7 @@ go_barplot<-ggplot(top20_GO, aes(x = size, y = pathway, fill = padj)) +
 go_barplot
 ```
 
-### GO Analysis Visualization
-
-```{r}
-# take the log2 fold change 
-# go_gene_list <- geneIDs$logFC
-# name the vector
-# names(go_gene_list) <- geneIDs$entrezgene_id
-# omit any NA values 
-# go_gene_list<-na.omit(go_gene_list)
-# sort the list in decreasing order (required for clusterProfiler)
-# go_gene_list = sort(go_gene_list, decreasing = TRUE)
-```
-
-```{r}
-# keytypes(org.Hs.eg.db)
-
-# go <- gseGO(geneList= go_gene_list,
-#             ont ="ALL",
-#             pvalueCutoff = 0.05,
-#            nPerm = 100000, 
-#             OrgDb = org.Hs.eg.db, 
-#             verbose = FALSE)
-```
-
-```{r}
-# dotplot
-# dotplot(gse, showCategory=10, split=".sign") + facet_grid(.~.sign)
-
-# enrichment map 
-
-# emapplot(pairwise_termsim(go), showCategory = 30, color = "p.adjust", cex_label_category = 0.35)
-
-
-# https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html
-```
-
-### Disease Association with T2D based on the DE genes Using Genome wide annotation for Human Database
+### Disease Association with T2D based on the DE genes Using DisGeNET
 
 ```{r}
 FDR <- 0.05
