@@ -340,7 +340,7 @@ top20_kegg <- kegg_significant_pathways %>%
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-kegg_plot<- ggplot(top20_kegg, aes(x = size, y = pathway, fill = padj)) +
+kegg_plot<- ggplot(top20_kegg, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
@@ -453,7 +453,7 @@ lab = c('REACTOME_DEFECTIVE_CHSY1_CAUSES_TPBS', 'REACTOME_MET_RECEPTOR_ACTIVATIO
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-reactome_plot<- ggplot(top20_reactome, aes(x = size, y = pathway, fill = padj)) +
+reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
@@ -487,12 +487,12 @@ reactome <- gsePathway(geneList = reactome_gene_list,
 
 ```{r}
 #enrichment map
-emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 40)
+#emapplot(pairwise_termsim(reactome), cex_label_category = 0.35, showCategory = 40)
 ```
 
 ```{r}
 # Ridgeplot
-ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
+# ridgeplot(reactome) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
 ```
 
 ### GO `fgsea` Analysis
@@ -548,7 +548,7 @@ labs = c('GOBP_REGULATION_OF_RETINAL_GANGLION_CELL_ \n AXON_GUIDANCE', 'GOBP_NEG
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-go_barplot<-ggplot(top20_GO, aes(x = size, y = pathway, fill = padj)) +
+go_barplot<-ggplot(top20_GO, aes(x = size, y = reorder(pathway, -NES), fill = padj)) +
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
