@@ -24,10 +24,10 @@ library(enrichplot)
 library(DOSE)
 library(clusterProfiler)
 library(enrichplot)
-library(biomaRt)
 library(ggridges)
 library(ReactomePA)
 library(org.Hs.eg.db)
+library(biomaRt)
 ```
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
@@ -341,8 +341,9 @@ There are 32 significant pathways.
 ```{r}
 # get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
 top20_kegg <- kegg_significant_pathways %>%
-  arrange(desc(NES)) %>%
-  head(20)
+  arrange(desc(NES)) 
+# %>%
+#   head(20)
 ```
 
 ```{r}
@@ -354,7 +355,7 @@ kegg_plot<- ggplot(top20_kegg, aes(x = size, y = pathway, fill = padj)) +
   xlab("number of genes") +
   ylab("pathway") +  
   scale_fill_gradient(low = "gray70", high = "red") +
-  ggtitle("REACTOME GSEA result") +
+  ggtitle("KEGG GSEA result") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 6)) 
 # scale_y_discrete(labels = lab)
@@ -401,12 +402,10 @@ kk2 <- gseKEGG(geneList     = kegg_gene_list,
 #enrichment map
 emapplot(pairwise_termsim(kk2), cex.params = list(category_label = 0.5))
 
-# category netplot
-cnetplot(kk2, categorySize="pvalue", foldChange=gene_list, cex_label_category = 0.5) # this is prob not very useful
 
 # Ridgeplot
 ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 5)
-## isoleucine degradation is down-regulated - a branched amino acid that will cause maple syrup urine disease when its concentration is too high
+## isoleucine degradation is down-regulated - a branched amino acid
 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
