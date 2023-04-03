@@ -152,12 +152,12 @@ ensemble_genes <- getBM(attributes=c("ensembl_gene_id", "affy_hugene_1_0_st_v1",
 # data clean up and rename
 ensemble_genes_clean <-
     ensemble_genes %>%  
-    dplyr::rename(gene_symbol = hgnc_symbol) %>% # Will use human gene symbol
+    dplyr::rename(gene_symbol = hgnc_symbol) %>% 
     as.data.table()
 
 ensemble_genes_clean$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes_clean$affy_hugene_1_0_st_v1)
 
-## Add on the p-values & other information in DEgenes
+# add on the p-values & other information in DEgenes
 ensembl_geneIDs <- ensemble_genes_clean %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
 
 saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
@@ -167,37 +167,26 @@ summary(ensemble_genes$entrezgene_id)
 ```
 
 ```{r}
-#remove duplicated gene names
+#filter the list with logFC values for KEGG analysis later on
 logFC_genes <- ensembl_geneIDs$logFC
 # name the vector
 names(logFC_genes) <- ensembl_geneIDs$ensembl_gene_id
 # omit any NA values 
 gene_list<-na.omit(logFC_genes)
-
 # sort the list in decreasing order (required for clusterProfiler)
 gene_list = sort(gene_list, decreasing = TRUE)
 ```
 
 ```{r}
-# make deg.ranks for gfsea analysis later
-
+# Create a new dataframe sorted_genes which has only the filtered genes using log(adj.P)
 ensembl_geneIDs <- ensembl_geneIDs %>% mutate(log_adjP = -log10(adj.P.Val))
 
-# deg.ranks <- ensembl_geneIDs %>%
-#     arrange(P.Value) %>% 
-#     as.data.table 
-  
-# deg.ranks <- deg.ranks %>% (function(.dt) { log_adjP <- .dt$log_adjP; names(log_adjP) <- .dt$gene_symbol; log_adjP })
-
-
-# Create a new dataframe df2 which has only the genes which were successfully mapped using the bitr function above
 sorted_genes <-
     ensembl_geneIDs[order(ensembl_geneIDs$log_adjP, decreasing = TRUE),
                    head(.SD, 1),
                    by = .(gene_symbol)]
 
-# gene_names = ensembl_geneIDs[ensembl_geneIDs$ensembl_gene_id %in% dedup_ids$ENSEMBL,]
-# Create a vector of the gene unuiverse
+# Create a vector of the gene
 deg.ranks <- sorted_genes$log_adjP
 # Name vector with ENTREZ ids
 names(deg.ranks) <- sorted_genes$gene_symbol
@@ -206,7 +195,6 @@ deg.ranks<-na.omit(deg.ranks)
 # sort the list in decreasing order (required for clusterProfiler)
 deg.ranks = sort(deg.ranks, decreasing = TRUE)
 
-
 ```
 
 ## Rank-based Gene Set Enrichment Analysis
@@ -214,25 +202,27 @@ deg.ranks = sort(deg.ranks, decreasing = TRUE)
 ### KEGG Enrichment
 
 ```{r}
-# for ppt presentation
-kegg_enrich <- enrichKEGG(gene = ensembl_geneIDs$entrezgene_id,
-                 organism     = 'human',
-                 pvalueCutoff = 0.05)
-
-# visualize the enriched pathway - the T2D pathway
-browseKEGG(kegg_enrich, 'hsa04930')
+# # for ppt presentation
+# kegg_enrich <- enrichKEGG(gene = ensembl_geneIDs$entrezgene_id,
+#                  organism     = 'human',
+#                  pvalueCutoff = 0.05)
+# 
+# # visualize the enriched pathway - the T2D pathway
+# browseKEGG(kegg_enrich, 'hsa04930')
 ```
 
 ```{r}
-.gs <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
+# take the pathways that represent T2D
+.kegg_info <- c("KEGG_INSULIN_SIGNALING_PATHWAY",
          "KEGG_TYPE_II_DIABETES_MELLITUS",
          "KEGG_PANCREATIC_CANCER")
 
-CUTOFF <- 1e-2 # q-value cutoff
+# q-value cutoff
+CUTOFF <- 1e-2 
 
 .dt <-
     kegg.human.db %>%
-    filter(`gs_name` %in% .gs) %>%
+    filter(`gs_name` %in% .kegg_info) %>%
     left_join(ensembl_geneIDs) %>%    
     group_by(gs_name) %>%          # for each gene set
     arrange(adj.P.Val) %>%         # sort genes by p-value
@@ -357,17 +347,17 @@ kegg_plot<- ggplot(top20_kegg, aes(x = size, y = pathway, fill = padj)) +
   scale_fill_gradient(low = "gray70", high = "red") +
   ggtitle("KEGG GSEA result") +
   theme_minimal() +
-  theme(axis.text.y = element_text(size = 6)) 
+  theme(axis.text.y = element_text(size = 4)) 
 # scale_y_discrete(labels = lab)
 kegg_plot
 ```
 
 ```{r}
-#some examples from KEGG pathway
-plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
-             deg.ranks) 
-plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
-              deg.ranks)
+# #some examples from KEGG pathway
+# plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
+#              deg.ranks) 
+# plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
+#               deg.ranks)
 ```
 
 ```{r}
