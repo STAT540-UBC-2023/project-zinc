@@ -403,7 +403,6 @@ reactome <- gsePathway(geneList = reactome_gene_list,
               verbose=FALSE)
 ```
 
-
 ### GO `fgsea` Analysis
 
 ```{r}
