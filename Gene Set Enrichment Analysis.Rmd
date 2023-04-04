@@ -1,23 +1,16 @@
-
+---
 title: "Gene Set Enrichment Analysis"
 author: "Lucy Chi & Janet Zhang" 
-date: "2023-03-22
-output: md_document
-
+date: "2023-03-22"
+output: github_document
 ---
 
-```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 # BiocManager::install("enrichplot")
 # BiocManager::install("clusterProfiler")
 # BiocManager::install("ggridges")
-```
 
-```{r include=FALSE}
-knitr::opts_chunk$set(size="scriptsize", fig.align="center")
-knitr::opts_chunk$set(message=FALSE, warning=FALSE)
-```
-
-```{r}
 library(tidyverse)
 library(fgsea)
 library(ggfortify)
