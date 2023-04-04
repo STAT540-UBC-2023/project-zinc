@@ -162,8 +162,6 @@ ensemble_genes_clean$affy_hugene_1_0_st_v1 <- as.character(ensemble_genes_clean$
 # add on the p-values & other information in DEgenes
 ensembl_geneIDs <- ensemble_genes_clean %>% left_join(DEgenes, by = "affy_hugene_1_0_st_v1") 
 
-saveRDS(ensembl_geneIDs, file = "ensembl_geneIDs.RDS")
-
 # Show NA's & other stats
 summary(ensemble_genes$entrezgene_id)
 ```
@@ -271,14 +269,6 @@ kegg_plot
 ```
 
 ```{r}
-# #some examples from KEGG pathway
-# plot1 <- plotEnrichment(kegg.lol[["KEGG_INSULIN_SIGNALING_PATHWAY"]],
-#              deg.ranks) 
-# plot2 <- plotEnrichment(kegg.lol[["KEGG_FATTY_ACID_METABOLISM"]],
-#               deg.ranks)
-```
-
-```{r}
 geneids <-bitr(names(logFC_genes), fromType = "ENSEMBL", toType = "ENTREZID", OrgDb="org.Hs.eg.db")
 
 #delete duplicate IDs
@@ -380,27 +370,7 @@ reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, padj),
   theme_minimal() +
   theme(axis.text.y = element_text(size = 6)) + 
   scale_y_discrete(labels = lab1)
-reactome_plot
-```
-
-```{r}
-reactome_gene_list <- geneIDs$logFC
-# Name vector with ENTREZ ids
-names(reactome_gene_list) <- geneIDs$entrezgene_id
-# omit any NA values 
-reactome_gene_list<-na.omit(reactome_gene_list)
-# sort the list in decreasing order (required for clusterProfiler)
-reactome_gene_list = sort(reactome_gene_list, decreasing = TRUE)
-
-```
-
-```{r}
-#plotting
-reactome <- gsePathway(geneList = reactome_gene_list, 
-                       organism = "human", 
-               pvalueCutoff = 0.05,
-               pAdjustMethod = "BH", 
-              verbose=FALSE)
+reactome_plots
 ```
 
 ### GO `fgsea` Analysis
