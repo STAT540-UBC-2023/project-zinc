@@ -4,7 +4,7 @@
 title: "Gene Set Enrichment Analysis"
 author: "Lucy Chi"
 date: "2023-03-22"
-output: github_document
+output: md_document
 ---
 
 ```{r}
@@ -404,10 +404,6 @@ reactome <- gsePathway(geneList = reactome_gene_list,
               verbose=FALSE)
 ```
 
-<<<<<<< HEAD
-=======
-
->>>>>>> c89fbe9688a5c912f858854ac12447bab91b54f8
 ### GO `fgsea` Analysis
 
 ```{r}
