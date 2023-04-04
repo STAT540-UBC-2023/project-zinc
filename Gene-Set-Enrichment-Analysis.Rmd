@@ -230,7 +230,7 @@ kegg.fgsea[,
            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
            by = .(pathway)]
 
-kegg.fgsea %>%
+kegg.fgsea <- kegg.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge)
@@ -332,7 +332,7 @@ reactome.fgsea[,
 
 ```{r}
 #Show result in table. 
-reactome.fgsea %>%
+reactome.fgsea <- reactome.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge)
@@ -465,10 +465,7 @@ FDR <- 0.05
 filtered_genes <- ensembl_geneIDs %>% filter(P.Value < FDR)
 
 filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
-filtered_genes$entrezgene_id[1:30]
-
-# de <- names(geneList)[abs(geneList) > 2]
-unique(filtered_genes$entrezgene_id)
+filtered_genes$entrezgene_id[1:30]s
 
 edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
