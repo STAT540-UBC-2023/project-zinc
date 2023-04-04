@@ -1,16 +1,20 @@
-------------------------------------------------------------------------
 
----
 title: "Gene Set Enrichment Analysis"
-author: "Lucy Chi"
-date: "2023-03-22"
+author: "Lucy Chi & Janet Zhang" 
+date: "2023-03-22
 output: md_document
+
 ---
 
 ```{r}
 # BiocManager::install("enrichplot")
 # BiocManager::install("clusterProfiler")
 # BiocManager::install("ggridges")
+```
+
+```{r include=FALSE}
+knitr::opts_chunk$set(size="scriptsize", fig.align="center")
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 ```
 
 ```{r}
@@ -250,7 +254,7 @@ There are 34 significant pathways.
 ### KEGG Pathway Visualization
 
 ```{r}
-# get the top 20 pathways from kegg_significant_pathways based on the enrichment score. 
+# arrange kegg_significant_pathways based on the p.adjust value. 
 kegg_ordered <- kegg_significant_pathways %>%
   arrange(padj) 
 ```
@@ -403,6 +407,7 @@ reactome <- gsePathway(geneList = reactome_gene_list,
                pAdjustMethod = "BH", 
               verbose=FALSE)
 ```
+
 
 ### GO `fgsea` Analysis
 
