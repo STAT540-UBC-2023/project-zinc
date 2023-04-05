@@ -57,6 +57,15 @@ GO.human.db <- msigdbr(species = "human",
 
 ```
 
+```{r}
+#Access the C7 Immunological gene sets. 
+#Specifically looking at the ImmuneSigDB subcollection of C7, because this is related to a collection of cell types, states, and perturbations within the immune system collected from human and mouse. (note: The other C7 subcollection is specifically regarding vaccine response to 50 vaccines. We are not interested in vaccine responses in T2D, so not exploring this subcollection.)
+IMMUNE.human.db <- msigdbr(species = "human", 
+                           category = "C7", 
+                           subcategory = "IMMUNESIGDB")
+
+```
+
 ### Obtain GWAS Catalog Information
 
 ```{r}
