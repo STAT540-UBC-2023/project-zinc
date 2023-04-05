@@ -186,6 +186,9 @@ sorted_genes <-
                    head(.SD, 1),
                    by = .(gene_symbol)]
 
+only_ensembl <- as.data.frame(sorted_genes$entrezgene_id)
+write.csv(only_ensembl, "only_ensembl.csv", row.names=FALSE)
+
 # Create a vector of the gene
 deg.ranks <- sorted_genes$log_adjP
 # Name vector with ENTREZ ids
@@ -230,7 +233,7 @@ kegg.fgsea[,
            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
            by = .(pathway)]
 
-kegg.fgsea <- kegg.fgsea %>%
+kegg.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge)
@@ -240,6 +243,48 @@ kegg.fgsea <- kegg.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 kegg_significant_pathways
+```
+
+```{r}
+#to be delete#
+pid.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:PID")
+
+pid.lol <- pid.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+pid.fgsea <- fgsea::fgsea(pathways = pid.lol, stats = deg.ranks, scoreType = "pos")
+
+pid.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+
+pid.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge)
+
+pid_significant_pathways <- pid.fgsea[padj < 0.05]
+pid_significant_pathways
+
+BIOCARTA.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:BIOCARTA")
+
+BIOCARTA.lol <- BIOCARTA.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+BIOCARTA.fgsea <- fgsea::fgsea(pathways = BIOCARTA.lol, stats = deg.ranks, scoreType = "pos")
+
+BIOCARTA.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+
+BIOCARTA.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge)
+
+BIOCARTA_significant_pathways <- BIOCARTA.fgsea[padj < 0.05]
+BIOCARTA_significant_pathways
+
 ```
 
 There are 34 significant pathways.
@@ -332,7 +377,7 @@ reactome.fgsea[,
 
 ```{r}
 #Show result in table. 
-reactome.fgsea <- reactome.fgsea %>%
+reactome.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge)
