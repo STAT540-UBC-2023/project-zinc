@@ -35,11 +35,18 @@ library(biomaRt)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
+```
+
+#### KEGG database
+
+```{r}
 #Access the KEGG gene sets. 
 kegg.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:KEGG")
 ```
+
+#### reactome database
 
 ```{r}
 #Access the REACTOME gene sets. 
@@ -49,13 +56,16 @@ reactome.human.db <- msigdbr(species = "human",
                             subcategory = "CP:REACTOME")
 ```
 
-```{r}
-#Access the GO gene sets. 
-#Using all GO gene sets: biological process, cellular component, and molecular function. 
-GO.human.db <- msigdbr(species = "human", 
-                            category = "C5")
+#### PID database
 
+```{r}
+#Access the PID gene sets. 
+pid.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:PID")
 ```
+
+#### C7 immune database
 
 ```{r}
 #Access the C7 Immunological gene sets. 
@@ -112,9 +122,6 @@ run.if.needed(gwas.tidy.file, {
 ### Genes associated with T2D disease
 
 ```{r}
-# set seed.
-set.seed(10)
-
 #' Convert a number into a scientifically-formatted string
 #' @param x number
 num.sci <- function(x) {
@@ -227,7 +234,7 @@ make.gs.lol <- function(data) {
 }
 ```
 
-### KEGG Pathway Analysis
+### KEGG `fgsea` Analysis
 
 ```{r}
 # set seed.
@@ -236,8 +243,6 @@ set.seed(10)
 kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
 kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
 ```
-
-### KEGG `fgsea` Analysis
 
 ```{r}
 kegg.fgsea[,
@@ -254,49 +259,6 @@ kegg.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 kegg_significant_pathways
-```
-
-```{r}
-# set seed.
-set.seed(10)
-pid.human.db <- msigdbr::msigdbr(species = "human",
-                                  category = "C2",
-                                  subcategory = "CP:PID")
-
-pid.lol <- pid.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
-pid.fgsea <- fgsea::fgsea(pathways = pid.lol, stats = deg.ranks, scoreType = "pos")
-
-pid.fgsea[,
-           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
-           by = .(pathway)]
-
-pid.fgsea %>%
-    arrange(pval) %>%
-    head(10) %>% 
-    dplyr::select(-leadingEdge)
-
-pid_significant_pathways <- pid.fgsea[padj < 0.05]
-pid_significant_pathways
-
-BIOCARTA.human.db <- msigdbr::msigdbr(species = "human",
-                                  category = "C2",
-                                  subcategory = "CP:BIOCARTA")
-
-BIOCARTA.lol <- BIOCARTA.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
-BIOCARTA.fgsea <- fgsea::fgsea(pathways = BIOCARTA.lol, stats = deg.ranks, scoreType = "pos")
-
-BIOCARTA.fgsea[,
-           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
-           by = .(pathway)]
-
-BIOCARTA.fgsea %>%
-    arrange(pval) %>%
-    head(10) %>% 
-    dplyr::select(-leadingEdge)
-
-BIOCARTA_significant_pathways <- BIOCARTA.fgsea[padj < 0.05]
-BIOCARTA_significant_pathways
-
 ```
 
 There are 34 significant pathways.
@@ -363,6 +325,50 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 ## isoleucine degradation is down-regulated - a branched amino acid
 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
+```
+
+### PID `fgsea` Analysis
+
+```{r}
+# set seed.
+set.seed(10)
+pid.human.db <- msigdbr::msigdbr(species = "human",
+                                  category = "C2",
+                                  subcategory = "CP:PID")
+
+pid.lol <- pid.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+pid.fgsea <- fgsea::fgsea(pathways = pid.lol, stats = deg.ranks, scoreType = "pos")
+
+pid.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+
+pid.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge)
+
+pid_significant_pathways <- pid.fgsea[padj < 0.05]
+pid_significant_pathways
+
+# BIOCARTA.human.db <- msigdbr::msigdbr(species = "human",
+#                                   category = "C2",
+#                                   subcategory = "CP:BIOCARTA")
+# 
+# BIOCARTA.lol <- BIOCARTA.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+# BIOCARTA.fgsea <- fgsea::fgsea(pathways = BIOCARTA.lol, stats = deg.ranks, scoreType = "pos")
+# 
+# BIOCARTA.fgsea[,
+#            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+#            by = .(pathway)]
+# 
+# BIOCARTA.fgsea %>%
+#     arrange(pval) %>%
+#     head(10) %>% 
+#     dplyr::select(-leadingEdge)
+# 
+# BIOCARTA_significant_pathways <- BIOCARTA.fgsea[padj < 0.05]
+# BIOCARTA_significant_pathways
 ```
 
 ### Reactome `fgsea` Analysis
