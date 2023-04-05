@@ -230,6 +230,8 @@ make.gs.lol <- function(data) {
 ### KEGG Pathway Analysis
 
 ```{r}
+# set seed.
+set.seed(10)
 #Convert the KEGG pathway tibble
 kegg.lol <- kegg.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
 kegg.fgsea <- fgsea::fgsea(pathways = kegg.lol, stats = deg.ranks, scoreType = "pos")
@@ -255,7 +257,8 @@ kegg_significant_pathways
 ```
 
 ```{r}
-#to be delete#
+# set seed.
+set.seed(10)
 pid.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:PID")
@@ -372,6 +375,8 @@ REACTOME.lol <- reactome.human.db %>%
 ```
 
 ```{r}
+# set seed.
+set.seed(10)
 # GSEA with fgsea()
 reactome.fgsea <- fgsea::fgsea(pathways = REACTOME.lol, stats = deg.ranks, scoreType = "pos")
 ```
@@ -409,7 +414,6 @@ top20_reactome <- reactome_significant_pathways %>%
   head(20)
 ```
 
-
 ```{r}
 # lab1 = c('REACTOME_ANTI_INFLAMMATORY_RESPONSE_ \n FAVOURING_LEISHMANIA_PARASITE_INFECTION', 'REACTOME_MRNA_SPLICING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_SIGNALING_BY_RECEPTOR_TYROSINE_KINASES', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_1_FAMILY_SIGNALING', 'REACTOME_INTRACELLULAR_SIGNALING_BY_SECOND_ \n MESSENGERS', 'REACTOME_INTERLEUKIN_4_AND_INTERLEUKIN_13_SIGNALING', 'REACTOME_DISEASES_OF_SIGNAL_TRANSDUCTION_ \n BY_GROWTH_FACTOR_RECEPTORS_AND_SECOND_MESSENGERS', 'REACTOME_PI3K_AKT_SIGNALING_IN_CANCER', 'REACTOME_NEGATIVE_REGULATION_OF_THE_PI3K_ \n AKT_NETWORK', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ABERRANT_ \n P13K_IN_CANCER', 'REACTOME_HEMOSTASIS', 'REACTOME_RRNA_PROCESSING', 'REACTOME_METABOLISM_OF_RNA', 'REACTOME_MAPK_FAMILY_SIGNALING_CASCADES','REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM', 'REACTOME_SIGNALING_BY_INTERLEUKINS')
 
@@ -428,17 +432,16 @@ reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -pval)
 reactome_plot
 ```
 
+### ImmuneSigDB 'fgsea' Analysis
 
-### ImmuneSigDB 'fgsea' Analysis 
-
-```{r} 
+```{r}
+# set seed.
+set.seed(10)
 #Convert the Immune signature tibble with the make.gs.lol function made previously. 
 immune.lol <- IMMUNE.human.db %>% 
   dplyr :: select(gene_symbol, gs_name) %>% 
   make.gs.lol()
-```
 
-```{r}
 #Gene set enrichment analysis with fgsea(). 
 IMMUNE.fgsea <- fgsea::fgsea(pathways = immune.lol, stats = deg.ranks, scoreType = "pos")
 ```
@@ -460,14 +463,13 @@ IMMUNE.fgsea %>%
     knitr::kable()
 ```
 
-
 ```{r}
 # filter significant pathways. Set p<0.05. 
 IMMUNE_significant_pathways <- IMMUNE.fgsea[padj < 0.05]
 IMMUNE_significant_pathways
 ```
 
-There are a total of 2069 significant pathways in the ImmuneSigDB subset of the immunologic signature gene sets from MsigDB. 
+There are a total of 1970 significant pathways in the ImmuneSigDB subset of the immunologic signature gene sets from MsigDB.
 
 ### ImmuneSigDB Visualization
 
@@ -477,7 +479,6 @@ top20_IMMUNE <- IMMUNE_significant_pathways %>%
   arrange(padj) %>%
   head(20)
 ```
-
 
 ```{r}
 # Names of the pathways are too long, so breaking them into two lines over here for grpah later. 
@@ -496,7 +497,6 @@ IMMUNE_barplot<-ggplot(top20_IMMUNE, aes(x = size, y = reorder(pathway, -pval), 
   theme(axis.text.y = element_text(size = 6)) 
 IMMUNE_barplot
 ```
-
 
 ### GO `fgsea` Analysis
 
