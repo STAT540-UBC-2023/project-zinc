@@ -371,18 +371,35 @@ pid_significant_pathways
 # BIOCARTA_significant_pathways
 ```
 
-### Reactome `fgsea` Analysis
+### PID Visualization
 
 ```{r}
-#Convert the REACTOME pathway tibble with the make.gs.lol function made previously. 
-REACTOME.lol <- reactome.human.db %>% 
-  dplyr :: select(gene_symbol, gs_name) %>% 
-  make.gs.lol()
+# arrange kegg_significant_pathways based on the p.adjust value. 
+pid_ordered <- pid_significant_pathways %>%
+  arrange(padj) 
+
+# Plot the barplot same way as above
+pid_plot<- ggplot(pid_ordered, aes(x = size, y = reorder(pathway, -pval), fill = padj)) +
+  # note ordered by p.val over here b/c some of the pathways have the exact same padj values.
+  geom_bar(stat = "identity") +
+  xlab("number of genes") +
+  ylab("pathway") +  
+  scale_fill_gradient(low = "red", high = "grey70") +
+  ggtitle("PID GSEA result") +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 4)) 
+pid_plot
 ```
+
+### Reactome `fgsea` Analysis
 
 ```{r}
 # set seed.
 set.seed(10)
+#Convert the REACTOME pathway tibble with the make.gs.lol function made previously. 
+REACTOME.lol <- reactome.human.db %>% 
+  dplyr :: select(gene_symbol, gs_name) %>% 
+  make.gs.lol()
 # GSEA with fgsea()
 reactome.fgsea <- fgsea::fgsea(pathways = REACTOME.lol, stats = deg.ranks, scoreType = "pos")
 ```
