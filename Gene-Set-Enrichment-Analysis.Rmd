@@ -35,7 +35,7 @@ library(biomaRt)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
-#Access the REACTOME gene sets. 
+#Access the KEGG gene sets. 
 kegg.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:KEGG")
@@ -310,15 +310,15 @@ kegg_ordered <- kegg_significant_pathways %>%
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-kegg_plot<- ggplot(kegg_ordered, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
+kegg_plot<- ggplot(kegg_ordered, aes(x = size, y = reorder(pathway, -pval), fill = padj)) +
+  # note ordered by p.val over here b/c some of the pathways have the exact same padj values.
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
-  scale_fill_gradient(low = "gray70", high = "red") +
+  scale_fill_gradient(low = "red", high = "grey70") +
   ggtitle("KEGG GSEA result") +
   theme_minimal() +
   theme(axis.text.y = element_text(size = 4)) 
-# scale_y_discrete(labels = lab)
 kegg_plot
 ```
 
@@ -398,7 +398,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 ```
 
-There are 80 significant pathways from REACTOME 'fgsea' analysis.
+There are 76 significant pathways from REACTOME 'fgsea' analysis.
 
 ### Reactome Visualization
 
@@ -409,23 +409,94 @@ top20_reactome <- reactome_significant_pathways %>%
   head(20)
 ```
 
+
 ```{r}
-lab1 = c('REACTOME_DISEASES_ASSOCIATED_WITH_ \n GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_PROCESSING_OF_CAPPED_INTRON_ \n CONTAINING_PRE_MRNA', 'REACTOME_MRNA_SPLICING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_SIGNALING_BY_RECEPTOR_TYROSINE_KINASES', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_1_FAMILY_SIGNALING', 'REACTOME_INTRACELLULAR_SIGNALING_BY_SECOND_ \n MESSENGERS', 'REACTOME_INTERLEUKIN_4_AND_INTERLEUKIN_13_SIGNALING', 'REACTOME_DISEASES_OF_SIGNAL_TRANSDUCTION_ \n BY_GROWTH_FACTOR_RECEPTORS_AND_SECOND_MESSENGERS', 'REACTOME_PI3K_AKT_SIGNALING_IN_CANCER', 'REACTOME_NEGATIVE_REGULATION_OF_THE_PI3K_ \n AKT_NETWORK', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ABERRANT_ \n P13K_IN_CANCER', 'REACTOME_HEMOSTASIS', 'REACTOME_RRNA_PROCESSING', 'REACTOME_METABOLISM_OF_RNA', 'REACTOME_MAPK_FAMILY_SIGNALING_CASCADES','REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM', 'REACTOME_SIGNALING_BY_INTERLEUKINS')
+# lab1 = c('REACTOME_ANTI_INFLAMMATORY_RESPONSE_ \n FAVOURING_LEISHMANIA_PARASITE_INFECTION', 'REACTOME_MRNA_SPLICING', 'REACTOME_ROLE_OF_PHOSPHOLIPIDS_IN_PHAGOCYTOSIS', 'REACTOME_GLYCOSAMINOGLYCAN_METABOLISM', 'REACTOME_SIGNALING_BY_RECEPTOR_TYROSINE_KINASES', 'REACTOME_RRNA_MODIFICATION_IN_THE_NUCLEUS_AND_CYTOSOL', 'REACTOME_INTERLEUKIN_1_FAMILY_SIGNALING', 'REACTOME_INTRACELLULAR_SIGNALING_BY_SECOND_ \n MESSENGERS', 'REACTOME_INTERLEUKIN_4_AND_INTERLEUKIN_13_SIGNALING', 'REACTOME_DISEASES_OF_SIGNAL_TRANSDUCTION_ \n BY_GROWTH_FACTOR_RECEPTORS_AND_SECOND_MESSENGERS', 'REACTOME_PI3K_AKT_SIGNALING_IN_CANCER', 'REACTOME_NEGATIVE_REGULATION_OF_THE_PI3K_ \n AKT_NETWORK', 'REACTOME_CONSTITUTIVE_SIGNALING_BY_ABERRANT_ \n P13K_IN_CANCER', 'REACTOME_HEMOSTASIS', 'REACTOME_RRNA_PROCESSING', 'REACTOME_METABOLISM_OF_RNA', 'REACTOME_MAPK_FAMILY_SIGNALING_CASCADES','REACTOME_CYTOKINE_SIGNALING_IN_IMMUNE_SYSTEM', 'REACTOME_SIGNALING_BY_INTERLEUKINS')
 
 # Plot the barplot. 
 # Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
 # Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
+reactome_plot<- ggplot(top20_reactome, aes(x = size, y = reorder(pathway, -pval), fill = padj)) +
+  # note ordered by p.val over here b/c some of the pathways have the exact same padj values.
   geom_bar(stat = "identity") +
   xlab("number of genes") +
   ylab("pathway") +  
-  scale_fill_gradient(low = "gray70", high = "red") +
+  scale_fill_gradient(low = "red", high = "gray70") +
   ggtitle("REACTOME GSEA result") +
   theme_minimal() +
-  theme(axis.text.y = element_text(size = 6)) + 
-  scale_y_discrete(labels = lab1)
-reactome_plots
+  theme(axis.text.y = element_text(size = 6)) 
+reactome_plot
 ```
+
+
+### ImmuneSigDB 'fgsea' Analysis 
+
+```{r} 
+#Convert the Immune signature tibble with the make.gs.lol function made previously. 
+immune.lol <- IMMUNE.human.db %>% 
+  dplyr :: select(gene_symbol, gs_name) %>% 
+  make.gs.lol()
+```
+
+```{r}
+#Gene set enrichment analysis with fgsea(). 
+IMMUNE.fgsea <- fgsea::fgsea(pathways = immune.lol, stats = deg.ranks, scoreType = "pos")
+```
+
+```{r}
+#Show top 5 genes for each pathway:
+# Here, we are "pasting" the first five genes in the leadingEdge column
+IMMUNE.fgsea[,
+           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
+           by = .(pathway)]
+```
+
+```{r}
+#Show result in table. 
+IMMUNE.fgsea %>%
+    arrange(pval) %>%
+    head(10) %>% 
+    dplyr::select(-leadingEdge) %>% 
+    knitr::kable()
+```
+
+
+```{r}
+# filter significant pathways. Set p<0.05. 
+IMMUNE_significant_pathways <- IMMUNE.fgsea[padj < 0.05]
+IMMUNE_significant_pathways
+```
+
+There are a total of 2069 significant pathways in the ImmuneSigDB subset of the immunologic signature gene sets from MsigDB. 
+
+### ImmuneSigDB Visualization
+
+```{r}
+# get the top 20 pathways from GO_significant_pathways based on the p.adjust value. 
+top20_IMMUNE <- IMMUNE_significant_pathways %>%
+  arrange(padj) %>%
+  head(20)
+```
+
+
+```{r}
+# Names of the pathways are too long, so breaking them into two lines over here for grpah later. 
+# lab2 = c('GSE9988_ANTI_TREM1_AND_LPS_VS_CTRL_TREATED_ \n MONOCYTES_UP', 'GSE2706_UNSTIM_VS_2H_LPS_AND_R848_DC_DN', 'GSE25085_FETAL_LIVER_VS_FETAL_BM_SP4_THYMIC_ \n IMPLANT_DN', 'GSE30971_CTRL_VS_LPS_STIM_MACROPHAGE_WBP7_  \n HET_2H_UP', 'GSE9988_ANTI_TREM1_VS_VEHICLE_TREATED_ \n MONOCYTES_UP', 'GSE26343_UNSTIM_VS_LPS_STIM_MACROPHAGE_UP', 'GSE32986_CURDLAN_HIGHDOSE_VS_GMCSF_AND_ \n CURDLAN_HIGHDOSE_STIM_DC_DN', 'GSE46606_IRF4MID_VS_WT_CD40L_IL2_IL5_DAY3_ \n STIMULATED_BCELL_UP', 'GSE28726_NAIVE_VS_ACTIVATED_NKTCELL_DN', 'GSE9988_ANTI_TREM1_VS_CTRL_TREATED_ \n MONOCYTES_UP', 'GSE14769_UNSTIM_VS_80MIN_LPS_BMDM_DN', 'GSE9601_NFKB_INHIBITOR_VS_PI3K_INHIBITOR_ \n TREATED_HCMV_INF_MONOCYTE_DN', 'GSE6674_ANTI_IGM_VS_CPG_STIM_BCELL_DN', 'GSE21670_UNTREATED_VS_IL6_TREATED_STAT3_KO_ \n CD4_TCELL_DN', 'GSE27434_WT_VS_DNMT1_KO_TREG_DN', 'GSE16385_ROSIGLITAZONE_IFNG_TNF_VS_IL4_STIM_ \n MACROPHAGE_UP', 'GSE37605_FOXP3_FUSION_GFP_VS_IRES_GFP_TREG_ \n C57BL6_UP', 'GSE45739_NRAS_KO_VS_WT_ACD3_ACD28_STIM_ \n CD4_TCELL_UP', 'GSE21670_STAT3_KO_VS_WT_CD4_TCELL_DN', 'GSE45365_NK_CELL_VS_CD11B_DC_DN')
+
+# Plot the barplot. 
+# Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
+# Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
+IMMUNE_barplot<-ggplot(top20_IMMUNE, aes(x = size, y = reorder(pathway, -pval), fill = padj)) + 
+  # note ordered by p.val over here b/c some of the pathways have the exact same padj values. 
+  geom_bar(stat = "identity") +
+  xlab("number of genes") +
+  ylab("pathway") +  
+  scale_fill_gradient(low = "red", high = "gray70") +
+  ggtitle("IMMUNE GSEA result") +
+  theme(axis.text.y = element_text(size = 6)) 
+IMMUNE_barplot
+```
+
 
 ### GO `fgsea` Analysis
 
