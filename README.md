@@ -12,9 +12,16 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 ## Table of Content: 
 1. [Gene Set Enrichment Analysis Folder](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis): contains everything(e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
+  + a. Gene set enrichment analysis R markdown file 
+  + b. Gene set enrichment analysis markdown file
+  + c. Figures (including the plots)
+  + d. Results 
 2. [Microarray Linear Regression](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression) Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
-3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations)
-
+  + a. linear regression analysis R Markdown file 
+  + b. linear regression analysis markdown file 
+  + c. Figures (including the plots) 
+  + d. Results 
+3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations): contains all the reports and presentation slides (e.g., lightning talk, written proposal) created for this project . 
 
 
 ## Project Proprosal:
