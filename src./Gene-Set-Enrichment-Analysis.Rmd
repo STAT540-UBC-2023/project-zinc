@@ -59,7 +59,8 @@ reactome.human.db <- msigdbr(species = "human",
 #### PID database
 
 ```{r}
-#Access the PID gene sets. 
+#Access the Pathway Interaction Database (PID) gene sets. This one specifically look at signaling pathways, molecular interactions, reaction kinetics, and cellular locations of signaling molecules involved in a pathway. 
+
 pid.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
                                   subcategory = "CP:PID")
@@ -332,43 +333,29 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 ```{r}
 # set seed.
 set.seed(10)
-pid.human.db <- msigdbr::msigdbr(species = "human",
-                                  category = "C2",
-                                  subcategory = "CP:PID")
 
+#Convert the PID pathway tibble
 pid.lol <- pid.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
+
+#Run fgsea analysis. 
 pid.fgsea <- fgsea::fgsea(pathways = pid.lol, stats = deg.ranks, scoreType = "pos")
 
+```
+
+```{r}
+#Show top 5 genes for each pathway:
+# Here, we are "pasting" the first five genes in the leadingEdge column
 pid.fgsea[,
            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
            by = .(pathway)]
-
+#Show result in table.
 pid.fgsea %>%
     arrange(pval) %>%
     head(10) %>% 
     dplyr::select(-leadingEdge)
-
+# filter significant pathways. Set p<0.05. 
 pid_significant_pathways <- pid.fgsea[padj < 0.05]
 pid_significant_pathways
-
-# BIOCARTA.human.db <- msigdbr::msigdbr(species = "human",
-#                                   category = "C2",
-#                                   subcategory = "CP:BIOCARTA")
-# 
-# BIOCARTA.lol <- BIOCARTA.human.db %>% dplyr::select(gene_symbol, gs_name) %>% make.gs.lol()
-# BIOCARTA.fgsea <- fgsea::fgsea(pathways = BIOCARTA.lol, stats = deg.ranks, scoreType = "pos")
-# 
-# BIOCARTA.fgsea[,
-#            topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
-#            by = .(pathway)]
-# 
-# BIOCARTA.fgsea %>%
-#     arrange(pval) %>%
-#     head(10) %>% 
-#     dplyr::select(-leadingEdge)
-# 
-# BIOCARTA_significant_pathways <- BIOCARTA.fgsea[padj < 0.05]
-# BIOCARTA_significant_pathways
 ```
 
 There are a total of 25 significant pathways in the PID gene sets. 
@@ -376,11 +363,11 @@ There are a total of 25 significant pathways in the PID gene sets.
 ### PID Visualization
 
 ```{r}
-# arrange kegg_significant_pathways based on the p.adjust value. 
+# arrange pid_significant_pathways based on the p.adjust value. 
 pid_ordered <- pid_significant_pathways %>%
   arrange(padj) 
 
-# Plot the barplot same way as above
+# Plot the barplot. 
 pid_plot<- ggplot(pid_ordered, aes(x = size, y = reorder(pathway, -pval), fill = padj)) +
   # note ordered by p.val over here b/c some of the pathways have the exact same padj values.
   geom_bar(stat = "identity") +
