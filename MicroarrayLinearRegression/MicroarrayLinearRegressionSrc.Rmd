@@ -137,8 +137,9 @@ toLonger(express[1:48]) %>%
 For experiment 1 (sample 1 to 48)
 ```{r}
 modm <- model.matrix(~status, meta)
-lmFitEb <- eBayes(lmFit(express[1:48], modm), trend=TRUE)
-plotSA(lmFitEb, main = "limma-trend") 
+lmFitEb <- eBayes(lmFit(express[1:48], modm))
+plotSA(lmFitEb, main= "mean-var relationship")
+
 
 ```
 Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
@@ -161,8 +162,8 @@ degT2d %>%
 For Experiment 2 (Sample 49 to 77)
 ```{r}
 modm_2<- model.matrix(~BMI*status, meta_2)
-lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2), trend=TRUE)
-plotSA(lmFitEb_2, main = "Mean-Variance Plot- Without LIMMA TREND")
+lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
+plotSA(lmFitEb_2, main= "mean-var relationship")
 ```
 
 No Significant DE were observed under the effect of BMI, T2D or their interactions in experiment 2(n=29)
