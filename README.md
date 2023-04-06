@@ -10,6 +10,10 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Lucy(Shuxin) Chi
 -   Janet (Jia He) Zhang
 
+## Directionary: 
+
+
+
 ## Project Proprosal:
 
 Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf).
@@ -20,6 +24,6 @@ Our written proposal (which contains our finalized plan) can be found [here](htt
 
 Our project progress report can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/progress_report.md).
 
-## Other Info
+## Final Report 
 
-More information for this project will be updated in this repository throughout the term.
+## Final Presentation 
