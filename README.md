@@ -12,7 +12,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 ## Directionary: 
 
-- [src.]() folder: contains all the .Rmd files and the knitted .md files for our codes. 
+- [src.](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/src.) folder: contains all the .Rmd files and the knitted .md files for our codes. 
 - [Reports&Presentations]() folder: contains all the written reports (e.g, progress report markdown file) and the presentation pdf files. 
 
 
