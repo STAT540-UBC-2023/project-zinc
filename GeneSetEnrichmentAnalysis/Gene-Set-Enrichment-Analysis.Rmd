@@ -66,7 +66,7 @@ pid.human.db <- msigdbr::msigdbr(species = "human",
                                   subcategory = "CP:PID")
 ```
 
-#### C7 immune database
+#### ImmuneSigDB Database
 
 ```{r}
 #Access the C7 Immunological gene sets. 
@@ -378,7 +378,7 @@ pid_plot<- ggplot(pid_ordered, aes(x = size, y = reorder(pathway, -pval), fill =
   scale_fill_gradient(low = "red", high = "grey70") +
   ggtitle("PID GSEA result") +
   theme_minimal() +
-  theme(axis.text.y = element_text(size = 4)) 
+  theme(axis.text.y = element_text(size = 6)) 
 pid_plot
 ```
 
@@ -534,90 +534,7 @@ IMMUNE_barplot<-ggplot(top20_IMMUNE, aes(x = size, y = reorder(pathway, -pval), 
 IMMUNE_barplot
 ```
 
-### GO `fgsea` Analysis
 
-```{r}
-#Convert the GO tibble with the make.gs.lol function made previously. 
-GO.lol <- GO.human.db %>% 
-  dplyr :: select(gene_symbol, gs_name) %>% 
-  make.gs.lol()
-```
-
-```{r}
-# GSEA with fgsea()
-GO.fgsea <- fgsea::fgsea(pathways = GO.lol, stats = deg.ranks, scoreType = "pos")
-```
-
-```{r}
-#Show top 5 genes for each pathway:
-# Here, we are "pasting" the first five genes in the leadingEdge column
-GO.fgsea[,
-           topGenes := paste0(head(unlist(`leadingEdge`), 5), collapse=", "),
-           by = .(pathway)]
-```
-
-```{r}
-#Show result in table. 
-GO.fgsea %>%
-    arrange(pval) %>%
-    head(10) %>% 
-    dplyr::select(-leadingEdge) %>% 
-    knitr::kable()
-```
-
-```{r}
-# filter significant pathways. Set p<0.05. 
-GO_significant_pathways <- GO.fgsea[padj < 0.05]
-GO_significant_pathways
-```
-
-There are 1262 significant pathways present in the GO gene sets.
-
-### GO Analysis Visualization
-
-```{r}
-# get the top 20 pathways from GO_significant_pathways based on the p.adjust value. 
-top20_GO <- GO_significant_pathways %>%
-  arrange(padj) %>%
-  head(20)
-```
-
-```{r}
-# Names of the pathways are too long, so breaking them into two lines over here for grpah later. 
-labs = c('GOBP_REGULATION_OF_CELL_DIFFERENTIATION', 'GOBP_NEGATIVE_REGULATION_OF_MULTICELLULAR_\n
-ORGANISMAL_PROCESS',
-         'GOBP_REGULATION_OF_RESPONSE_TO_STRESS',
-         'GOBP_POSITIVE_REGULATION_OF_DEVELOPMENTAL_PROCESS',
-         'GOBP_B_CELL_ACTIVATION',
-         'GOBP_REGULATION_OF_RESPONSE_TO_EXTERNAL_STIMULUS',
-         'GOBP_RIBOSOME_BIOGENESIS',
-         'GOBP_IMMUNE_RESPONSE',
-         'GOBP_CELL_ACTIVATION',
-         'GOBP_IMMUNE_SYSTEM_DEVELOPMENT',
-         'GOBP_REGULATION_OF_CELL_POPULATION_PROLIFERATION',
-         'GOBP_REGULATION_OF_CELL_ACTIVATION',
-         'GOBP_LYMPHOCYTE_ACTIVATION',
-         'GOBP_LOCOMOTION',
-         'GOBP_REGULATION_OF_CELLULAR_COMPONENT_MOVEMENT',
-         'GOBP_POSITIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS',
-         'GOBP_IMMUNE_EFFECTOR_PROCESS',
-         'GOBP_CELL_MIGRATION',
-         'GOBP_NEGATIVE_REGULATION_OF_RESPONSE_TO_STIMULUS',
-         'GOBP_REGULATION_OF_IMMUNE_SYSTEM_PROCESS')
-      
-# Plot the barplot. 
-# Plot the 'size' column from the table onto x-axis, the the top 20 pathways on the y-axis
-# Using the size because size represents the size of each pathway after removing genes not present in 'names(stats)'
-go_barplot<-ggplot(top20_GO, aes(x = size, y = reorder(pathway, padj), fill = padj)) +
-  geom_bar(stat = "identity") +
-  xlab("number of genes") +
-  ylab("pathway") +  
-  scale_fill_gradient(low = "gray70", high = "red") +
-  ggtitle("GO GSEA result") +
-  theme(axis.text.y = element_text(size = 6)) +
-  scale_y_discrete(labels = labs)
-go_barplot
-```
 
 ### Disease Association with T2D based on the DE genes Using DisGeNET
 
