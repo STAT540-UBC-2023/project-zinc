@@ -16,7 +16,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 ## Project Proprosal:
 
-Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf).
+Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/Project%20Proposal%20Lightning%20Talks%2016-20-04-489.pdf).
 
 Our written proposal (which contains our finalized plan) can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md).
 
