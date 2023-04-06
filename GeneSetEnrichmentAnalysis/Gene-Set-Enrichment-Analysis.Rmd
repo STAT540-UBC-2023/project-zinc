@@ -89,9 +89,7 @@ run.if.needed <- function(.file, .code) {
 gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
 
 run.if.needed(gwas.tidy.file, {
-
     gwas.file <- "gwas_catalog_v1.0-associations_e105_r2022-02-02.tsv.gz"
-
     run.if.needed(gwas.file, {
         url <- "https://www.ebi.ac.uk/gwas/api/search/downloads/full"
         .file <- str_remove(gwas.file, ".gz$")
@@ -99,18 +97,14 @@ run.if.needed(gwas.tidy.file, {
         gzip(.file)
         unlink(.file)
     })
-
     .dt <-
         fread(gwas.file, sep="\t", quote="") %>%
         dplyr::select(`MAPPED_GENE`, `DISEASE/TRAIT`, `PVALUE_MLOG`)
-
     .dt <- .dt[order(.dt$PVALUE_MLOG, decreasing = TRUE),
                head(.SD, 1),
                by = .(`MAPPED_GENE`, `DISEASE/TRAIT`)]
-
     .count <- .dt[, .(.N), by = .(`DISEASE/TRAIT`)]
     .dt <- left_join(.count[`N` >= 100, ], .dt)[nchar(`MAPPED_GENE`)> 0,]
-
     .dt <- .dt[,
                .(gene_symbol = unlist(strsplit(`MAPPED_GENE`, split="[ ,.-]+"))),
                by = .(`DISEASE/TRAIT`, PVALUE_MLOG)]
@@ -152,7 +146,7 @@ write.csv(t2d_genes, "tsd.genes.csv", row.names=FALSE)
 
 ```{r}
 # read data frame for the DE genes
-DEgenes<-readRDS("degT2d_DE.RDS")
+DEgenes<-readRDS("degT2d_DEcopy.RDS")
 ```
 
 ### Data formatting for `fgsea` analysis
@@ -270,7 +264,7 @@ kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 kegg_significant_pathways
 
 # export result as csv
-write.csv(kegg_significant_pathways, "kegg_significant_pathways.csv", row.names=FALSE)
+fwrite(kegg_significant_pathways, file = "kegg_significant_pathways.csv")
 ```
 
 There are 34 significant pathways.
@@ -369,7 +363,7 @@ pid_significant_pathways <- pid.fgsea[padj < 0.05]
 pid_significant_pathways
 
 # export result as csv
-write.csv(pid_significant_pathways, "pid_significant_pathways.csv", row.names=FALSE)
+fwrite(pid_significant_pathways, "pid_significant_pathways.csv")
 ```
 
 There are a total of 25 significant pathways in the PID gene sets.
@@ -431,7 +425,7 @@ reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
 
 # export result as csv
-write.csv(reactome_significant_pathways, "reactome_significant_pathways.csv", row.names=FALSE)
+fwrite(reactome_significant_pathways, "reactome_significant_pathways.csv")
 ```
 
 There are a total of 82 significant pathways from REACTOME 'fgsea' analysis.
@@ -502,7 +496,7 @@ IMMUNE_significant_pathways <- IMMUNE.fgsea[padj < 0.05]
 IMMUNE_significant_pathways
 
 # export result as csv
-write.csv(IMMUNE_significant_pathways, "IMMUNE_significant_pathways.csv", row.names=FALSE)
+fwrite(IMMUNE_significant_pathways, "IMMUNE_significant_pathways.csv")
 ```
 
 There are a total of 1970 significant pathways in the ImmuneSigDB subset of the immunologic signature gene sets from MsigDB.

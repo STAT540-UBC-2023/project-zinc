@@ -10,19 +10,22 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Lucy(Shuxin) Chi
 -   Janet (Jia He) Zhang
 
-## Directionary: 
+## Table of Content: 
+1. [Gene Set Enrichment Analysis Folder](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis): contains everything(e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
+2. [Microarray Linear Regression](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression) Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
+3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations)
 
 
 
 ## Project Proprosal:
 
-Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf).
+Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/Project%20Proposal%20Lightning%20Talks%2016-20-04-489.pdf).
 
-Our written proposal (which contains our finalized plan) can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Written%20Project%20Proposal.md).
+Our written proposal (which contains our finalized plan) can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/Written%20Project%20Proposal.md). 
 
 ## Progress Report
 
-Our project progress report can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/progress_report.md).
+Our project progress report can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/progress_report.md).
 
 ## Final Report 
 
