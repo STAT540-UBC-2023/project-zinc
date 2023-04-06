@@ -87,6 +87,7 @@ run.if.needed <- function(.file, .code) {
 
 ```{r}
 gwas.tidy.file <- "gwas_catalog_tidy.tsv.gz"
+
 run.if.needed(gwas.tidy.file, {
 
     gwas.file <- "gwas_catalog_v1.0-associations_e105_r2022-02-02.tsv.gz"
