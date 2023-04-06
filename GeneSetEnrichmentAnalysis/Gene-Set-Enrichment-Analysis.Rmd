@@ -3,7 +3,7 @@ title: "Gene-Set-Enrichment-Analysis"
 author: "Lucy Chi & Janet Zhang" 
 date: "2023-03-22"
 output: github_document   
---- 
+---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -267,6 +267,9 @@ kegg.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 kegg_significant_pathways <- kegg.fgsea[padj < 0.05]
 kegg_significant_pathways
+
+# export result as csv
+write.csv(kegg_significant_pathways, "kegg_significant_pathways.csv", row.names=FALSE)
 ```
 
 There are 34 significant pathways.
@@ -363,6 +366,9 @@ pid.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 pid_significant_pathways <- pid.fgsea[padj < 0.05]
 pid_significant_pathways
+
+# export result as csv
+write.csv(pid_significant_pathways, "pid_significant_pathways.csv", row.names=FALSE)
 ```
 
 There are a total of 25 significant pathways in the PID gene sets.
@@ -422,6 +428,9 @@ reactome.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 reactome_significant_pathways <- reactome.fgsea[padj < 0.05]
 reactome_significant_pathways
+
+# export result as csv
+write.csv(reactome_significant_pathways, "reactome_significant_pathways.csv", row.names=FALSE)
 ```
 
 There are a total of 82 significant pathways from REACTOME 'fgsea' analysis.
@@ -490,6 +499,9 @@ IMMUNE.fgsea %>%
 # filter significant pathways. Set p<0.05. 
 IMMUNE_significant_pathways <- IMMUNE.fgsea[padj < 0.05]
 IMMUNE_significant_pathways
+
+# export result as csv
+write.csv(IMMUNE_significant_pathways, "IMMUNE_significant_pathways.csv", row.names=FALSE)
 ```
 
 There are a total of 1970 significant pathways in the ImmuneSigDB subset of the immunologic signature gene sets from MsigDB.
@@ -540,8 +552,6 @@ IMMUNE_barplot<-ggplot(top20_IMMUNE, aes(x = size, y = reorder(pathway, -pval), 
   scale_y_discrete(labels=lab2)
 IMMUNE_barplot
 ```
-
-
 
 ### Disease Association with T2D based on the DE genes Using DisGeNET
 
