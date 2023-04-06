@@ -312,9 +312,11 @@ For experiment 1 (sample 1 to 48)
 
 ``` r
 modm <- model.matrix(~status, meta)
-lmFitEb <- eBayes(lmFit(express[1:48], modm))
+lmFitEb <- eBayes(lmFit(express[1:48], modm), trend=TRUE)
+plotSA(lmFitEb, main = "limma-trend") 
 ```
 
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
 
 ``` r
@@ -323,16 +325,16 @@ degT2d %>% head(10)
 ```
 
     ##              logFC   AveExpr         t      P.Value   adj.P.Val        B
-    ## 8003667  1.4034296  7.609690  6.316668 6.816466e-08 0.001958371 7.545931
-    ## 8095080  1.0921294  7.404872  5.542533 1.090848e-06 0.007738258 5.146712
-    ## 8043995  0.8684121  8.800716  5.529337 1.143097e-06 0.007738258 5.106089
-    ## 7938608  1.2241985  7.428053  5.511468 1.217814e-06 0.007738258 5.051107
-    ## 7952341  1.0060584  7.362819  5.435595 1.592742e-06 0.007738258 4.817966
-    ## 8139087  1.8199810  4.825679  5.431479 1.616065e-06 0.007738258 4.805336
-    ## 8097282  0.4422703  7.180575  5.191681 3.754117e-06 0.015407968 4.072531
-    ## 7974090 -0.3208450  7.017336 -5.150541 4.334315e-06 0.015565609 3.947504
-    ## 7954377 -0.9860317 13.168026 -5.059747 5.945901e-06 0.018906487 3.672402
-    ## 8156848  0.4525494  5.989503  5.007422 7.129418e-06 0.018906487 3.514405
+    ## 8003667  1.4034296  7.609690  6.322827 6.553650e-08 0.001882864 7.572925
+    ## 8095080  1.0921294  7.404872  5.546019 1.064679e-06 0.007481510 5.162790
+    ## 8043995  0.8684121  8.800716  5.528646 1.132439e-06 0.007481510 5.109261
+    ## 7938608  1.2241985  7.428053  5.516846 1.180884e-06 0.007481510 5.072916
+    ## 8139087  1.8199810  4.825679  5.442519 1.536786e-06 0.007481510 4.844284
+    ## 7952341  1.0060584  7.362819  5.437840 1.562446e-06 0.007481510 4.829909
+    ## 8097282  0.4422703  7.180575  5.158826 4.170196e-06 0.017115675 3.977013
+    ## 7974090 -0.3208450  7.017336 -5.081025 5.471111e-06 0.018056134 3.740937
+    ## 7954377 -0.9860317 13.168026 -5.071466 5.656290e-06 0.018056134 3.711992
+    ## 8156848  0.4525494  5.989503  4.986051 7.609981e-06 0.018498263 3.453958
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
@@ -340,8 +342,11 @@ For Experiment 2 (Sample 49 to 77)
 
 ``` r
 modm_2<- model.matrix(~BMI*status, meta_2)
-lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
+lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2), trend=TRUE)
+plotSA(lmFitEb_2, main = "Mean-Variance Plot- Without LIMMA TREND")
 ```
+
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 No Significant DE were observed under the effect of BMI, T2D or their
 interactions in experiment 2(n=29)
@@ -355,7 +360,7 @@ topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIo
 
 ``` r
 # BMI  
-topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30") 
+topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
 ```
 
     ## data frame with 0 columns and 0 rows

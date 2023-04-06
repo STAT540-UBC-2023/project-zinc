@@ -137,12 +137,15 @@ toLonger(express[1:48]) %>%
 For experiment 1 (sample 1 to 48)
 ```{r}
 modm <- model.matrix(~status, meta)
-lmFitEb <- eBayes(lmFit(express[1:48], modm))
+lmFitEb <- eBayes(lmFit(express[1:48], modm), trend=TRUE)
+plotSA(lmFitEb, main = "limma-trend") 
+
 ```
 Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
 ```{r}
 degT2d  <- topTable(lmFitEb, number = Inf, adjust.method="BH", p.value = 0.05, coef= "statust2d")
 degT2d %>% head(10)
+
 ```
 
 ```{r echo=FALSE}
@@ -158,17 +161,21 @@ degT2d %>%
 For Experiment 2 (Sample 49 to 77)
 ```{r}
 modm_2<- model.matrix(~BMI*status, meta_2)
-lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
+lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2), trend=TRUE)
+plotSA(lmFitEb_2, main = "Mean-Variance Plot- Without LIMMA TREND")
 ```
 
 No Significant DE were observed under the effect of BMI, T2D or their interactions in experiment 2(n=29)
 ```{r}
 # BMI:T2dstatus   
 topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30:statust2d")
+
 # BMI  
-topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30") 
+topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "BMIover30")
+
 #T2dstatus 
 topTable(lmFitEb_2, number = Inf, adjust.method="BH",p.value = 0.05, coef= "statust2d")
+
 ```
 
 Saving all DE gene for aim 2 gene set enrichment analysis
