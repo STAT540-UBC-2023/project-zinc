@@ -10,6 +10,13 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Lucy(Shuxin) Chi
 -   Janet (Jia He) Zhang
 
+## Directionary: 
+
+- [src.](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/src.) folder: contains all the .Rmd files and the knitted .md files for our codes. 
+- [Reports&Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations) folder: contains all the written reports (e.g, progress report markdown file) and the presentation pdf files. 
+
+
+
 ## Project Proprosal:
 
 Our project proposal slide lightning talk slides can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Project%20Proposal%20Lightning%20Talks.pdf).
@@ -20,6 +27,6 @@ Our written proposal (which contains our finalized plan) can be found [here](htt
 
 Our project progress report can be found [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/progress_report.md).
 
-## Other Info
+## Final Report 
 
-More information for this project will be updated in this repository throughout the term.
+## Final Presentation 
