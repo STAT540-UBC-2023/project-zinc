@@ -250,22 +250,38 @@ svd <- as_data_frame(scores) %>% rename(U1 = V1, U2 = V2, U3 = V3)
 svd$sample_id = colnames(express)
 svd <- left_join(svd, MetaData, by = "sample_id")
 
-ggplot(svd, aes(x=U1, y=U2, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U1, y=U2, color = experiment)) + 
+  geom_point(size=3) +
+  ggtitle("U2 vs. U1")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ggplot(svd, aes(x=U2, y=U3, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U2, y=U3, color = experiment)) + 
+  geom_point(size=3) +
+  ggtitle("U3 vs. U2")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
-ggplot(svd, aes(x=U3, y=U1, color = experiment)) + geom_point(size=3)
+ggplot(svd, aes(x=U3, y=U1, color = experiment)) + 
+  geom_point(size=3) +
+  ggtitle("U1 vs. U3")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
+``` r
+  ggtitle("U2 vs. U1")
+```
+
+    ## $title
+    ## [1] "U2 vs. U1"
+    ## 
+    ## attr(,"class")
+    ## [1] "labels"
 
 - A moderate batch effect was observed for U2 vs. U1 and U3 vs. U1.
   Thus, the two experiments will be analyzed separately
@@ -301,7 +317,8 @@ toLonger(express[1:48]) %>%
   ggplot(aes(x=sample_id, y= Expression, color=sample_id)) +
   geom_boxplot() + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1),legend.position = "none") + 
-  labs(x = "sample", y = "Gene Expression") 
+  labs(x = "sample", y = "Gene Expression") +
+  ggtitle("Boxplot of Samples from Experiment One")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
@@ -313,10 +330,11 @@ For experiment 1 (sample 1 to 48)
 ``` r
 modm <- model.matrix(~status, meta)
 lmFitEb <- eBayes(lmFit(express[1:48], modm))
-plotSA(lmFitEb, main= "mean-var relationship")
+plotSA(lmFitEb, main= "Mean-Var Relationship")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
 Significant DE genes in T2D vs. Healthy in experiment 1 (n = 48)
 
 ``` r
@@ -338,12 +356,43 @@ degT2d %>% head(10)
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
+    ## List of 2
+    ##  $ axis.text.y:List of 11
+    ##   ..$ family       : NULL
+    ##   ..$ face         : NULL
+    ##   ..$ colour       : NULL
+    ##   ..$ size         : num 10
+    ##   ..$ hjust        : NULL
+    ##   ..$ vjust        : NULL
+    ##   ..$ angle        : NULL
+    ##   ..$ lineheight   : NULL
+    ##   ..$ margin       : NULL
+    ##   ..$ debug        : NULL
+    ##   ..$ inherit.blank: logi FALSE
+    ##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+    ##  $ plot.title :List of 11
+    ##   ..$ family       : NULL
+    ##   ..$ face         : NULL
+    ##   ..$ colour       : NULL
+    ##   ..$ size         : num 12
+    ##   ..$ hjust        : NULL
+    ##   ..$ vjust        : NULL
+    ##   ..$ angle        : NULL
+    ##   ..$ lineheight   : NULL
+    ##   ..$ margin       : NULL
+    ##   ..$ debug        : NULL
+    ##   ..$ inherit.blank: logi FALSE
+    ##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+    ##  - attr(*, "class")= chr [1:2] "theme" "gg"
+    ##  - attr(*, "complete")= logi FALSE
+    ##  - attr(*, "validate")= logi TRUE
+
 For Experiment 2 (Sample 49 to 77)
 
 ``` r
 modm_2<- model.matrix(~BMI*status, meta_2)
 lmFitEb_2 <- eBayes(lmFit(express[49:77], modm_2))
-plotSA(lmFitEb_2, main= "mean-var relationship")
+plotSA(lmFitEb_2, main= "Mean-Var Relationship")
 ```
 
 ![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
