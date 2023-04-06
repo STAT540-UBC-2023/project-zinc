@@ -22,7 +22,6 @@ library(R.utils)
 library(enrichplot)
 library(DOSE)
 library(clusterProfiler)
-library(enrichplot)
 library(ggridges)
 library(ReactomePA)
 library(org.Hs.eg.db)
@@ -31,7 +30,7 @@ library(biomaRt)
 
 ## Gene Sets for Downstream Gene Set Enrichment Analysis
 
-### Obtain Molecular Signature Database (KEGG, reactome and GO pathways)
+### Obtain Molecular Signature Database (KEGG, reactome and C7 pathways)
 
 ```{r}
 knitr::kable(msigdbr::msigdbr_species())
@@ -134,9 +133,15 @@ gwas.db[, gs_name := `DISEASE/TRAIT`]
 t2d_genes<- gwas.db[str_detect(`DISEASE/TRAIT`, "[Dd]iabetes") & !is.na(gene_symbol)] %>%
     mutate(p.value = num.sci(p.value)) %>%
     dplyr::select(`gs_name`, `gene_symbol`, `p.value`, `PVALUE_MLOG`) 
-
+# removed t1d associated genes
 t2d_genes <- t2d_genes %>% filter(t2d_genes$gs_name == "Type 2 diabetes")
-## 2364 genes identified
+#removed duplicates
+t2d_genes <-
+    t2d_genes[order(t2d_genes$p.value, decreasing = TRUE),
+                   head(.SD, 1),
+                   by = .(gene_symbol)]
+## 1693 genes identified
+
 ```
 
 ### Load DE Gene List
@@ -371,7 +376,7 @@ pid_significant_pathways
 # BIOCARTA_significant_pathways
 ```
 
-There are a total of 25 significant pathways in the PID gene sets. 
+There are a total of 25 significant pathways in the PID gene sets.
 
 ### PID Visualization
 
