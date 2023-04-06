@@ -13,7 +13,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 ## Table of Content: 
 1. GeneSetEnrichmentAnalysis Folder 
 2. MicroarrayLinearRegression Folder 
-3. Reports&Presentations
+3. [Reports&Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations)
 
 
 
