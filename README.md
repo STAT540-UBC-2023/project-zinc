@@ -11,8 +11,8 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Janet (Jia He) Zhang
 
 ## Table of Content: 
-1. Gene Set Enrichment Analysis Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
-2. Microarray Linear Regression Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
+1. [Gene Set Enrichment Analysis Folder: contains everything]() (e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
+2. [Microarray Linear Regression](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression) Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
 3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations)
 
 
