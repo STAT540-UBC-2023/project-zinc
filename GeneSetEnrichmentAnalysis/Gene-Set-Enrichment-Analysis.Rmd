@@ -146,7 +146,7 @@ write.csv(t2d_genes, "tsd.genes.csv", row.names=FALSE)
 
 ```{r}
 # read data frame for the DE genes
-DEgenes<-readRDS("degT2d_DE.RDS")
+DEgenes<-readRDS("MicroarraylinearRegression/Result/degT2d_DE.RDS")
 ```
 
 ### Data formatting for `fgsea` analysis
