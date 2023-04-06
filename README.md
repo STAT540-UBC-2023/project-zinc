@@ -10,7 +10,9 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Lucy(Shuxin) Chi
 -   Janet (Jia He) Zhang
 
-## Directionary: 
+## Table of Content: 
+1. GeneSetEnrichmentAnalysis Folder 
+2. MicroarrayLinearRegression Folder 
 
 
 
