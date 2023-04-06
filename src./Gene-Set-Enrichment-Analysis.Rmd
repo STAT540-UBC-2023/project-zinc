@@ -142,6 +142,8 @@ t2d_genes <-
                    by = .(gene_symbol)]
 ## 1693 genes identified
 
+# export result as csv
+write.csv(t2d_genes, "tsd.genes.csv", row.names=FALSE)
 ```
 
 ### Load DE Gene List
@@ -647,5 +649,5 @@ edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
 barplot(edo, showCategory=25, font.size = 7) 
 
-# there seems to be a higher association with female diseases. T2D has a stronger influence on females?
+# there seems to be a higher association with female diseases. T2D may have a stronger influence on females
 ```
