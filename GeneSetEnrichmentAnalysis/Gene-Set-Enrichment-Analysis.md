@@ -220,9 +220,6 @@ sorted_genes <-
                    head(.SD, 1),
                    by = .(gene_symbol)]
 
-only_ensembl <- as.data.frame(sorted_genes$entrezgene_id)
-write.csv(only_ensembl, "only_ensembl.csv", row.names=FALSE)
-
 # Create a vector of the gene
 deg.ranks <- sorted_genes$log_adjP
 # Name vector with ENTREZ ids
