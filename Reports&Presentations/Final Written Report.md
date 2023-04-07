@@ -1,5 +1,5 @@
 # A Glimpse into Type II Diabetes(T2D) at the Gene Expression Level 
-_Zinc Group_
+_Team Zinc_
 
 ### Background
 
@@ -29,10 +29,10 @@ To answer the biological question,  the datasets from [GSE41762](https://www.ncb
 
 The Robust Multi-Array (RMA) normalized expression matrix and metadata were downloaded from [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE41762). The variables of interest were subsetted from metadata. Upon examination, we observed 366 genes and 29 samples with missing data from sample 49 to 77 in the original dataset. However, no detailed description of the discrepancy was found from literature. Next, singular vector decomposition plots were used to visualize any potential batch effects between samples gathered from the first (sample 1 to 48) and second (sample 49 to 77) experiment in this dataset. As shown in figure1 ([1A](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [1B](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [1C](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)), a moderate batch effect was observed between the two experiments. Two approaches have been considered in dealing with the batch effect: 
 
-1. Harmonizing data from both experiments using ComBat 
+1. Harmonizing data from both experiments using R packages, such as, ComBat 
 2. Samples from the two experiments were analyzed separately. 
 
-The second approach, albeit more cumbersome, was deemed to reduce risk of inducing bias in data merging, which is limited by unbalanced sample sizes of other confounders under different protocols. Hence, the second approach was chosen. 
+The second approach, albeit more cumbersome, was deemed to reduce risk of bias induced by data merging due to the unbalanced sample sizes and other confounders under different protocols. Hence, the second approach was chosen. 
 
 ###### 1.2 Model Fitting 
 
@@ -40,7 +40,7 @@ The number of samples in each category of experiment 1 and 2 were shown in table
 
 Table 2. Dataset for samples 1:48
 
-|  |BMI<30 | BMI>30 |
+| |BMI<30 | BMI>30 |
 |------|-----|---------|
 |   non-T2D |  32  |  0   | 
 | T2D  |  8 |  2   |
