@@ -40,23 +40,18 @@ The number of samples in each category of experiment 1 and 2 were shown in table
 
 Table 2. Dataset for samples 1:48
 
-+---------------+---------------+--------------------+
-|               | BMI<30        | BMI>30             |
-+===============+===============+====================+
-| non-T2D       | 32            | 0                  |
-+---------------+---------------+--------------------+
-| T2D           | 8             | 2                  |
-+---------------+---------------+--------------------+
+|  |BMI<30 | BMI>30 |
+|------|-----|---------|
+|   non-T2D |  32  |  0   | 
+| T2D  |  8 |  2   |
 
 Table 3. Dataset for samples 49:77
 
-+---------------+---------------+--------------------+
-|               | BMI<30        | BMI>30             |
-+===============+===============+====================+
-| non-T2D       | 15            | 4                  |
-+---------------+---------------+--------------------+
-| T2D           | 6             | 4                  |
-+---------------+---------------+--------------------+
+|  |BMI<30 | BMI>30 |
+|------|-----|---------|
+|   non-T2D |  15  |  4   | 
+| T2D  |  6 |  4   |
+
 *Result interpretation please refer to the result section*
 
 #### [Gene Set Enrichment Analysis](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md) 
