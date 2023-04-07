@@ -29,7 +29,7 @@ Here, we briefly summarize the analysis procedures of previous work, to clarify 
 
 Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. All datasets selections and wrangling 3.SVD visualizagion and batch effect handling 4.Linear Regression and Result Interpretation
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial and new datasets selection and wrangling 3.SVD visualizagion and batch effect handling 4.Linear Regression and Result Interpretation
 Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. Single cell RNA-seq data processing,quality control, and analysis 
 Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  Literature search on biological background 3. Volcano plot visualizagion and for obese vs non-obese T2D
 
