@@ -7,9 +7,9 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 ## Team Members and Work Division 
 Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial and new datasets selection and wrangling 3.SVD visualization 4.Linear regression and result interpretation
-Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. gene set enrichment analysis 
-Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  Literature search on biological background 3. Volcano plot visualizagion and for obese vs non-obese T2D
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh| Datasets selection and wrangling, SVD visualization, Linear regression and result interpretation
+Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|Github management, gene set enrichment analysis, visualization and study disease associated with T2D
+Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)| gene set enrichment analysis, visualization and study disease associated with T2D 
 
 ## Table of Content:
 
