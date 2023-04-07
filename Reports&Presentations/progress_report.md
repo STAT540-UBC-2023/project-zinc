@@ -26,7 +26,7 @@ Since our analysis plan has changed, our division of labour has changed slightly
 |Name|New Labour Plan|
 | ------- |:-----|
 | Cindy | (no change) Datasets Selection, Literature Review, Data Wrangling, PCA Visualization, Linear Regression and Result Interpretation|
-| Janet |Gene Set Enrichment Analysis|
+| Janet |Gene Set Enrichment Analysis + Github Organization|
 | Lucy |Gene Set Enrichment Analysis + Principle Component Analysis|
 
 ## WHAT IS THE PROGRESS OF THE ANALYSES
