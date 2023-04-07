@@ -438,7 +438,7 @@ There are a total of 82 significant pathways from REACTOME 'fgsea' analysis.
 ### Reactome Visualization
 
 ```{r}
-# get the top 20 pathways from reactome_significant_pathways based on the p.adjusted value. 
+# get the top 20 pathways from reactome_significant_pathways based on the p.adjusted value 
 top20_reactome <- reactome_significant_pathways %>%
   arrange(padj) %>%
   head(20)
@@ -569,7 +569,7 @@ edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 barplot(edo,
         showCategory=25, 
         font.size = 7, 
-        main="Disease Association with T2D") 
+        title="Disease Association with T2D") 
 
 # there seems to be a higher association with female diseases. T2D may have a stronger influence on females
 ```
