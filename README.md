@@ -25,19 +25,19 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 ## Summary
 
-#### DATA Wrangling
+#### Exploratory Data Analysis
 
--   Aim: To examine batch-effect in assessing how suitable it is to combine data from two experiments. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details.
+-   Aim: To explore our data set and examine the batch-effect in the possibility of merging data from two experiments. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details.
 -   Results: Moderate batch effect was observed in SVD plots, as shown in these figures ([1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)).
 
 #### Linear Model Fitting
 
--   Aim: To examine the differentially expressed genes across a variety of conditions (e.g., T2D status, BMI, and T2D:BMI interaction). Detail analysis can be found in [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details.
--   Results: For the first experiment (sample 1 to 48), 67 genes were found with significant differential expression (FDR\<0.05) in T2D vs healthy samples using the simple regression model, as shown in figure 2. For the second experiment (sample 49 to 77), however, no genes passed the significance cut-off using the interactive model. The linear regression result for experiment 1 showed that T2D is associated with differential gene expression, which answered the first half of the biological question. However, the result from model 2 failed to reject the null hypothesis that BMI is not associated with differential gene expression. No significant differences in gene expression were found between obese and non-obese individuals with T2D.
+-   Aim: To examine the differentially expressed genes using T2D status, BMI, and T2D:BMI interaction models. Detailed analysis can be found in [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details.
+-   Results: For experiment 1 (sampl-48), 67 genes were found with significant differential expression (FDR\<0.05) in T2D samples using the simple regression model, as shown in figure 2, indicating that T2D is associated with differential gene expression. For experiment 2 (sample 49-77), however, no genes passed the significance cut-off using the interactive model. The results from model 2 failed to reject the null hypothesis that BMI is not associated with differential gene expression. No significant differences in gene expression were found between obese and non-obese individuals with T2D.
 
 #### Gene Set Enrichment Analysis
 
--   Aim: To determine if a prior defined set of genes (also called gene sets) show statistically significant difference between T2D VS Healthy with the [R markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.Rmd)(and the relevant [markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)).
+-   Aim: To perform functional analysis on the previously identified DE genes to obtain their genetic contributions to T2D. Detailed information is shown in [R markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.Rmd)(and the relevant [markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)).
 -   Results: Results of different gene sets analyzed can be found in the [Results](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Result) directory. This directory contains a number of tables containing the significant pathways found in different gene sets. For visualizations, please check the [Figure](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm) directory.
 
 ## Final Report
