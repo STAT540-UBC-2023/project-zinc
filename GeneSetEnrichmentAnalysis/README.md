@@ -1,4 +1,4 @@
-# Documentation 
+# Introduction 
 
 This directory contains the R markdown file and the markdown file generated from the Gene Set Enrichment Analysis(GSEA) of the differentially expressed genes. 
 
