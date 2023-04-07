@@ -38,14 +38,14 @@ The second approach, albeit more cumbersome, was deemed to reduce risk of bias i
 
 The number of samples in each category of experiment 1 and 2 were shown in table 2 and 3, respectively. Since none of the sample had BMI >30, for experiment 1 (sample 49:77) a simple linear model was used with  ~T2D, while experiment 2 (sample 1:48) was fitted with an interaction model, ~T2D* BMI. The [LIMMA](https://bioconductor.org/packages/release/bioc/html/limma.html) package in R was used for linear model fitting to the gene expression data. An empirical Bayes moderation of the standard errors was performed for each model and for the calculation computing of moderated t-statistics. LIMMA was well-suited for the purpose of this analysis due to its robustness to noise and statistical power in detecting subtle differences in microarray experiments. Statistical significance was defined as FDR<0.05 by Benjamini-Hochberg Procedure. 
 
-Table 2. Dataset for samples 1:48
+Table 2. Dataset for Experiment 1 - Samples 1:48
 
 | |BMI<30 | BMI>30 |
 |------|-----|---------|
 |   non-T2D |  32  |  0   | 
 | T2D  |  8 |  2   |
 
-Table 3. Dataset for samples 49:77
+Table 3. Dataset for Experiment 2 - Samples 49:77
 
 ||BMI<30 | BMI>30 |
 |------|-----|---------|
@@ -118,9 +118,7 @@ Lastly, [DisGeNET](https://www.disgenet.org/), a large collection of genes and v
 
 ### Conclusion/Significance
 
-Our analysis identified 67 differential expressed genes that were associated with T2D. Future study is needed to sufficiently analyze the effect of BMI on gene expression in T2D individuals. 
-
-Overall, this study provided more than 100 unique signaling and metabolic pathways and 1970 immune pathways that were associated with T2D disease. The knowledge of these genetic factors can be used to elucidate the T2D disease mechanisms and better understand its association with other diseases. Particularly, we identified a high connection between T2D and colorectal cancer and melanoma. There is also a high association between T2D and many female focused diseases/symptoms. Collectively, these genetic markers can also be used to provide insights for therapeutic development and bring invaluable medical treatments to those who are in need. 
+Our linear regression analysis identified 67 differential expressed genes that were associated with T2D. Overall, the GSEA study identified more than 100 unique signaling and metabolic pathways and 1970 immune pathways that were associated with T2D disease. These results signify the importance of genetic variation and their functional roles in Type-2-diabetes. The knowledge of these genetic factors can be used to elucidate the T2D disease mechanisms and better understand its association with other diseases. Particularly, we identified a high connection between T2D and colorectal cancer and melanoma. There is also a high association between T2D and many female focused diseases/symptoms. Collectively, these genetic markers can also be used to provide insights for therapeutic development and bring invaluable medical treatments to those who are in need. 
 
 
 ### References. 
