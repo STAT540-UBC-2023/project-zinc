@@ -27,4 +27,7 @@ The [Figure](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetE
   - [PID](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm/unnamed-chunk-24-1.png)
   - [ImmuneSigDB](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm/unnamed-chunk-36-1.png) 
   - [DisGeNet](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm/unnamed-chunk-38-1.png) 
+  2. Additional visualizations for KEGG analysis results: 
+  - [Enrichment plot](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm/unnamed-chunk-21-1.png) 
+  - [Ridge plot](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm/unnamed-chunk-21-2.png)
     
