@@ -222,14 +222,6 @@ The first 48 samples were from one experiment cohort while the remaining
 29 samples were from another. The batch effect between the two cohorts
 were evaluated
 
-``` r
-express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
-s <- svd(express_scaled)
-loadings <- s$v[, 1:3]
-scores <- express_scaled %*% loadings
-svd <- as_data_frame(scores) %>% rename(U1 = V1, U2 = V2, U3 = V3) 
-```
-
     ## Warning: `as_data_frame()` was deprecated in tibble 2.0.0.
     ## ℹ Please use `as_tibble()` instead.
     ## ℹ The signature and semantics have changed, see `?as_tibble`.
@@ -246,36 +238,7 @@ svd <- as_data_frame(scores) %>% rename(U1 = V1, U2 = V2, U3 = V3)
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
-``` r
-svd$sample_id = colnames(express)
-svd <- left_join(svd, MetaData, by = "sample_id")
-
-ggplot(svd, aes(x=U1, y=U2, color = experiment)) + 
-  geom_point(size=3) +
-  ggtitle("U2 vs. U1")
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
-
-``` r
-ggplot(svd, aes(x=U2, y=U3, color = experiment)) + 
-  geom_point(size=3) +
-  ggtitle("U3 vs. U2")
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
-
-``` r
-ggplot(svd, aes(x=U3, y=U1, color = experiment)) + 
-  geom_point(size=3) +
-  ggtitle("U1 vs. U3")
-```
-
-![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
-
-``` r
-  ggtitle("U2 vs. U1")
-```
+![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->![](MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
     ## $title
     ## [1] "U2 vs. U1"

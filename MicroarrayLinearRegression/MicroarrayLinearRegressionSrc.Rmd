@@ -84,7 +84,7 @@ experiment_labels <- c(rep("Experiment 1 Samples", 48), rep("Experiment 2 Sample
 MetaData$experiment = experiment_labels
 ```
 The first 48 samples were from one experiment cohort while the remaining 29 samples were from another. The batch effect between the two cohorts were evaluated   
-```{r}
+```{r echo=FALSE}
 express_scaled <- scale(t(express), center = TRUE, scale = TRUE)
 s <- svd(express_scaled)
 loadings <- s$v[, 1:3]
