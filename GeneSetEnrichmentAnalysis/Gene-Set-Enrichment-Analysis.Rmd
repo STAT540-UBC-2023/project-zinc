@@ -58,7 +58,8 @@ reactome.human.db <- msigdbr(species = "human",
 #### PID database
 
 ```{r}
-#Access the Pathway Interaction Database (PID) gene sets. This one specifically look at signaling pathways, molecular interactions, reaction kinetics, and cellular locations of signaling molecules involved in a pathway. 
+#Access the Pathway Interaction Database (PID) gene sets.
+#This one specifically look at signaling pathways, molecular interactions, reaction kinetics, and cellular locations of signaling molecules involved in a pathway. 
 
 pid.human.db <- msigdbr::msigdbr(species = "human",
                                   category = "C2",
@@ -68,8 +69,8 @@ pid.human.db <- msigdbr::msigdbr(species = "human",
 #### ImmuneSigDB Database
 
 ```{r}
-#Access the C7 Immunological gene sets. 
-#Specifically looking at the ImmuneSigDB subcollection of C7, because this is related to a collection of cell types, states, and perturbations within the immune system collected from human and mouse. (note: The other C7 subcollection is specifically regarding vaccine response to 50 vaccines. We are not interested in vaccine responses in T2D, so not exploring this subcollection.)
+#Access the Immunological gene sets in MSigDB. 
+#Specifically looking at the ImmuneSigDB subcollection of the Immunologica gene sets, because this is specifically related to a collection of cell types, states, and perturbations within the immune system collected from human and mouse. (note: The other C7 subcollection is specifically regarding vaccine response to 50 vaccines. We are not interested in vaccine responses in T2D, so not exploring this subcollection.)
 IMMUNE.human.db <- msigdbr(species = "human", 
                            category = "C7", 
                            subcategory = "IMMUNESIGDB")
@@ -136,11 +137,12 @@ t2d_genes <-
     t2d_genes[order(t2d_genes$p.value, decreasing = TRUE),
                    head(.SD, 1),
                    by = .(gene_symbol)]
-## 1693 genes identified
 
 # export result as csv
 write.csv(t2d_genes, "tsd.genes.csv", row.names=FALSE)
 ```
+
+A total of 1693 genes identified to be associated T2D. 
 
 ### Load DE Gene List
 
@@ -333,6 +335,7 @@ ridgeplot(kk2) + labs(x = "enrichment distribution") + theme_ridges(font_size = 
 # https://learn.gencore.bio.nyu.edu/rna-seq-analysis/gene-set-enrichment-analysis/
 ```
 
+
 ### PID `fgsea` Analysis
 
 ```{r}
@@ -368,6 +371,7 @@ fwrite(pid_significant_pathways, "pid_significant_pathways.csv")
 
 There are a total of 25 significant pathways in the PID gene sets.
 
+
 ### PID Visualization
 
 ```{r}
@@ -389,6 +393,7 @@ pid_plot<- ggplot(pid_ordered, aes(x = size, y = reorder(pathway, -pval), fill =
   theme(axis.text.y = element_text(size = 6)) 
 pid_plot
 ```
+
 
 ### Reactome `fgsea` Analysis
 
@@ -558,8 +563,13 @@ filtered_genes <- filtered_genes[order(filtered_genes$P.Value),]
 filtered_genes$entrezgene_id[1:30]
 
 edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
+```
 
-barplot(edo, showCategory=25, font.size = 7, main = "DisGeNet: Disease Association with T2D") 
+```{r}
+barplot(edo,
+        showCategory=25, 
+        font.size = 7, 
+        main="Disease Association with T2D") 
 
 # there seems to be a higher association with female diseases. T2D may have a stronger influence on females
 ```
