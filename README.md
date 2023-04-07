@@ -43,4 +43,4 @@ Please check out our final written report [here](https://github.com/STAT540-UBC-
 
 ## Final Presentation 
 
-Please check out our final presentation slides [here] . 
+Please check out our final presentation slides [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/STAT540%20final%20project.pptx). 
