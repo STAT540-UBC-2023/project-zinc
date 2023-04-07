@@ -26,13 +26,13 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 ## Summary 
 
 #### Data Wrangling 
-Aim: To re-shape, filter, and wrangle data, and to explore raw data. 
-Conclusion: there were 48 samples from one experiment cohort, and the other 29 samples from another, so these two experiments both contributed to the dataset. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md). 
++ Aim: To re-shape, filter, and wrangle data, and to explore raw data. 
++ Conclusion: there were 48 samples from one experiment cohort, and the other 29 samples from another, so these two experiments both contributed to the dataset. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md). 
 
 #### Principal Componenet Analysis
-Aim: To examine batch-effect. 
-Results: Moderate batach effect for U2 vsU1 and U3 vs U1. Visualize results in these figures ([1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)). 
-Conclusion: moderate batch effect, so two experiments are analyzed separately. 
++ Aim: To examine batch-effect. 
++ Results: Moderate batach effect for U2 vsU1 and U3 vs U1. Visualize results in these figures ([1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)). 
++ Conclusion: moderate batch effect, so two experiments are analyzed separately. 
 
 #### 
 
