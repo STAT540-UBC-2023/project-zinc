@@ -47,7 +47,7 @@ Table 2. Dataset for samples 1:48
 
 Table 3. Dataset for samples 49:77
 
-|  |BMI<30 | BMI>30 |
+||BMI<30 | BMI>30 |
 |------|-----|---------|
 |   non-T2D |  15  |  4   | 
 | T2D  |  6 |  4   |
