@@ -1,4 +1,4 @@
-# Documentation 
+# Introduction 
 
 This directory contains R markdown and the markdown files related to microarray linear regression analysis. 
 
