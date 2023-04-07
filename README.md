@@ -33,7 +33,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 #### Linear Model Fitting
 
 -   Aim: To examine the differentially expressed genes using T2D status, BMI, and T2D:BMI interaction models. Detailed analysis can be found in [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details.
--   Results: For experiment 1 (sampl-48), 67 genes were found with significant differential expression (FDR\<0.05) in T2D samples using the simple regression model, as shown in figure 2, indicating that T2D is associated with differential gene expression. For experiment 2 (sample 49-77) data, however, no genes passed the significance cut-off using the interaction model, suggesting that BMI is not associated with differential gene expression. No significant differences in gene expression were found between obese and non-obese individuals with T2D. 
+-   Results: For experiment 1 (sample 1-48), 67 genes were found with significant differential expression (FDR\<0.05) in T2D samples using the simple regression model, as shown in figure 2, indicating that T2D is associated with differential gene expression. For experiment 2 (sample 49-77) data, however, no genes passed the significance cut-off using the interaction model, suggesting that BMI is not associated with differential gene expression. No significant differences in gene expression were found between obese and non-obese individuals with T2D. 
 
 #### Gene Set Enrichment Analysis
 
