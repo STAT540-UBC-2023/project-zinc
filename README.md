@@ -21,22 +21,26 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
       + [Gene-set-enrichment-analysis.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)
       + [Figures](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm)
       + [Results](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Result)
-3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations): contains all the reports and presentation slides (e.g., lightning talk, written proposal) created for this project . 
+3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations) Directory: contains all the reports and presentation slides (e.g., lightning talk, written proposal) created for this project . 
 
 ## Summary 
 
-#### Data Wrangling 
-+ Aim: To re-shape, filter, and wrangle data, and to explore raw data. 
-+ Conclusion: there were 48 samples from one experiment cohort, and the other 29 samples from another, so these two experiments both contributed to the dataset. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md). 
-
 #### Principal Componenet Analysis
-+ Aim: To examine batch-effect. 
++ Aim: To examine batch-effect. Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details. 
 + Results: Moderate batach effect for U2 vsU1 and U3 vs U1. Visualize results in these figures ([1](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-1.png), [2](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-2.png), [3](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm/unnamed-chunk-7-3.png)). 
-+ Conclusion: moderate batch effect, so two experiments are analyzed separately. 
 
-#### 
+#### Linear Model Fitting 
++ Aim: To examine the diferentially expressed genes across a variety of conditions (e.g., T2D status, BMI, and T2D;BMI interaction). 
++ Results: 
 
+#### Gene Set Enrichment Analysis 
++ Aim: To determine if a priori defined set of genes (also called gene sets) show statistically significant difference between T2D VS Healthy with the [R markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.Rmd)(and the relevant [markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)). 
++ Results: results of different gene sets analyzed can be found in the [Results](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Result) directory. This directory contains a number of tables containing the significant pathways found in different gene sets. For visualizations, please check this [Figure](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm) directory. 
 
 ## Final Report 
 
+Please check out our final written report [here](). 
+
 ## Final Presentation 
+
+Please check out our final presentation slides [here](). 
