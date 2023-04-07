@@ -11,16 +11,16 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 -   Janet (Jia He) Zhang
 
 ## Table of Content: 
-1. [Gene Set Enrichment Analysis Folder](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis): contains everything(e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
-      + Gene-set-enrichment-analysis.rmd 
-      + Gene-set-enrichment-analysos.md
-      + Figures
-      + Results
-2. [Microarray Linear Regression](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression) Folder: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
-      + linear-regression.rmd
-      + linear-regression.md
-      + Figures
-      + Results
+
+1. [Microarray Linear Regression](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression) Directory: contains everything (e.g., .Rmd file, .md file, results and plots) generated for the microarray linear regression analysis. 
+      + [linear-regression.rmd](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.Rmd)
+      + [linear-regression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md)
+      + [Figures](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc_files/figure-gfm)
+2. [Gene Set Enrichment Analysis](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis) Directory: contains everything(e.g., .Rmd file, .md file, results and plots) generated for the gene set enrichment analysis. 
+      + [Gene-set-enrichment-analysis.rmd](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.Rmd)
+      + [Gene-set-enrichment-analysis.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)
+      + [Figures](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm)
+      + [Results](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Result)
 3. [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations): contains all the reports and presentation slides (e.g., lightning talk, written proposal) created for this project . 
 
 
