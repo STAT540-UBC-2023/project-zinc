@@ -36,16 +36,16 @@ Due to data limitations, the second approach, albeit more cumbersome, was select
 
 ###### 1.2 Model Fitting 
 
-The number of samples in each category of experiment 1 and 2 were shown in table 1 and 2, respectively. Since none of the sample had BMI >30, for experiment 1 (sample 49:77) a simple linear model was used with  ~T2D, while experiment 2 (sample 1:48) was fitted with an interaction model, ~T2D* BMI. The [LIMMA](https://bioconductor.org/packages/release/bioc/html/limma.html) package in R was used for linear model fitting to the gene expression data. An empirical Bayes moderation of the standard errors was performed for each model and for the calculation computing of moderated t-statistics. LIMMA was well-suited for the purpose of this analysis due to its robustness to noise and statistical power in detecting subtle differences in microarray experiments. Statistical significance was defined as FDR<0.05 by Benjamini-Hochberg Procedure. 
+The number of samples in each category of experiment 1 and 2 were shown in table 1 and 2, respectively. Since none of the sample had BMI >30, for experiment 1 (samples 49-77) a simple linear model was used with ~T2D, while experiment 2 (samples 1-48) was fitted with an interaction model, ~T2D * BMI. The [LIMMA](https://bioconductor.org/packages/release/bioc/html/limma.html) package in R was used for linear model fitting. An empirical Bayes moderation of the standard errors was performed for each model and for the calculation computing of moderated t-statistics. LIMMA was well-suited for the purpose of this analysis due to its robustness to noise and statistical power in detecting subtle differences in microarray experiments. Statistical significance was defined as FDR<0.05 by the Benjamini-Hochberg Procedure. 
 
-Table 1. Dataset for Experiment 1 - Samples 1:48
+Table 1. Dataset for Experiment 1 - Samples 1-48
 
 | |BMI<30 | BMI>30 |
 |------|-----|---------|
 |   non-T2D |  32  |  0   | 
 | T2D  |  8 |  2   |
 
-Table 2. Dataset for Experiment 2 - Samples 49:77
+Table 2. Dataset for Experiment 2 - Samples 49-77
 
 ||BMI<30 | BMI>30 |
 |------|-----|---------|
@@ -59,7 +59,7 @@ Table 2. Dataset for Experiment 2 - Samples 49:77
 
 ###### 2.1 Differentially Expressed (DE) Gene ID Conversion and Clean-up
 
-The DE gene were expressed in the transcript cluster IDs form (labeled as “affy_hugene_1_0_st_v1”), which was not compatible with the required IDs for downstream functional analysis. [`biomaRt`](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) package was used to obtained the corresponding ensembl gene IDs, gene symbols, and entrez gene IDs. However, many gene duplicates appeared. R code used the `order` function to sort the rows of gene list by the log_adjP column in descending order. The `head` function is then used to select the top row for each unique gene_symbol value. Similar process was also done using log fold change values for further KEGG analysis. 
+The DE genes were recorded in the transcript cluster IDs form (labeled as “affy_hugene_1_0_st_v1”), which was not compatible with the required IDs for downstream functional analysis. The [`biomaRt`](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) package was used to obtained the corresponding ensembl gene IDs, gene symbols, and entrez gene IDs. However, many duplicates appeared, so we selected one row per gene with the lowest p-value.
 
 ###### 2.2 Functional Analysis 
 
