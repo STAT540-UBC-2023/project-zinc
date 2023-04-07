@@ -1,23 +1,16 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 # Introduction
 
 This directory contains the R markdown file and the markdown file
 generated from the Gene Set Enrichment Analysis (GSEA) of the
 differentially expressed genes.
 
-We analyzed a total of 4 pathways from
-[MSigDB](http://www.gsea-msigdb.org/gsea/msigdb/human/collection_details.jsp#IMMUNESIGDB)
-database. And the following pathways are being selected and analyzed: 1.
-[KEGG](http://www.pathway.jp) Pathway 2.
-[REACTOME](http://www.reactome.org) Pathway 3. [Pathway Interaction
-Database](http://www.ndexbio.org)(PID) Pathway 4.
-[ImmuneSigDB](https://www.cell.com/immunity/fulltext/S1074-7613(15)00532-4)
-Pathway
+We analyzed a total of 4 databases from
+[MSigDB](http://www.gsea-msigdb.org/gsea/msigdb/human/collection_details.jsp#IMMUNESIGDB): 
+1.[KEGG](http://www.pathway.jp) 
+2.[REACTOME](http://www.reactome.org) 
+3.[Pathway Interaction Database](http://www.ndexbio.org)(PID) 
+4.[ImmuneSigDB](https://www.cell.com/immunity/fulltext/S1074-7613(15)00532-4)
+
 
 We also used the [GWAS Catalog](https://www.ebi.ac.uk/gwas/) to identify
 genes associated with T2D. And [DisGeNET](https://www.disgenet.org/) was
