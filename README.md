@@ -31,7 +31,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 #### Linear Model Fitting 
 + Aim: To examine the diferentially expressed genes across a variety of conditions (e.g., T2D status, BMI, and T2D;BMI interaction). Please check the [MicroarrayLinearRegression.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/MicroarrayLinearRegression/MicroarrayLinearRegressionSrc.md) for more details. 
-+ Results: 
++ Results: For the first experiment (sample 1 to 48), 67 genes were found with significant differential expression (FDR<0.05) in T2D vs healthy samples using the simple regression model, as shown in figure 2.  For the second experiment (sample 49 to 77), however, no genes passed the significance cut-off using the interactive model. The linear regression result for experiment 1 showed that T2D is associated with differential gene expression, which answered the first half of the biological question. However, the result from model 2 failed to reject the null hypothesis that BMI is not associated with differential gene expression. No significant differences in gene expression were found between obese and non-obese individuals with T2D.
 
 #### Gene Set Enrichment Analysis 
 + Aim: To determine if a priori defined set of genes (also called gene sets) show statistically significant difference between T2D VS Healthy with the [R markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.Rmd)(and the relevant [markdown file](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)). 
@@ -43,4 +43,4 @@ Please check out our final written report [here](https://github.com/STAT540-UBC-
 
 ## Final Presentation 
 
-Please check out our final presentation slides [here]. 
+Please check out our final presentation slides [here] (https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/Final%20Written%20Report.md). 
