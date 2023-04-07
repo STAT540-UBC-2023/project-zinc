@@ -21,7 +21,7 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
     -   [Gene-set-enrichment-analysis.md](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis.md)
     -   [Figures](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Gene-Set-Enrichment-Analysis_files/figure-gfm)
     -   [Results](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/GeneSetEnrichmentAnalysis/Result)
-3.  [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations) Directory: contains all the reports and presentations created for this project .
+3.  [Reports & Presentations](https://github.com/STAT540-UBC-2023/project-zinc/tree/main/Reports%26Presentations) Directory: contains all the reports and presentations created for this project.
 
 ## Summary
 
