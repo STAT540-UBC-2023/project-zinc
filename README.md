@@ -1,6 +1,7 @@
 # STAT540 Group Project
 
 ## Acknowledgements
+
 Contributors: Janet Zhang, Lucy Chi and Cindy Zhang
 
 Welcome to the repository for the Zinc group! For this group project, we initially chose this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5069352/). Data can be found on ArrayExpress with accession numbers: [E-MTAB-5060](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-5060) and [E-MTAB-5061](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-5061?accession=E-MTAB-5061).
