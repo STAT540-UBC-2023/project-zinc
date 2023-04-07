@@ -7,7 +7,7 @@ Type-2 diabetes (T2D) is a common metabolic disorder characterized by an elevati
 
 To date, there is no effective cure. However, many researchers have suggested cost-effective intervention to prevent serious outcome, including physical exercise, and diet control [3]. One of the reasons is because they increasingly noticed a strong association between obesity and diabetes, shown in many published papers [5,6]. Many patients with T2D are commonly portrayed as having accumulated higher fat percentages in their bodies [1]. Obesity is commonly defined as Body Mass Index (BMI) larger than 30 kg/m2 [1,7]. The major metabolic complications of obese individuals consist of insulin resistance, culminating in pancreatic cell overload and failure [8], which leads to T2D [9,10]. However, obesity is not the only factor for T2D, as a large population of non-obese T2D patients has also been rising [10]. The driving force for T2D in non-obese patients leans towards a genetic factor, resulting in defective insulin production [11]. Therefore, it is critical to understand the pathogenesis of both conditions for therapies developments [11].
 
-Since clinical observation shows obesity as a contributing factor for some T2D patience but not the others, it brings up interesting biological questions: does obesity contribute to gene expression change for T2D patients? If so, what is the differential gene expression between obese and non-obese T2D individuals? 
+Since clinical observation shows obesity as a contributing factor for some T2D patience but not the others, it brings up interesting biological questions: does obesity contribute to gene expression change for T2D patients? Is there a difference in the gene expression between T2D patients who are obese and non-obese? 
 
 ### Hypothesis and Aims
 
@@ -19,7 +19,7 @@ There are two aims to this analysis.
 
 ### Datasets 
 
-To answer the biological question,  the datasets from [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE41762) were chosen. This dataset contains microarray data for RNA harvested from islets of cadaver donors and was previously described in Pubmed articles, [PMID23140642](https://pubmed.ncbi.nlm.nih.gov/23140642/) and [PMID25298321](https://pubmed.ncbi.nlm.nih.gov/25298321/)[12,13]. There are 77 samples in total - 53 samples with non-T2D and BMI < 30, 4 samples with non-T2D and BMI > 30, 14 samples with T2D and BMI < 30 and 6 samples with T2D and BMI >30, with expression data for samples 1 to 48 obtained from one experiment and 49 through 77 from another. 
+To answer the biological question,  the datasets from [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE41762) were chosen. This dataset contains microarray data for RNA harvested from islets of cadaver donors and was previously described in Pubmed articles, [PMID23140642](https://pubmed.ncbi.nlm.nih.gov/23140642/) and [PMID25298321](https://pubmed.ncbi.nlm.nih.gov/25298321/)[12,13]. There are 77 samples in total: 53 samples with non-T2D and BMI < 30, 4 samples with non-T2D and BMI > 30, 14 samples with T2D and BMI < 30 and 6 samples with T2D and BMI >30, with expression data for samples 1 to 48 obtained from one experiment and 49 through 77 from another. 
 
 ### Methods 
 
