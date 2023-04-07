@@ -11,11 +11,11 @@ Since clinical observations show obesity as a contributing factor for some T2D p
 
 ### Hypothesis and Aims
 
-We hypothesize that T2D and obesity are associated with differential gene expression. Moreover, the non-obese and obese T2D individuals are expected to have different gene expression due to the different mechanisms proposed above. 
+We hypothesize that T2D and obesity are associated with differential gene expression; specifically, non-obese and obese T2D individuals are expected to have different gene expression due to the different mechanisms of their conditions as proposed above. 
 
 There are two aims to this analysis. 
-+ Aim1: perform linear regression for assessing the effect of T2D and BMI on differential gene expression. 
-+ Aim2: perform gene set enrichment analysis with Reactome, Pathway Interaction Database (PID), ImmuneSigDB, and Kyoto Encyclopedia of Genes and Genomes (KEGG) databases for differentially expressed genes. Additionally, we will use DisGeNET to study the types of diseases associated with T2D. 
+- Aim 1: Perform linear regression for assessing the effect of T2D and BMI on differential gene expression. 
+- Aim 2: Perform gene set enrichment analysis with REACTOME, Pathway Interaction Database (PID), ImmuneSigDB, and Kyoto Encyclopedia of Genes and Genomes (KEGG) databases for differentially expressed genes. Additionally, we will use DisGeNET to study the types of diseases associated with T2D. 
 
 ### Datasets 
 
