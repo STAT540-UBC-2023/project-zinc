@@ -559,7 +559,7 @@ filtered_genes$entrezgene_id[1:30]
 
 edo <- enrichDGN(unique(filtered_genes$entrezgene_id))
 
-barplot(edo, showCategory=25, font.size = 7) 
+barplot(edo, showCategory=25, font.size = 7, main = "DisGeNet: Disease Association with T2D") 
 
 # there seems to be a higher association with female diseases. T2D may have a stronger influence on females
 ```
