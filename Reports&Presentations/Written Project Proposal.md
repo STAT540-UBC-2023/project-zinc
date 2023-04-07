@@ -29,9 +29,10 @@ Here, we briefly summarize the analysis procedures of previous work, to clarify 
 
 Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial and new datasets selection and wrangling 3.SVD visualization and batch effect handling 4.Linear Regression and Result Interpretation
 Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. Single cell RNA-seq data processing,quality control, and analysis 
-Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  Literature search on biological background 3. Volcano plot visualizagion and for obese vs non-obese T2D
+Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  literature search on biological background 3. Differential gene analysis (volcano plot for obese vs non-obese T2D)
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial data selection and wrangling 3. Examine relationship between BMI, age, sex and differential gene expression in T2D and healthy subjects using a linear regression model
+Shunsuke Ishige|Interdisciplinary Oncology|BSc.(Mathematics, with Philosophy minor), BSc.(Computer Science)|1. Literature survey on methods for quantitative comparison of genetic expression differences 2. Data processing 3. Search for larger data sets(e.g., mice) which we can apply our analysis (if needed) 4. Study data with summary statistics 5. Provide support for coding issues (if needed) 6. Provide typeset drafts in LaTeX (if needed)
 
 ## References (By Lucy)
 
@@ -42,5 +43,4 @@ Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github ma
 5. Olaogun, Idowu et al. “The Pathophysiology of Type 2 Diabetes Mellitus in Non-obese Individuals: An Overview of the Current Understanding.” *Cureus* vol. 12,4 e7614. 10 Apr. 2020, doi:10.7759/cureus.7614
 6. Vaag, Allan, and Søren S Lund. “Non-obese patients with type 2 diabetes and prediabetic subjects: distinct phenotypes requiring special diabetes treatment and (or) prevention?.” *Applied physiology, nutrition, and metabolism = Physiologie appliquee, nutrition et metabolisme* vol. 32,5 (2007): 912-20. doi:10.1139/H07-100
 7. Segerstolpe, Åsa et al. “Single-Cell Transcriptome Profiling of Human Pancreatic Islets in Health and Type 2 Diabetes.” *Cell metabolism* vol. 24,4 (2016): 593-607. doi:10.1016/j.cmet.2016.08.020
-
 
