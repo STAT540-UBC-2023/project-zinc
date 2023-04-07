@@ -25,7 +25,7 @@ We plan to use the MSigDB database, and the fgsea R package. Using the MSigDB da
 Since our analysis plan has changed, our division of labour has changed slightly as well. Please see the following table for our plan for new division of labour: 
 |Name|New Labour Plan|
 | ------- |:-----|
-| Cindy | (no change) Datasets Selection, Literature Review, Data Wrangling, PCA Visualization, Linear Regression and Result Interpretation|
+| Cindy | (no change) Datasets Selection, Literature Review, Data Wrangling, SVD Visualization, Linear Regression and Result Interpretation|
 | Janet |Gene Set Enrichment Analysis + Github Organization|
 | Lucy |Gene Set Enrichment Analysis + Principle Component Analysis|
 
