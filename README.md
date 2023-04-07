@@ -4,11 +4,12 @@ Welcome to the repository for the Zinc group! For this group project, we initial
 
 We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE41762). This dataset was used in two papers, one by [Mahdi et al.,(2012)](https://pubmed.ncbi.nlm.nih.gov/23140642/), and the other by [Tang et al., (2014)](https://pubmed.ncbi.nlm.nih.gov/25298321/).
 
-## Team members:
-
--   Lucy (Shuxin) Chi
--   Cindy (XiaoYu) Zhang
--   Janet (Jia He) Zhang
+## Team Members and Work Division 
+Group Member|Department|Background/Degree/Affiliation|Division of Labour
+------------|----------|---------|----------
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial and new datasets selection and wrangling 3.SVD visualization and batch effect handling 4.Linear Regression and Result Interpretation
+Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. Single cell RNA-seq data processing,quality control, and analysis 
+Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  Literature search on biological background 3. Volcano plot visualizagion and for obese vs non-obese T2D
 
 ## Table of Content:
 
@@ -48,9 +49,3 @@ Please check out our final written report [here](https://github.com/STAT540-UBC-
 
 Please check out our final presentation slides [here](https://github.com/STAT540-UBC-2023/project-zinc/blob/main/Reports%26Presentations/STAT540%20final%20project.pptx).
 
-## Group Members and Work Division 
-Group Member|Department|Background/Degree/Affiliation|Division of Labour
-------------|----------|---------|----------
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh|1. Github management 2. Initial and new datasets selection and wrangling 3.SVD visualization and batch effect handling 4.Linear Regression and Result Interpretation
-Janet(Jia He) Zhang|Pharmacology|BSc.(Pharmacology)|1. Github management 2. Single cell RNA-seq data processing,quality control, and analysis 
-Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)|1. Github management 2.  Literature search on biological background 3. Volcano plot visualizagion and for obese vs non-obese T2D
