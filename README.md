@@ -6,8 +6,8 @@ We changed our dataset to this one: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/
 
 ## Team members:
 
--   Cindy (XiaoYu) Zhang
 -   Lucy (Shuxin) Chi
+-   Cindy (XiaoYu) Zhang
 -   Janet (Jia He) Zhang
 
 ## Table of Content:
