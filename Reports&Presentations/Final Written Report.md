@@ -81,7 +81,7 @@ For experiment 1 (sample 1-48) data, 67 genes were found with significant differ
 
 #### Gene Set Enrichment Analysis 
 
-Upon assessing, we decided to perform functional gene set enrichment analysis (fgsea) to further analyze the DE genes with a rank-based method. One benefit is that this ranking method provides a normalization tool for all genes with various expression levels before the enrichment analysis. Although multiple databases were considered, four databases were chosen for further examinations based on the compatibility to our research interest. 
+We decided to perform functional gene set enrichment analysis (fgsea) to further analyze the DE genes with a rank-based method. One benefit is that this ranking method provides a normalization tool for all genes with various expression levels before the enrichment analysis. Although multiple databases were considered, four databases were chosen for further examinations based on the compatibility to our research interest. 
 
 ###### The REACTOME Database
 
