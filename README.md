@@ -12,7 +12,7 @@ Dataset was changed to this: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/a
 Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
 Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh| Datasets selection, data wrangling, SVD visualization, linear regression and result interpretation
-Janet (Jia He) Zhang |Pharmacology|BSc.(Pharmacology)|Gene set enrichment analysis and diseases associated with T2D and Github management 
+Janet (Jia He) Zhang |Pharmacology|BSc.(Pharmacology)|Gene set enrichment analysis and Github management 
 Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)| Gene set enrichment analysis and diseases associated with T2D 
 
 ## Table of Content:
