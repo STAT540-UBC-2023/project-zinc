@@ -11,7 +11,7 @@ Dataset was changed to this: [GSE41762](https://www.ncbi.nlm.nih.gov/geo/query/a
 ## Team Members and Work Division 
 Group Member|Department|Background/Degree/Affiliation|Division of Labour
 ------------|----------|---------|----------
-Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh| Datasets selection, data wrangling, SVD visualization, linear regression and result interpretation
+Cindy (Xiao Yu) Zhang|Bioinformatics|BSc.(Pharm), PharmD, RPh| Literature review, Datasets selection, data wrangling, SVD visualization, linear regression and result interpretation
 Janet (Jia He) Zhang |Pharmacology|BSc.(Pharmacology)|Gene set enrichment analysis, Github management, and results intepretations
 Lucy Chi|Biochemistry|BSc. Honour(Biochemistry & Molecular Biology)| Data reformatting for GSEA, Gene set enrichment analysis, diseases associated with T2D, and results interpretations
 
