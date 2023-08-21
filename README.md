@@ -2,7 +2,7 @@
 
 ## Acknowledgements
 
-Contributors: Janet Zhang, Lucy Chi and Cindy Zhang
+Contributors: Cindy Zhang, Janet Zhang, and  Lucy Chi
 
 Welcome to the repository for the Zinc group! For this group project, this [paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5069352/) was chosen initially. Data can be found on ArrayExpress with accession numbers: [E-MTAB-5060](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-5060) and [E-MTAB-5061](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-5061?accession=E-MTAB-5061).
 
